@@ -3,8 +3,8 @@
 
 The old notebook is used only as a reference for Hamiltonian formulas,
 parameters, k-space spans, grid dimensions, band pairs, and energy cuts.
-Surface sampling and contour extraction go through the current
-KnottedGraph_1earlier MaterialFermiSurface workflow.
+Surface sampling and contour extraction go through the boundary-resolved
+KnottedGraph MaterialFermiSurface workflow.
 """
 
 from __future__ import annotations
@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import sys
 import time
 from dataclasses import dataclass
@@ -26,14 +27,39 @@ from plotly.subplots import make_subplots
 
 
 THIS_REPO = Path(__file__).resolve().parents[1]
-KG_ROOT = Path(
-    "/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/"
-    "Knotted_graph_code_paper/KnottedGraph_1earlier"
-)
+
+
+def find_knotted_graph_root() -> Path:
+    """Locate the boundary-resolved KnottedGraph library used by the scans."""
+    candidates = [
+        Path(value).expanduser()
+        for value in [os.environ.get("KNOTTED_GRAPH_ROOT")]
+        if value
+    ]
+    candidates.extend((THIS_REPO, THIS_REPO.parent / "KnottedGraph_1earlier"))
+    for candidate in candidates:
+        root = candidate.resolve()
+        if (root / "src" / "knotted_graph" / "applications" / "phase_maps.py").is_file():
+            return root
+    raise RuntimeError(
+        "Cannot locate the boundary-resolved KnottedGraph library. Set "
+        "KNOTTED_GRAPH_ROOT to the repository containing "
+        "src/knotted_graph/applications/phase_maps.py."
+    )
+
+
+KG_ROOT = find_knotted_graph_root()
 KG_SRC = KG_ROOT / "src"
 if not KG_SRC.is_dir():
-    raise RuntimeError(f"Cannot find KnottedGraph_1earlier source at {KG_SRC}")
+    raise RuntimeError(f"Cannot find KnottedGraph source at {KG_SRC}")
 sys.path.insert(0, str(KG_SRC))
+
+LEGACY_OUTPUT_DIR = Path(
+    os.environ.get(
+        "LEGACY_MATERIAL_OUTPUT_DIR",
+        str(THIS_REPO.parent / "OLDS" / "Latest_WorkplaceOLD" / "site_preview" / "plot_outputs"),
+    )
+).expanduser()
 
 from knotted_graph.applications.material_surface import MaterialFermiSurface  # noqa: E402
 
@@ -228,7 +254,7 @@ def legacy_specs() -> tuple[FigureSpec, ...]:
             title="TiB2 panel a",
             hamiltonian=H_D6_sympy(panel_a_params),
             params=panel_a_params,
-            legacy_png="/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/Knotted_graph_code_paper/OLDS/Latest_WorkplaceOLD/site_preview/plot_outputs/material_tib2_transition.png",
+            legacy_png=str(LEGACY_OUTPUT_DIR / "material_tib2_transition.png"),
             surfaces=(
                 SurfaceSpec("tib2_e_lt_2p8", "E < 2.8 eV", 0.35, cube_span(1.5), 200, old_notebook_cell=9),
                 SurfaceSpec("tib2_e_approx_2p8", "E ~= 2.8 eV", 2.8, cube_span(1.5), 200, opacity=0.60, old_notebook_cell=11),
@@ -241,7 +267,7 @@ def legacy_specs() -> tuple[FigureSpec, ...]:
             title="Ti3Al",
             hamiltonian=H_Ti3Al_sympy(),
             params={"A1": -9.66, "A2": 11.37, "B1": 36.22, "B2": -25.71, "M1": 0.12, "M2": -0.52, "C": 22.34},
-            legacy_png="/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/Knotted_graph_code_paper/OLDS/Latest_WorkplaceOLD/site_preview/plot_outputs/material_ti3al_transition.png",
+            legacy_png=str(LEGACY_OUTPUT_DIR / "material_ti3al_transition.png"),
             surfaces=(
                 SurfaceSpec("ti3al_low", "E < 0.25 eV", 0.3, cube_span(math.pi), 250, old_notebook_cell=45),
                 SurfaceSpec("ti3al_high", "0.25 eV < E", 0.6, cube_span(math.pi), 250, old_notebook_cell=47),
@@ -252,7 +278,7 @@ def legacy_specs() -> tuple[FigureSpec, ...]:
             title="YH3",
             hamiltonian=H_YH3_sympy(),
             params={"m1": 2.99, "a1": 2.0, "r1": 1.032, "s1": 1.032, "t1": 1.032, "n1": 3, "m2": 2.96, "m3": 2.96, "a2": 4.0, "a3": 4.0, "a_lattice": 3.14},
-            legacy_png="/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/Knotted_graph_code_paper/OLDS/Latest_WorkplaceOLD/site_preview/plot_outputs/material_yh3_transition.png",
+            legacy_png=str(LEGACY_OUTPUT_DIR / "material_yh3_transition.png"),
             surfaces=(
                 SurfaceSpec("yh3_low", "E < 0.006 eV", 0.002, cube_span(1.0), 200, old_notebook_cell=52),
                 SurfaceSpec("yh3_mid", "0.006 eV < E < 0.2 eV", 0.007, cube_span(1.0), 200, opacity=0.60, old_notebook_cell=54),
@@ -264,7 +290,7 @@ def legacy_specs() -> tuple[FigureSpec, ...]:
             title="Co2MnGa panel c",
             hamiltonian=H_Co2MnGa_TB6_sympy(),
             params={"t1": -0.31, "t2": -0.018, "t3": -0.01, "t4": 0.2, "t5": -0.02, "t6": 0.04, "t7": 0.28, "t8": -0.34, "eps_d": -0.6, "eps_p": 0.6},
-            legacy_png="/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/Knotted_graph_code_paper/OLDS/Latest_WorkplaceOLD/site_preview/plot_outputs/material_co2mnga_transition.png",
+            legacy_png=str(LEGACY_OUTPUT_DIR / "material_co2mnga_transition.png"),
             surfaces=(
                 SurfaceSpec("co2mnga_low", "E < 0.25 eV", 0.05, cube_span(2.0 * math.pi), 200, old_notebook_cell=63),
                 SurfaceSpec("co2mnga_mid", "0.25 eV < E < 1.15 eV", 0.5, cube_span(2.0 * math.pi), 200, old_notebook_cell=65),
@@ -529,7 +555,7 @@ def build_plotly_gallery(
     fig.update_layout(
         **scene_layouts,
         title={
-            "text": "Legacy material Hamiltonian surfaces reproduced with current KnottedGraph_1earlier",
+            "text": "Legacy material Hamiltonian surfaces reproduced with boundary-resolved KnottedGraph",
             "x": 0.5,
             "xanchor": "center",
         },

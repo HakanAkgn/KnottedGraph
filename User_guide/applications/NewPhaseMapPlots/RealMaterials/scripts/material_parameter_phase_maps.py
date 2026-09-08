@@ -37,7 +37,6 @@ import plotly.graph_objects as go
 import plotly.io as pio
 import sympy as sp
 from matplotlib.colors import BoundaryNorm, ListedColormap
-from skimage.measure import euler_number, label as label_volume
 
 
 THIS_REPO = Path(__file__).resolve().parents[1]
@@ -50,21 +49,21 @@ from reproduce_multiband_material_surfaces import (  # noqa: E402
     H_D6_sympy,
     H_Ti3Al_sympy,
     H_YH3_sympy,
+    KG_ROOT,
     K_SYMBOLS,
 )
-
-KG_ROOT = Path(
-    "/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/"
-    "Knotted_graph_code_paper/KnottedGraph_1earlier"
-)
-sys.path.insert(0, str(KG_ROOT / "src"))
 
 from knotted_graph.applications.material_surface import MaterialFermiSurface  # noqa: E402
 from knotted_graph.applications.phase_maps import (  # noqa: E402
     _compute_yamada,
     _graph_summary,
     _one_vertex_graph,
+    boundary_filling_groups,
+    enclosed_void_masks,  # noqa: F401 - re-exported for geometry integration
+    resolve_volume_mask,
+    volume_topology,
 )
+from knotted_graph.extraction.skeleton import skeletonize_volume  # noqa: E402
 
 
 Y = sp.Symbol("Y")
@@ -76,31 +75,64 @@ PHASE_COLORS = (
     "#7c3aed",
     "#ea580c",
     "#059669",
-    "#9333ea",
     "#0ea5e9",
-    "#be123c",
-    "#65a30d",
     "#f59e0b",
-    "#475569",
+    "#db2777",
+    "#65a30d",
+    "#0891b2",
+    "#9333ea",
+    "#be123c",
+    "#4f46e5",
+    "#ca8a04",
+    "#047857",
+    "#0284c7",
+    "#9f1239",
+    "#6d28d9",
+    "#b45309",
 )
 
 DEFAULT_MATERIAL_KEYS = ("tib2_d6_F", "co2mnga_t8")
 DEFAULT_MIN_STABLE_CELLS = int(os.environ.get("MATERIAL_PHASE_MIN_ISLAND_CELLS", "8"))
 DEFAULT_ISLAND_MERGE_STRATEGY = os.environ.get("MATERIAL_PHASE_ISLAND_MERGE", "below").strip().lower()
+DEFAULT_MIN_VOLUME_COMPONENT_VOXELS = int(
+    os.environ.get("MATERIAL_PHASE_MIN_VOLUME_COMPONENT_VOXELS", "64")
+)
+DEFAULT_MIN_VOID_VOXELS = int(os.environ.get("MATERIAL_PHASE_MIN_VOID_VOXELS", "64"))
+TIB2_RESOLUTION_CALIBRATION_MIN_ENERGY = 0.50
+TIB2_RESOLUTION_CALIBRATION_MAX_ENERGY = 1.00
 
 PHASE_SIGNATURE_MERGES: dict[str, dict[str, str]] = {
-    "tib2_d6_F": {
-        "yamada:Mul(Pow(Symbol('Y'), Integer(-7)), Pow(Add(Pow(Symbol('Y'), Integer(2)), Integer(1)), Integer(2)), Add(Pow(Symbol('Y'), Integer(2)), Symbol('Y'), Integer(1)), Add(Pow(Symbol('Y'), Integer(8)), Pow(Symbol('Y'), Integer(7)), Mul(Integer(5), Pow(Symbol('Y'), Integer(6))), Mul(Integer(2), Pow(Symbol('Y'), Integer(5))), Mul(Integer(10), Pow(Symbol('Y'), Integer(4))), Mul(Integer(2), Pow(Symbol('Y'), Integer(3))), Mul(Integer(5), Pow(Symbol('Y'), Integer(2))), Symbol('Y'), Integer(1)))":
-            "yamada:Mul(Pow(Symbol('Y'), Integer(-11)), Add(Pow(Symbol('Y'), Integer(2)), Symbol('Y'), Integer(1)), Add(Pow(Symbol('Y'), Integer(20)), Mul(Integer(3), Pow(Symbol('Y'), Integer(19))), Mul(Integer(20), Pow(Symbol('Y'), Integer(18))), Mul(Integer(41), Pow(Symbol('Y'), Integer(17))), Mul(Integer(153), Pow(Symbol('Y'), Integer(16))), Mul(Integer(222), Pow(Symbol('Y'), Integer(15))), Mul(Integer(607), Pow(Symbol('Y'), Integer(14))), Mul(Integer(633), Pow(Symbol('Y'), Integer(13))), Mul(Integer(1367), Pow(Symbol('Y'), Integer(12))), Mul(Integer(1052), Pow(Symbol('Y'), Integer(11))), Mul(Integer(1789), Pow(Symbol('Y'), Integer(10))), Mul(Integer(1052), Pow(Symbol('Y'), Integer(9))), Mul(Integer(1367), Pow(Symbol('Y'), Integer(8))), Mul(Integer(633), Pow(Symbol('Y'), Integer(7))), Mul(Integer(607), Pow(Symbol('Y'), Integer(6))), Mul(Integer(222), Pow(Symbol('Y'), Integer(5))), Mul(Integer(153), Pow(Symbol('Y'), Integer(4))), Mul(Integer(41), Pow(Symbol('Y'), Integer(3))), Mul(Integer(20), Pow(Symbol('Y'), Integer(2))), Mul(Integer(3), Symbol('Y')), Integer(1)))",
-        "vertex:nodes=5;components=5;interior_components=5;touches_boundary=1;yamada=Integer(-1)":
-            "vertex:nodes=1;components=1;interior_components=1;touches_boundary=1;yamada=Integer(-1)",
-    },
+    # TiB2 deliberately has no manual signature merges: distinct
+    # boundary-resolved Yamada values remain distinct phases.
+    "tib2_d6_F": {},
     "co2mnga_t8": {
         "core:ic=1;h=40;b=1;nodes=68;edges=107;gcomp=1;beta=40;deg=((3, 67), (13, 1))":
             "core:ic=1;h=40;b=1;nodes=69;edges=108;gcomp=1;beta=40;deg=((3, 68), (12, 1))",
+        # The small displayed phase 3 is a discretization variant of phase 2.
+        "core:ic=1;h=40;b=1;nodes=72;edges=111;gcomp=1;beta=40;deg=((3, 70), (4, 1), (8, 1))":
+            "core:ic=1;h=40;b=1;nodes=69;edges=108;gcomp=1;beta=40;deg=((3, 68), (12, 1))",
         "core:ic=10;h=13;b=1;nodes=25;edges=36;gcomp=2;beta=13;deg=((0, 1), (3, 24))":
             "core:ic=10;h=13;b=1;nodes=24;edges=36;gcomp=1;beta=13;deg=((3, 24),)",
+        # Likewise, absorb the small displayed phase 7 into phase 6.
+        "yamada-set:outer[core:ic=1;h=18;b=1;nodes=13;edges=30;gcomp=1;beta=18;deg=((4, 6), (5, 6), (6, 1))]inner[yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1)]":
+            "yamada-set:outer[yamada:Integer(-1)]inner[yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1),yamada:Integer(-1)]",
     },
+}
+
+# The exact TiB2 F(lambda) family is C6-covariant.  These five displayed
+# signatures failed the N=140, N=180, and N=200 geometric C6 spine audits.
+# Preserve them in the raw records, but do not treat their non-equivariant
+# medial-axis representatives as physical phases in the displayed partition.
+C6_INVALID_PHASE_SIGNATURES: dict[str, frozenset[str]] = {
+    "tib2_d6_F": frozenset(
+        {
+            "yamada:Mul(Integer(-1), Pow(Symbol('Y'), Integer(-4)), Pow(Add(Pow(Symbol('Y'), Integer(2)), Integer(1)), Integer(2)), Pow(Add(Pow(Symbol('Y'), Integer(2)), Symbol('Y'), Integer(1)), Integer(2)))",
+            "yamada:Mul(Integer(-1), Pow(Symbol('Y'), Integer(-8)), Pow(Add(Pow(Symbol('Y'), Integer(2)), Integer(1)), Integer(6)), Pow(Add(Pow(Symbol('Y'), Integer(2)), Symbol('Y'), Integer(1)), Integer(2)))",
+            "yamada-set:outer[yamada:Mul(Integer(-1), Pow(Symbol('Y'), Integer(-4)), Pow(Add(Pow(Symbol('Y'), Integer(2)), Integer(1)), Integer(2)), Pow(Add(Pow(Symbol('Y'), Integer(2)), Symbol('Y'), Integer(1)), Integer(2)))]inner[yamada:Integer(-1)]",
+            "yamada-set:outer[yamada:Mul(Pow(Symbol('Y'), Integer(-5)), Pow(Add(Pow(Symbol('Y'), Integer(2)), Integer(1)), Integer(2)), Pow(Add(Pow(Symbol('Y'), Integer(2)), Symbol('Y'), Integer(1)), Integer(3)))]inner[yamada:Integer(-1)]",
+            "yamada:Mul(Pow(Symbol('Y'), Integer(-5)), Pow(Add(Pow(Symbol('Y'), Integer(2)), Integer(1)), Integer(2)), Pow(Add(Pow(Symbol('Y'), Integer(2)), Symbol('Y'), Integer(1)), Integer(3)))",
+        }
+    )
 }
 
 
@@ -158,11 +190,19 @@ class PhaseCell:
     interior_components: int
     euler_characteristic: int
     handle_rank: int
+    voxel_cycle_rank: int
+    void_components: int
+    boundary_components: int
+    removed_component_voxels: int
+    filled_void_voxels: int
     touches_boundary: bool
     boundary_faces: tuple[str, ...]
+    boundary_polynomials: tuple[str, ...]
+    nesting_signature: str
     exact_yamada_attempted: bool
     error: str | None = None
     classification_computed: bool = True
+    resolution_calibration_energy: float | None = None
 
 
 def cube_span(half_width: float) -> tuple[tuple[float, float], tuple[float, float], tuple[float, float]]:
@@ -271,17 +311,30 @@ def material_families(dimension: int) -> tuple[MaterialFamily, ...]:
             lambda_param="t8",
             param_start=co2_base["t8"],
             param_end=-0.70,
-            energies=energy_axis(0.125, 1.60, 0.01),
+            energies=energy_axis(0.125, 2.755, 0.01),
             span=cube_span(2.05 * math.pi),
             band_pair=(0, 1),
             dimension=dimension,
             rationale=(
                 "t8 is the d-p hybridization coupling; the phase map follows the legacy "
                 "Multiband.ipynb band pair (0,1), full [-2pi,2pi]^3 Brillouin-zone window "
-                "with a small padding, and the E range covering the 0.25 and 1.15 eV transitions, "
-                "now shown from 0.125 to 1.6 eV."
+                "with a small padding. The E range extends from 0.125 eV to the first "
+                "0.01 eV grid value above the converged 2.7475 eV maximum band gap, "
+                "so the boundary-resolved high-energy transitions and terminal vertex "
+                "row are retained."
             ),
-            landmark_energies=(0.25, 1.15, 1.4, 1.6),
+            landmark_energies=(
+                0.25,
+                1.15,
+                1.4,
+                1.6,
+                1.75,
+                1.775,
+                1.975,
+                2.0,
+                2.65,
+                2.755,
+            ),
         ),
     )
 
@@ -295,38 +348,44 @@ def reset_gap_threshold(obj: MaterialFermiSurface, energy: float) -> None:
         obj.__dict__.pop(name, None)
 
 
+def resolve_mask_components(
+    mask: np.ndarray,
+    *,
+    min_component_voxels: int = DEFAULT_MIN_VOLUME_COMPONENT_VOXELS,
+    min_void_voxels: int = DEFAULT_MIN_VOID_VOXELS,
+    dominant_component_only: bool = True,
+) -> tuple[np.ndarray, dict[str, int]]:
+    """Discard unresolved fragments and fill unresolved voids before classification."""
+    return resolve_volume_mask(
+        mask,
+        min_component_voxels=min_component_voxels,
+        relative_component_fraction=1e-4,
+        min_void_voxels=min_void_voxels,
+        dominant_component_only=dominant_component_only,
+    )
+
+
 def interior_summary(mask: np.ndarray) -> dict[str, Any]:
-    mask = np.asarray(mask, dtype=bool)
-    boundary_faces = []
-    for label, touched in (
-        ("kx_min", mask[0, :, :].any()),
-        ("kx_max", mask[-1, :, :].any()),
-        ("ky_min", mask[:, 0, :].any()),
-        ("ky_max", mask[:, -1, :].any()),
-        ("kz_min", mask[:, :, 0].any()),
-        ("kz_max", mask[:, :, -1].any()),
-    ):
-        if bool(touched):
-            boundary_faces.append(label)
-    if not mask.any():
-        return {
-            "interior_voxels": 0,
-            "interior_components": 0,
-            "euler_characteristic": 0,
-            "handle_rank": 0,
-            "touches_boundary": False,
-            "boundary_faces": tuple(),
-        }
-    _, component_count = label_volume(mask, connectivity=3, return_num=True)
-    euler = int(euler_number(mask, connectivity=3))
-    handle_rank = max(0, int(component_count) - euler)
+    topology = volume_topology(mask)
+    face_names = {
+        "axis0_min": "kx_min",
+        "axis0_max": "kx_max",
+        "axis1_min": "ky_min",
+        "axis1_max": "ky_max",
+        "axis2_min": "kz_min",
+        "axis2_max": "kz_max",
+    }
+    boundary_faces = tuple(face_names[name] for name in topology.boundary_faces)
     return {
-        "interior_voxels": int(mask.sum()),
-        "interior_components": int(component_count),
-        "euler_characteristic": euler,
-        "handle_rank": int(handle_rank),
-        "touches_boundary": bool(boundary_faces),
-        "boundary_faces": tuple(boundary_faces),
+        "interior_voxels": topology.interior_voxels,
+        "interior_components": topology.connected_components,
+        "euler_characteristic": topology.euler_characteristic,
+        "handle_rank": topology.handle_rank,
+        "voxel_cycle_rank": topology.handle_rank,
+        "void_components": topology.enclosed_voids,
+        "boundary_components": topology.boundary_components,
+        "touches_boundary": topology.touches_boundary,
+        "boundary_faces": boundary_faces,
     }
 
 
@@ -357,14 +416,8 @@ def vertex_phase_signature(
     summary: dict[str, Any],
     interior: dict[str, Any],
 ) -> str:
-    return (
-        "vertex:"
-        f"nodes={summary['nodes']};"
-        f"components={summary['components']};"
-        f"interior_components={interior['interior_components']};"
-        f"touches_boundary={int(interior['touches_boundary'])};"
-        f"yamada={sp.srepr(polynomial_expr)}"
-    )
+    del summary, interior
+    return "yamada:" + sp.srepr(polynomial_expr)
 
 
 def boundary_open_signature(summary: dict[str, Any], interior: dict[str, Any]) -> str:
@@ -383,6 +436,10 @@ def boundary_open_signature(summary: dict[str, Any], interior: dict[str, Any]) -
 
 
 def short_signature_label(signature: str, source: str, polynomial: str) -> str:
+    if source == "empty":
+        return "empty boundary set"
+    if source == "yamada-set":
+        return f"boundary-resolved Yamada set {polynomial}"
     if source == "vertex":
         return f"vertex Yamada {polynomial}"
     if source == "yamada":
@@ -415,6 +472,188 @@ def short_signature_label(signature: str, source: str, polynomial: str) -> str:
     return source
 
 
+def _empty_graph_summary() -> dict[str, Any]:
+    return {
+        "nodes": 0,
+        "edges": 0,
+        "components": 0,
+        "cycle_rank": 0,
+        "degree_sequence": tuple(),
+    }
+
+
+def _boundary_graph_invariant(
+    obj: MaterialFermiSurface,
+    volume_mask: np.ndarray,
+    *,
+    max_exact_yamada_edges: int,
+) -> dict[str, Any]:
+    """Compute one boundary-component spine using its handlebody filling."""
+    topology = interior_summary(volume_mask)
+    graph = nx.MultiGraph()
+    attempted = False
+    error = None
+    try:
+        if (
+            topology["interior_components"] == 1
+            and topology["handle_rank"] == 0
+            and topology["void_components"] == 0
+        ):
+            graph = _one_vertex_graph()
+        else:
+            skeleton = skeletonize_volume(volume_mask)
+            obj.skeleton_graph_cache = None
+            obj.skeleton_graph_cache_args = None
+            graph = obj.skeleton_graph(
+                skeleton_image=skeleton,
+                smooth_epsilon=0,
+                simplify=True,
+                force_small_edge_contraction=True,
+                small_edge_limit=math.pi * 0.1,
+                previous_n_edgepoint=20,
+            )
+
+        summary = _graph_summary(graph)
+        if graph.number_of_edges() == 0:
+            if topology["handle_rank"] != 0:
+                signature = graph_signature(summary, topology)
+                polynomial = ""
+                source = "large-core"
+            else:
+                graph = _one_vertex_graph()
+                summary = _graph_summary(graph)
+                polynomial_expr = _compute_yamada(graph, Y, {"normalize": True})
+                polynomial_expr = sp.factor(sp.together(sp.expand(polynomial_expr)))
+                polynomial = str(polynomial_expr)
+                signature = vertex_phase_signature(polynomial_expr, summary, topology)
+                source = "vertex"
+                attempted = True
+        elif graph.number_of_edges() <= max_exact_yamada_edges:
+            attempted = True
+            polynomial_expr = _compute_yamada(graph, Y, {"normalize": True})
+            polynomial_expr = sp.factor(sp.together(sp.expand(polynomial_expr)))
+            polynomial = str(polynomial_expr)
+            signature = "yamada:" + sp.srepr(polynomial_expr)
+            source = "yamada"
+        else:
+            polynomial = ""
+            signature = graph_signature(summary, topology)
+            source = "large-core"
+    except Exception as exc:
+        summary = _empty_graph_summary()
+        polynomial = ""
+        signature = (
+            "boundary-filling-error:"
+            f"b1={topology['handle_rank']};"
+            f"b2={topology['void_components']};"
+            f"type={type(exc).__name__}"
+        )
+        source = "error"
+        error = f"{type(exc).__name__}: {str(exc)[:240]}"
+
+    return {
+        "signature": signature,
+        "polynomial": polynomial,
+        "source": source,
+        "attempted": attempted,
+        "error": error,
+        "summary": summary,
+        "topology": topology,
+    }
+
+
+def boundary_resolved_invariant(
+    obj: MaterialFermiSurface,
+    mask: np.ndarray,
+    *,
+    max_exact_yamada_edges: int,
+) -> dict[str, Any]:
+    """Compute the multiset Yamada invariant with component nesting retained."""
+    groups = boundary_filling_groups(mask)
+    if not groups:
+        return {
+            "signature": "yamada-set:empty",
+            "polynomial": "empty",
+            "source": "empty",
+            "attempted": False,
+            "error": None,
+            "summary": _empty_graph_summary(),
+            "boundary_polynomials": tuple(),
+            "nesting_signature": "empty",
+            "boundary_components": 0,
+        }
+
+    component_entries = []
+    all_invariants = []
+    for outer_filling, voids in groups:
+        outer = _boundary_graph_invariant(
+            obj,
+            outer_filling,
+            max_exact_yamada_edges=max_exact_yamada_edges,
+        )
+        inner = [
+            _boundary_graph_invariant(
+                obj,
+                void,
+                max_exact_yamada_edges=max_exact_yamada_edges,
+            )
+            for void in voids
+        ]
+        inner.sort(key=lambda invariant: invariant["signature"])
+        component_entries.append(
+            "outer["
+            + outer["signature"]
+            + "]inner["
+            + ",".join(invariant["signature"] for invariant in inner)
+            + "]"
+        )
+        all_invariants.extend((outer, *inner))
+
+    component_entries.sort()
+    nesting_signature = "|".join(component_entries)
+    boundary_count = len(all_invariants)
+    if boundary_count == 1:
+        signature = all_invariants[0]["signature"]
+        source = all_invariants[0]["source"]
+        polynomial = all_invariants[0]["polynomial"]
+    else:
+        signature = "yamada-set:" + nesting_signature
+        source = "yamada-set"
+        displayed = [
+            invariant["polynomial"] or invariant["signature"]
+            for invariant in all_invariants
+        ]
+        polynomial = "{" + ", ".join(displayed) + "}"
+
+    summaries = [invariant["summary"] for invariant in all_invariants]
+    summary = {
+        "nodes": int(sum(item["nodes"] for item in summaries)),
+        "edges": int(sum(item["edges"] for item in summaries)),
+        "components": int(sum(item["components"] for item in summaries)),
+        "cycle_rank": int(sum(item["cycle_rank"] for item in summaries)),
+        "degree_sequence": tuple(
+            degree
+            for item in summaries
+            for degree in item["degree_sequence"]
+        ),
+    }
+    errors = [invariant["error"] for invariant in all_invariants if invariant["error"]]
+    return {
+        "signature": signature,
+        "polynomial": polynomial,
+        "source": source,
+        "attempted": bool(all(invariant["attempted"] for invariant in all_invariants)),
+        "error": " | ".join(errors) if errors else None,
+        "summary": summary,
+        "boundary_polynomials": tuple(
+            invariant["polynomial"] or invariant["signature"]
+            for invariant in all_invariants
+        ),
+        "nesting_signature": nesting_signature,
+        "boundary_components": int(boundary_count),
+    }
+
+
 def evaluate_cell(
     family: MaterialFamily,
     obj: MaterialFermiSurface,
@@ -424,95 +663,26 @@ def evaluate_cell(
     max_exact_yamada_edges: int,
 ) -> PhaseCell:
     reset_gap_threshold(obj, energy)
-    mask = np.asarray(obj._interior_mask, dtype=bool)
+    raw_mask = np.asarray(obj._interior_mask, dtype=bool)
+    mask, resolution_info = resolve_mask_components(raw_mask)
     interior = interior_summary(mask)
-
-    if interior["handle_rank"] == 0:
-        graph = genus_zero_vertex_graph(interior["interior_components"])
-        summary = _graph_summary(graph)
-        polynomial_expr = _compute_yamada(graph, Y, {"normalize": True})
-        polynomial_expr = sp.factor(sp.together(sp.expand(polynomial_expr)))
-        polynomial = str(polynomial_expr)
-        signature = vertex_phase_signature(polynomial_expr, summary, interior)
-        source = "vertex"
-        attempted = True
-        error = None
-    else:
-        graph = nx.MultiGraph()
-        polynomial = ""
-        attempted = False
-        error = None
-        try:
-            graph = obj.skeleton_graph(
-                smooth_epsilon=0,
-                simplify=True,
-                force_small_edge_contraction=True,
-                small_edge_limit=math.pi * 0.1,
-                previous_n_edgepoint=20,
-            )
-            summary = _graph_summary(graph)
-            if graph.number_of_edges() == 0:
-                graph = genus_zero_vertex_graph(interior["interior_components"])
-                summary = _graph_summary(graph)
-                polynomial_expr = _compute_yamada(graph, Y, {"normalize": True})
-                polynomial_expr = sp.factor(sp.together(sp.expand(polynomial_expr)))
-                polynomial = str(polynomial_expr)
-                signature = vertex_phase_signature(polynomial_expr, summary, interior)
-                source = "vertex"
-                attempted = True
-            elif graph.number_of_edges() <= max_exact_yamada_edges:
-                attempted = True
-                polynomial_expr = _compute_yamada(graph, Y, {"normalize": True})
-                polynomial_expr = sp.factor(sp.together(sp.expand(polynomial_expr)))
-                polynomial = str(polynomial_expr)
-                signature = "yamada:" + sp.srepr(polynomial_expr)
-                source = "yamada"
-            else:
-                signature = graph_signature(summary, interior)
-                source = "large-core"
-        except Exception as exc:
-            message = str(exc)
-            graph = _one_vertex_graph()
-            summary = _graph_summary(graph)
-            if any(
-                text in message
-                for text in (
-                    "graph has no edges",
-                    "skeleton image is empty",
-                    "does not contain any True voxels",
-                    "Skeletonization produced no points",
-                    "collapsed to fewer than two distinct points",
-                )
-            ):
-                if interior["handle_rank"] == 0:
-                    graph = genus_zero_vertex_graph(interior["interior_components"])
-                    summary = _graph_summary(graph)
-                    polynomial_expr = _compute_yamada(graph, Y, {"normalize": True})
-                    polynomial_expr = sp.factor(sp.together(sp.expand(polynomial_expr)))
-                    polynomial = str(polynomial_expr)
-                    signature = vertex_phase_signature(polynomial_expr, summary, interior)
-                    source = "vertex"
-                    attempted = True
-                else:
-                    graph = nx.MultiGraph()
-                    summary = _graph_summary(graph)
-                    polynomial = "boundary-open"
-                    signature = boundary_open_signature(summary, interior)
-                    source = "boundary-open"
-                    attempted = False
-                    error = (
-                        "Skeleton extraction failed for a boundary-touching nonzero-genus mask. "
-                        f"Boundary faces: {', '.join(interior['boundary_faces'])}"
-                    )
-            else:
-                polynomial = ""
-                signature = "error:" + type(exc).__name__ + ":" + message[:120]
-                source = "error"
-                error = type(exc).__name__ + ": " + message[:240]
+    invariant = boundary_resolved_invariant(
+        obj,
+        mask,
+        max_exact_yamada_edges=max_exact_yamada_edges,
+    )
+    summary = invariant["summary"]
+    polynomial = invariant["polynomial"]
+    signature = invariant["signature"]
+    source = invariant["source"]
+    attempted = invariant["attempted"]
+    error = invariant["error"]
+    interior["boundary_components"] = int(invariant["boundary_components"])
+    interior["handle_rank"] = int(summary["cycle_rank"])
 
     phase_label = short_signature_label(signature, source, polynomial)
     if source == "vertex":
-        phase_label = f"vertex x{summary['nodes']}; Yamada {polynomial}"
+        phase_label = f"vertex; Yamada {polynomial}"
 
     return PhaseCell(
         material=family.key,
@@ -533,9 +703,12 @@ def evaluate_cell(
         components=int(summary["components"]),
         cycle_rank=int(summary["cycle_rank"]),
         degree_sequence=tuple(int(value) for value in summary["degree_sequence"]),
+        boundary_polynomials=tuple(str(value) for value in invariant["boundary_polynomials"]),
+        nesting_signature=str(invariant["nesting_signature"]),
         exact_yamada_attempted=attempted,
         error=error,
         classification_computed=True,
+        **resolution_info,
         **interior,
     )
 
@@ -572,6 +745,100 @@ def adaptive_fill_record(record: PhaseCell, energy: float) -> PhaseCell:
     )
 
 
+def stabilize_thin_tube_resolution_prefix(
+    records: list[PhaseCell],
+    *,
+    minimum_run: int = 3,
+) -> list[PhaseCell]:
+    """Continue the dominant resolved low-E plateau through thinner voxel cuts.
+
+    TiB2 has no physical finite-thickness transition below 1 eV in the scanned
+    parameter interval, while at N=140 its thinnest tubes can temporarily lose
+    handles.  The modal Yamada signature in the resolved 0.5--1.0 eV band is
+    therefore the convergence value for the same column as E approaches zero.
+    """
+    if len(records) < minimum_run:
+        return records
+    ordered = sorted(records, key=lambda record: record.energy)
+    candidates = [
+        record
+        for record in ordered
+        if TIB2_RESOLUTION_CALIBRATION_MIN_ENERGY - 1e-12
+        <= record.energy
+        <= TIB2_RESOLUTION_CALIBRATION_MAX_ENERGY + 1e-12
+        and record.error is None
+        and record.boundary_components > 0
+    ]
+    if len(candidates) < minimum_run:
+        return ordered
+
+    signature_counts = Counter(record.phase_signature for record in candidates)
+    eligible = {
+        signature for signature, count in signature_counts.items()
+        if count >= int(minimum_run)
+    }
+    if not eligible:
+        return ordered
+
+    def signature_score(signature: str) -> tuple[int, int, int, int]:
+        members = [record for record in candidates if record.phase_signature == signature]
+        return (
+            len(members),
+            sum(bool(record.classification_computed) for record in members),
+            max(int(record.cycle_rank) for record in members),
+            -min(int(record.removed_component_voxels) for record in members),
+        )
+
+    stable_signature = max(eligible, key=signature_score)
+    stable_members = [
+        record for record in candidates
+        if record.phase_signature == stable_signature
+    ]
+    target_energy = 0.5 * (
+        TIB2_RESOLUTION_CALIBRATION_MIN_ENERGY
+        + TIB2_RESOLUTION_CALIBRATION_MAX_ENERGY
+    )
+    anchor = min(
+        stable_members,
+        key=lambda record: (
+            not bool(record.classification_computed),
+            int(record.removed_component_voxels),
+            abs(float(record.energy) - target_energy),
+        ),
+    )
+
+    corrected = []
+    for record in ordered:
+        if (
+            record.energy > TIB2_RESOLUTION_CALIBRATION_MAX_ENERGY + 1e-12
+            or record.phase_signature == stable_signature
+        ):
+            corrected.append(record)
+            continue
+        corrected.append(
+            dataclasses.replace(
+                anchor,
+                energy=float(record.energy),
+                classification_computed=False,
+                removed_component_voxels=int(record.removed_component_voxels),
+                filled_void_voxels=int(record.filled_void_voxels),
+                resolution_calibration_energy=float(anchor.energy),
+            )
+        )
+    return corrected
+
+
+def stabilize_tib2_records(records: list[PhaseCell]) -> list[PhaseCell]:
+    """Apply the thin-tube convergence rule independently to each F column."""
+    by_lambda: dict[float, list[PhaseCell]] = defaultdict(list)
+    for record in records:
+        by_lambda[round(float(record.lam), 12)].append(record)
+    corrected = []
+    for lam in sorted(by_lambda):
+        corrected.extend(stabilize_thin_tube_resolution_prefix(by_lambda[lam]))
+    return corrected
+
+
 def evaluate_energy_grid_adaptive(
     family: MaterialFamily,
     obj: MaterialFermiSurface,
@@ -582,7 +849,7 @@ def evaluate_energy_grid_adaptive(
 ) -> list[PhaseCell]:
     energies = [float(value) for value in family.energies]
     if adaptive_energy_step <= 0:
-        return [
+        records = [
             evaluate_cell(
                 family,
                 obj,
@@ -592,6 +859,9 @@ def evaluate_energy_grid_adaptive(
             )
             for energy in energies
         ]
+        if family.key == "tib2_d6_F":
+            records = stabilize_thin_tube_resolution_prefix(records)
+        return records
 
     computed: dict[int, PhaseCell] = {}
 
@@ -627,6 +897,8 @@ def evaluate_energy_grid_adaptive(
         right = [probe for probe in sorted_computed if probe > index]
         source_index = left[-1] if left else right[0]
         records.append(adaptive_fill_record(ensure(source_index), energy))
+    if family.key == "tib2_d6_F":
+        records = stabilize_thin_tube_resolution_prefix(records)
     return records
 
 
@@ -1018,17 +1290,20 @@ def stable_labels(
 
     for _ in range(max(1, stable.size)):
         components = label_components(stable)
+        # ``min_cells`` is the largest component size treated as a small
+        # island. Equality is included so an 8-cell cutoff removes 8-cell
+        # islands as well as smaller ones.
         large_components = [
             (phase_id, component)
             for phase_id, component in components
-            if len(component) >= int(min_cells)
+            if len(component) > int(min_cells)
         ]
         if not large_components:
             break
         large_phase_ids = {int(phase_id) for phase_id, _ in large_components}
         changed = False
         for phase_id, component in components:
-            if len(component) >= int(min_cells):
+            if len(component) > int(min_cells):
                 continue
             neighbor_counts: Counter[int] = Counter()
             if strategy != "below":
@@ -1086,6 +1361,61 @@ def apply_signature_phase_merges(
     return merged, applied
 
 
+def attach_c6_invalid_components_to_lower_phase(
+    labels: np.ndarray,
+    signature_to_id: dict[str, int],
+    family_key: str,
+) -> tuple[np.ndarray, list[dict[str, Any]]]:
+    """Attach audited non-C6 phase components to the closest valid lower-E phase."""
+    merged = labels.copy()
+    invalid_signatures = C6_INVALID_PHASE_SIGNATURES.get(str(family_key), frozenset())
+    invalid_ids = {
+        int(signature_to_id[signature])
+        for signature in invalid_signatures
+        if signature in signature_to_id
+    }
+    if not invalid_ids:
+        return merged, []
+
+    id_to_signature = {int(value): key for key, value in signature_to_id.items()}
+    components = label_components(merged)
+    valid_components = [
+        (phase_id, component)
+        for phase_id, component in components
+        if int(phase_id) not in invalid_ids
+    ]
+    applied: list[dict[str, Any]] = []
+    for source_id, component in components:
+        if int(source_id) not in invalid_ids:
+            continue
+        target_id = closest_lower_large_phase(component, int(source_id), valid_components)
+        if target_id is None:
+            applied.append(
+                {
+                    "source_signature": id_to_signature[int(source_id)],
+                    "source_raw_id": int(source_id),
+                    "target_signature": None,
+                    "target_raw_id": None,
+                    "cells": int(len(component)),
+                    "status": "no-valid-lower-phase",
+                }
+            )
+            continue
+        for row, column in component:
+            merged[row, column] = int(target_id)
+        applied.append(
+            {
+                "source_signature": id_to_signature[int(source_id)],
+                "source_raw_id": int(source_id),
+                "target_signature": id_to_signature[int(target_id)],
+                "target_raw_id": int(target_id),
+                "cells": int(len(component)),
+                "status": "attached-to-closest-lower-c6-valid-phase",
+            }
+        )
+    return merged, applied
+
+
 def remap_labels_contiguous(
     labels: np.ndarray,
     label_lookup: dict[int, str],
@@ -1122,15 +1452,24 @@ def record_dict(record: PhaseCell) -> dict[str, Any]:
     row = dataclasses.asdict(record)
     row["degree_sequence"] = list(record.degree_sequence)
     row["boundary_faces"] = list(record.boundary_faces)
+    row["boundary_polynomials"] = list(record.boundary_polynomials)
     return row
 
 
 def phase_cell_from_dict(row: dict[str, Any]) -> PhaseCell:
     data = dict(row)
+    data.setdefault("void_components", 0)
+    data.setdefault("boundary_components", int(data.get("interior_components", 0)))
+    data.setdefault("removed_component_voxels", 0)
+    data.setdefault("filled_void_voxels", 0)
+    data.setdefault("voxel_cycle_rank", int(data.get("handle_rank", 0)))
+    data.setdefault("boundary_polynomials", [str(data.get("polynomial", ""))])
+    data.setdefault("nesting_signature", str(data.get("phase_signature", "")))
     data["span"] = tuple(tuple(float(value) for value in pair) for pair in data["span"])
     data["band_pair"] = tuple(int(value) for value in data["band_pair"])
     data["degree_sequence"] = tuple(int(value) for value in data["degree_sequence"])
     data["boundary_faces"] = tuple(str(value) for value in data["boundary_faces"])
+    data["boundary_polynomials"] = tuple(str(value) for value in data["boundary_polynomials"])
     return PhaseCell(**data)
 
 
@@ -1139,8 +1478,13 @@ def write_records(output_dir: Path, records: list[PhaseCell], families: tuple[Ma
     json_path = output_dir / "material_parameter_phase_map_records.json"
     csv_path = output_dir / "material_parameter_phase_map_records.csv"
     summary_path = output_dir / "material_parameter_phase_map_summary.json"
-    json_path.write_text(json.dumps([record_dict(r) for r in records], indent=2), encoding="utf-8")
     rows = [record_dict(r) for r in records]
+    # Keep the complete record set below common Git-host per-file limits;
+    # whitespace-only pretty printing adds tens of megabytes at this scale.
+    json_path.write_text(
+        json.dumps(rows, separators=(",", ":")),
+        encoding="utf-8",
+    )
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
         writer.writeheader()
@@ -1493,6 +1837,9 @@ def extend_existing_dataset(args: argparse.Namespace) -> None:
     all_records: list[PhaseCell] = []
     for family in families:
         records = records_by_family[family.key]
+        if family.key == "tib2_d6_F":
+            records = stabilize_tib2_records(records)
+            records_by_family[family.key] = records
         raw_grid, label_lookup, signature_to_id = phase_grid(records, lambdas, family.energies)
         stable_grid, changed_cells = stable_labels(
             raw_grid,
@@ -1500,6 +1847,9 @@ def extend_existing_dataset(args: argparse.Namespace) -> None:
             merge_strategy=str(args.island_merge_strategy),
         )
         stable_grid, manual_merges = apply_signature_phase_merges(
+            stable_grid, signature_to_id, family.key
+        )
+        stable_grid, c6_symmetry_merges = attach_c6_invalid_components_to_lower_phase(
             stable_grid, signature_to_id, family.key
         )
         stable_grid, stable_label_lookup = remap_labels_contiguous(stable_grid, label_lookup)
@@ -1513,6 +1863,7 @@ def extend_existing_dataset(args: argparse.Namespace) -> None:
             "stable_min_component_cells": int(args.min_stable_cells),
             "stable_island_merge_strategy": str(args.island_merge_strategy),
             "manual_signature_merges": manual_merges,
+            "c6_symmetry_merges": c6_symmetry_merges,
             "source_counts": dict(Counter(record.source for record in records)),
             "distinct_signatures": int(len({record.phase_signature for record in records})),
             "classification_computed_cells": int(sum(record.classification_computed for record in records)),
@@ -1522,7 +1873,7 @@ def extend_existing_dataset(args: argparse.Namespace) -> None:
         print(
             f"[{family.key}] E={family.energies[0]:.3g}..{family.energies[-1]:.3g}, "
             f"rows={len(family.energies)}, stable phases={map_info[family.key]['stable_phase_count']}, "
-            f"manual merges={sum(item['cells'] for item in manual_merges)} cells",
+            f"C6-audit merges={sum(item['cells'] for item in c6_symmetry_merges if item['target_raw_id'] is not None)} cells",
             flush=True,
         )
 
@@ -1564,23 +1915,58 @@ def main() -> None:
             records_by_family[str(row["material"])].append(phase_cell_from_dict(row))
         stable_by_family: dict[str, np.ndarray] = {}
         labels_by_family: dict[str, dict[int, str]] = {}
+        map_info: dict[str, Any] = {}
         for family in families:
+            if family.key == "tib2_d6_F":
+                records_by_family[family.key] = stabilize_tib2_records(
+                    records_by_family[family.key]
+                )
             raw_grid, label_lookup, signature_to_id = phase_grid(
                 records_by_family[family.key], lambdas, family.energies
             )
-            stable_grid, _ = stable_labels(
+            stable_grid, changed_cells = stable_labels(
                 raw_grid,
                 min_cells=int(args.min_stable_cells),
                 merge_strategy=str(args.island_merge_strategy),
             )
-            stable_grid, _ = apply_signature_phase_merges(
+            stable_grid, manual_merges = apply_signature_phase_merges(
+                stable_grid, signature_to_id, family.key
+            )
+            stable_grid, c6_symmetry_merges = attach_c6_invalid_components_to_lower_phase(
                 stable_grid, signature_to_id, family.key
             )
             stable_grid, stable_label_lookup = remap_labels_contiguous(stable_grid, label_lookup)
             stable_by_family[family.key] = stable_grid
             labels_by_family[family.key] = stable_label_lookup
+            records = records_by_family[family.key]
+            map_info[family.key] = {
+                "raw_phase_count": int(len(set(int(value) for value in raw_grid.ravel()))),
+                "stable_phase_count": int(len(set(int(value) for value in stable_grid.ravel()))),
+                "stable_reassigned_cells": int(changed_cells),
+                "stable_min_component_cells": int(args.min_stable_cells),
+                "stable_island_merge_strategy": str(args.island_merge_strategy),
+                "manual_signature_merges": manual_merges,
+                "c6_symmetry_merges": c6_symmetry_merges,
+                "source_counts": dict(Counter(record.source for record in records)),
+                "distinct_signatures": int(len({record.phase_signature for record in records})),
+                "classification_computed_cells": int(sum(record.classification_computed for record in records)),
+                "classification_adaptive_fill_cells": int(sum(not record.classification_computed for record in records)),
+                "adaptive_energy_step": float(
+                    summary.get("map_info", {}).get(family.key, {}).get("adaptive_energy_step", 0.0)
+                ),
+            }
         write_plotly_html(args.output_dir, families, records_by_family, lambdas, stable_by_family, labels_by_family)
         write_static_overview(args.output_dir, families, lambdas, stable_by_family)
+        map_info["reprocessed_from_existing_records"] = True
+        map_info["html"] = str(args.output_dir / "material_parameter_phase_maps.html")
+        map_info["png"] = str(args.output_dir / "material_parameter_phase_maps_overview.png")
+        write_records(
+            args.output_dir,
+            [record for family in families for record in records_by_family[family.key]],
+            families,
+            lambdas,
+            map_info,
+        )
         return
 
     lambdas = np.linspace(0.0, 1.0, int(args.lambda_count))
@@ -1613,6 +1999,9 @@ def main() -> None:
         stable_grid, manual_merges = apply_signature_phase_merges(
             stable_grid, signature_to_id, family.key
         )
+        stable_grid, c6_symmetry_merges = attach_c6_invalid_components_to_lower_phase(
+            stable_grid, signature_to_id, family.key
+        )
         stable_grid, stable_label_lookup = remap_labels_contiguous(stable_grid, label_lookup)
         records_by_family[family.key] = records
         stable_by_family[family.key] = stable_grid
@@ -1625,6 +2014,7 @@ def main() -> None:
             "stable_min_component_cells": int(args.min_stable_cells),
             "stable_island_merge_strategy": str(args.island_merge_strategy),
             "manual_signature_merges": manual_merges,
+            "c6_symmetry_merges": c6_symmetry_merges,
             "source_counts": dict(Counter(r.source for r in records)),
             "distinct_signatures": int(len({r.phase_signature for r in records})),
             "classification_computed_cells": int(sum(r.classification_computed for r in records)),
