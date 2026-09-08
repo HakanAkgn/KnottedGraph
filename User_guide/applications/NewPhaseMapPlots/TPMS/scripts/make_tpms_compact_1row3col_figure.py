@@ -6,18 +6,10 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
-import math
-import os
 import re
 from collections import Counter, deque
 from pathlib import Path
 from typing import Any
-
-os.environ.setdefault("MPLBACKEND", "Agg")
-os.environ.setdefault("MPLCONFIGDIR", "/private/tmp/codex-matplotlib")
-os.environ.setdefault("XDG_CACHE_HOME", "/private/tmp/codex-cache")
-Path(os.environ["MPLCONFIGDIR"]).mkdir(parents=True, exist_ok=True)
-Path(os.environ["XDG_CACHE_HOME"]).mkdir(parents=True, exist_ok=True)
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -28,13 +20,14 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from skimage.measure import marching_cubes
 
 
-DEFAULT_SCAN_DIR = Path("tmp/tpms_compact_scaffold_phase_maps_c0_03_dense")
+DEFAULT_SCAN_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_HTML = (
     DEFAULT_SCAN_DIR
+    / "html"
     / "tpms_compact_c0_03_dense_stable_yamada_plotly_region_geometry.html"
 )
 DEFAULT_OUTPUT = (
-    DEFAULT_SCAN_DIR
+    Path("_build/new_phase_maps/tpms_figures")
     / "tpms_compact_c0_03_stable_up_to_contraction_2row_cba.pdf"
 )
 DEFAULT_TRANSITION_ORDER = (
@@ -154,7 +147,10 @@ def stable_labels(
                     for delta_row, delta_col in ((1, 0), (-1, 0), (0, 1), (0, -1)):
                         next_row = row + delta_row
                         next_col = col + delta_col
-                        if 0 <= next_row < stable.shape[0] and 0 <= next_col < stable.shape[1]:
+                        if (
+                            0 <= next_row < stable.shape[0]
+                            and 0 <= next_col < stable.shape[1]
+                        ):
                             neighbor = int(stable[next_row, next_col])
                             if neighbor != phase_id:
                                 neighbor_counts[neighbor] += 1
@@ -266,11 +262,7 @@ def field_values(
     z: np.ndarray,
 ) -> np.ndarray:
     if key == "gyroid":
-        return (
-            np.sin(x) * np.cos(y)
-            + np.sin(y) * np.cos(z)
-            + np.sin(z) * np.cos(x)
-        )
+        return np.sin(x) * np.cos(y) + np.sin(y) * np.cos(z) + np.sin(z) * np.cos(x)
     if key == "schwarz_p":
         return np.cos(x) + np.cos(y) + np.cos(z)
     if key == "diamond":
@@ -278,7 +270,9 @@ def field_values(
     raise ValueError(f"unsupported TPMS field key: {key}")
 
 
-def compact_values_for_geometry(metadata: dict[str, Any]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def compact_values_for_geometry(
+    metadata: dict[str, Any],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     span = np.asarray(metadata["span"], dtype=float)
     dimension = int(metadata["dimension"])
     axes = [
@@ -306,7 +300,10 @@ def representative_geometry_path(
     lambda_index: int,
     c_index: int,
 ) -> Path:
-    return geometry_dir / f"{transition_key}_lambda{lambda_index:03d}_c{c_index:03d}.json.gz"
+    return (
+        geometry_dir
+        / f"{transition_key}_lambda{lambda_index:03d}_c{c_index:03d}.json.gz"
+    )
 
 
 def load_geometry_metadata(path: Path) -> dict[str, Any]:
@@ -324,7 +321,9 @@ def slice_representatives(
 ) -> dict[str, Any]:
     parameters = [float(value) for value in transition["parameters"]]
     lambdas = [float(value) for value in transition["lambdas"]]
-    row_index = min(range(len(parameters)), key=lambda index: abs(parameters[index] - target_c))
+    row_index = min(
+        range(len(parameters)), key=lambda index: abs(parameters[index] - target_c)
+    )
     row_values = [int(value) for value in stable_original_labels[row_index]]
     row_display_values = [int(value) for value in display_labels[row_index]]
 
@@ -474,7 +473,9 @@ def render_figure(
     slice_c: float,
     surface_max_faces: int,
 ) -> dict[str, Any]:
-    transitions_by_key = {transition["key"]: transition for transition in payload["transitions"]}
+    transitions_by_key = {
+        transition["key"]: transition for transition in payload["transitions"]
+    }
     missing = [key for key in transition_order if key not in transitions_by_key]
     if missing:
         raise ValueError(f"transition keys not found in payload: {missing}")
@@ -491,18 +492,32 @@ def render_figure(
         regions = connected_regions(stable)
         grids[transition["key"]] = stable
         diagnostics[transition["key"]] = {
-            "raw_contraction_classes": int(transition["modes"]["contraction"]["classes"]),
-            "raw_contraction_regions": int(transition["modes"]["contraction"]["components"]),
-            "stable_up_to_contraction_classes": int(len(set(int(v) for v in stable.ravel()))),
+            "raw_contraction_classes": int(
+                transition["modes"]["contraction"]["classes"]
+            ),
+            "raw_contraction_regions": int(
+                transition["modes"]["contraction"]["components"]
+            ),
+            "stable_up_to_contraction_classes": int(
+                len(set(int(v) for v in stable.ravel()))
+            ),
             "stable_up_to_contraction_regions": int(len(regions)),
             "stable_min_cells": int(stable_min_cells),
             "reassigned_cells": int(changed_cells),
-            "single_cell_regions": sum(1 for region in regions if len(region["cells"]) == 1),
-            "small_regions_le_3_cells": sum(1 for region in regions if len(region["cells"]) <= 3),
+            "single_cell_regions": sum(
+                1 for region in regions if len(region["cells"]) == 1
+            ),
+            "small_regions_le_3_cells": sum(
+                1 for region in regions if len(region["cells"]) <= 3
+            ),
         }
 
     used_phase_ids = sorted(
-        {int(value) for transition in transitions for value in grids[transition["key"]].ravel()}
+        {
+            int(value)
+            for transition in transitions
+            for value in grids[transition["key"]].ravel()
+        }
     )
     display_label_by_phase_id = {
         phase_id: index + 1 for index, phase_id in enumerate(used_phase_ids)
@@ -628,12 +643,19 @@ def render_figure(
         title_size = 19 if include_panel_c_slice else 16
         label_size = 25 if include_panel_c_slice else 22
         tick_size = 18 if include_panel_c_slice else 16
-        ax.set_title(title_for_transition(key), fontsize=title_size, fontweight="semibold", pad=10)
+        ax.set_title(
+            title_for_transition(key),
+            fontsize=title_size,
+            fontweight="semibold",
+            pad=10,
+        )
         ax.set_xlabel(r"$\lambda$", fontsize=label_size, labelpad=5)
         ax.set_ylabel(r"$c$", fontsize=label_size, labelpad=6)
         ax.set_xticks(np.linspace(0.0, 1.0, 6))
         ax.set_yticks([0.0, 0.1, 0.2, 0.3])
-        ax.tick_params(axis="both", which="major", labelsize=tick_size, width=1.5, length=5)
+        ax.tick_params(
+            axis="both", which="major", labelsize=tick_size, width=1.5, length=5
+        )
         ax.tick_params(axis="both", which="minor", width=0.9, length=3)
         ax.minorticks_on()
         for spine in ax.spines.values():
@@ -659,7 +681,9 @@ def render_figure(
             panel_c_transition = transition
 
     if mappable is not None and top_right_ax is not None and not include_panel_c_slice:
-        cax = top_right_ax.inset_axes([1.045, 0.0, 0.04, 1.0], transform=top_right_ax.transAxes)
+        cax = top_right_ax.inset_axes(
+            [1.045, 0.0, 0.04, 1.0], transform=top_right_ax.transAxes
+        )
         cbar = fig.colorbar(
             mappable,
             cax=cax,
@@ -673,8 +697,14 @@ def render_figure(
         cbar.outline.set_linewidth(1.2)
 
     if include_panel_c_slice:
-        if panel_c_ax is None or panel_c_transition is None or panel_c_representatives is None:
-            raise ValueError(f"could not identify panel-c transition {PANEL_C_TRANSITION_KEY}")
+        if (
+            panel_c_ax is None
+            or panel_c_transition is None
+            or panel_c_representatives is None
+        ):
+            raise ValueError(
+                f"could not identify panel-c transition {PANEL_C_TRANSITION_KEY}"
+            )
         box_ax = fig.add_subplot(grid[1, :])
         box_ax.set_in_layout(False)
         box_ax.set_zorder(30)
@@ -720,7 +750,9 @@ def render_figure(
         )
         runs = list(panel_c_representatives["runs"])
         if len(runs) != 5:
-            raise ValueError(f"expected five panel-c representatives, found {len(runs)}")
+            raise ValueError(
+                f"expected five panel-c representatives, found {len(runs)}"
+            )
         for index, run in enumerate(runs):
             geo_col = 1 + index * 2
             ax_geo = fig.add_subplot(geo_grid[0, geo_col], projection="3d")
@@ -838,7 +870,9 @@ def render_figure(
     source = {
         "figure": str(output_pdf),
         "mode": "stable up to contraction",
-        "layout": "2row_phase_maps_plus_panel_c_slice" if include_panel_c_slice else "2row_2_1",
+        "layout": "2row_phase_maps_plus_panel_c_slice"
+        if include_panel_c_slice
+        else "2row_2_1",
         "transition_order": list(transition_order),
         "panel_labels_by_position": list(PANEL_LABELS),
         "panel_c_slice": panel_c_representatives,
@@ -879,7 +913,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--stable-min-cells", type=int, default=4)
     parser.add_argument("--include-panel-c-slice", action="store_true")
-    parser.add_argument("--geometry-dir", type=Path, default=DEFAULT_SCAN_DIR / "geometry")
+    parser.add_argument(
+        "--geometry-dir", type=Path, default=DEFAULT_SCAN_DIR / "geometry"
+    )
     parser.add_argument("--slice-c", type=float, default=0.1)
     parser.add_argument("--surface-max-faces", type=int, default=100000)
     parser.add_argument(

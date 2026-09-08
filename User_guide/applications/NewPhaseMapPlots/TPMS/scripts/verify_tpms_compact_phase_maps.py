@@ -11,10 +11,19 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from knotted_graph.applications.phase_map_examples._runtime import (
+    geometry_directory,
+    resolve_geometry_path,
+)
 
 
-DEFAULT_SCAN_DIR = Path("tmp/tpms_compact_scaffold_phase_maps")
-DEFAULT_HTML = DEFAULT_SCAN_DIR / "tpms_compact_yamada_plotly_region_geometry.html"
+REFERENCE_DIR = Path(__file__).resolve().parents[1]
+DEFAULT_SCAN_DIR = REFERENCE_DIR / "data"
+DEFAULT_HTML = (
+    REFERENCE_DIR
+    / "html"
+    / "tpms_compact_c0_03_dense_stable_yamada_plotly_region_geometry.html"
+)
 
 
 def load_json(path: Path) -> Any:
@@ -75,7 +84,10 @@ def stable_labels(
             seen = np.zeros(stable.shape, dtype=bool)
             for start_row in range(stable.shape[0]):
                 for start_col in range(stable.shape[1]):
-                    if seen[start_row, start_col] or int(stable[start_row, start_col]) != phase_id:
+                    if (
+                        seen[start_row, start_col]
+                        or int(stable[start_row, start_col]) != phase_id
+                    ):
                         continue
                     queue = deque([(start_row, start_col)])
                     seen[start_row, start_col] = True
@@ -86,7 +98,10 @@ def stable_labels(
                         for delta_row, delta_col in ((1, 0), (-1, 0), (0, 1), (0, -1)):
                             next_row = row + delta_row
                             next_col = col + delta_col
-                            if not (0 <= next_row < stable.shape[0] and 0 <= next_col < stable.shape[1]):
+                            if not (
+                                0 <= next_row < stable.shape[0]
+                                and 0 <= next_col < stable.shape[1]
+                            ):
                                 continue
                             if seen[next_row, next_col]:
                                 continue
@@ -103,7 +118,10 @@ def stable_labels(
                     for delta_row, delta_col in ((1, 0), (-1, 0), (0, 1), (0, -1)):
                         next_row = row + delta_row
                         next_col = col + delta_col
-                        if 0 <= next_row < stable.shape[0] and 0 <= next_col < stable.shape[1]:
+                        if (
+                            0 <= next_row < stable.shape[0]
+                            and 0 <= next_col < stable.shape[1]
+                        ):
                             neighbor = int(stable[next_row, next_col])
                             if neighbor != phase_id:
                                 neighbor_counts[neighbor] += 1
@@ -143,7 +161,10 @@ def recompute_raw_grid(
         signature: index + 1 for index, signature in enumerate(signatures)
     }
     lookup = {
-        (round(float(record["threshold_c"]), 12), round(float(record["lam"]), 12)): record
+        (
+            round(float(record["threshold_c"]), 12),
+            round(float(record["lam"]), 12),
+        ): record
         for record in family_records
     }
     grid = np.zeros((len(thresholds), len(lambdas)), dtype=int)
@@ -177,9 +198,7 @@ def phase_signature_stats(records: list[dict[str, Any]]) -> dict[str, Any]:
         )
         gross_groups[gross_key].add(signature)
     exact_polynomial_conflicts = {
-        key: sorted(values)
-        for key, values in exact_groups.items()
-        if len(values) > 1
+        key: sorted(values) for key, values in exact_groups.items() if len(values) > 1
     }
     graph_similar_but_signature_distinct = [
         {
@@ -225,35 +244,47 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
     family_records = records_by_family(records)
     lambdas = [float(value) for value in source_data["lambdas"]]
 
-    geometry_files = list((scan_dir / "geometry").glob("*.json.gz"))
+    geometry_files = list(geometry_directory(scan_dir).glob("*.json.gz"))
     if len(geometry_files) != len(records):
         failures.append(
             f"geometry file count {len(geometry_files)} does not match record count {len(records)}"
         )
     for record in records:
-        geometry_path = Path(str(record["geometry_path"]))
-        if not geometry_path.is_absolute() and not geometry_path.exists():
-            geometry_path = scan_dir / "geometry" / geometry_path.name
-        if not geometry_path.exists():
-            failures.append(f"missing geometry file: {record['geometry_path']}")
+        try:
+            resolve_geometry_path(str(record["geometry_path"]), scan_dir)
+        except FileNotFoundError as exc:
+            failures.append(str(exc))
             break
 
     compactness = {
         "record_count": len(records),
-        "box_boundary_touch_count": sum(int(record["touches_boundary"]) for record in records),
-        "closed_surface_count": sum(int(record["surface_is_closed"]) for record in records),
-        "open_surface_count": sum(int(not record["surface_is_closed"]) for record in records),
-        "surface_open_edge_max": max(int(record["surface_open_edges"]) for record in records),
+        "box_boundary_touch_count": sum(
+            int(record["touches_boundary"]) for record in records
+        ),
+        "closed_surface_count": sum(
+            int(record["surface_is_closed"]) for record in records
+        ),
+        "open_surface_count": sum(
+            int(not record["surface_is_closed"]) for record in records
+        ),
+        "surface_open_edge_max": max(
+            int(record["surface_open_edges"]) for record in records
+        ),
         "surface_nonmanifold_edge_max": max(
             int(record["surface_nonmanifold_edges"]) for record in records
         ),
-        "empty_solid_count": sum(int(record["interior_voxels"] == 0) for record in records),
+        "empty_solid_count": sum(
+            int(record["interior_voxels"] == 0) for record in records
+        ),
     }
     if compactness["box_boundary_touch_count"]:
         failures.append("one or more compact solids touch the sampling box boundary")
     if compactness["open_surface_count"]:
         failures.append("one or more marching-cubes surfaces are not closed")
-    if compactness["surface_open_edge_max"] or compactness["surface_nonmanifold_edge_max"]:
+    if (
+        compactness["surface_open_edge_max"]
+        or compactness["surface_nonmanifold_edge_max"]
+    ):
         failures.append("one or more surfaces have open or nonmanifold edges")
     if compactness["empty_solid_count"]:
         failures.append("one or more parameter cells generated an empty solid")
@@ -263,18 +294,28 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
         expected = endpoint["expected_field"]
         correlation = float(endpoint["correlations"][expected])
         if float(endpoint["self_max_abs_error"]) > 1e-10:
-            endpoint_failures.append(f"{endpoint['family']} lambda={endpoint['lambda']} field mismatch")
+            endpoint_failures.append(
+                f"{endpoint['family']} lambda={endpoint['lambda']} field mismatch"
+            )
         if correlation < 1.0 - 1e-10:
-            endpoint_failures.append(f"{endpoint['family']} lambda={endpoint['lambda']} low correlation")
+            endpoint_failures.append(
+                f"{endpoint['family']} lambda={endpoint['lambda']} low correlation"
+            )
         if endpoint["interior"]["touches_boundary"]:
-            endpoint_failures.append(f"{endpoint['family']} lambda={endpoint['lambda']} touches box")
+            endpoint_failures.append(
+                f"{endpoint['family']} lambda={endpoint['lambda']} touches box"
+            )
         if not endpoint["surface"]["surface_is_closed"]:
-            endpoint_failures.append(f"{endpoint['family']} lambda={endpoint['lambda']} open surface")
+            endpoint_failures.append(
+                f"{endpoint['family']} lambda={endpoint['lambda']} open surface"
+            )
     failures.extend(endpoint_failures)
 
     source_counts = dict(Counter(record["source"] for record in records))
     if source_counts != summary["source_counts"]:
-        failures.append(f"summary source_counts {summary['source_counts']} != records {source_counts}")
+        failures.append(
+            f"summary source_counts {summary['source_counts']} != records {source_counts}"
+        )
 
     family_checks: dict[str, Any] = {}
     html_transition_lookup = {
@@ -301,18 +342,19 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
         classic = transition["modes"]["classic"]
         html_grid = np.asarray(classic["z"], dtype=int)
         if not np.array_equal(stable_grid, html_grid):
-            failures.append(f"{family_key}: HTML classic grid does not match source stable grid")
+            failures.append(
+                f"{family_key}: HTML classic grid does not match source stable grid"
+            )
         classic_regions = connected_regions(html_grid)
         if int(classic["components"]) != len(classic_regions):
             failures.append(f"{family_key}: HTML classic component count mismatch")
         region_key_grid = classic["regionKeys"]
         for region in classic_regions:
-            keys = {
-                region_key_grid[row][col]
-                for row, col in region["cells"]
-            }
+            keys = {region_key_grid[row][col] for row, col in region["cells"]}
             if len(keys) != 1:
-                failures.append(f"{family_key}: a connected classic region has multiple keys")
+                failures.append(
+                    f"{family_key}: a connected classic region has multiple keys"
+                )
                 break
             key = next(iter(keys))
             payload_region = payload["regions"].get(key)
@@ -346,23 +388,30 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
             stable_region_key_grid = stable_mode["regionKeys"]
             for region in stable_regions:
                 keys = {
-                    stable_region_key_grid[row][col]
-                    for row, col in region["cells"]
+                    stable_region_key_grid[row][col] for row, col in region["cells"]
                 }
                 if len(keys) != 1:
-                    failures.append(f"{family_key}: a connected stable region has multiple keys")
+                    failures.append(
+                        f"{family_key}: a connected stable region has multiple keys"
+                    )
                     break
                 key = next(iter(keys))
                 payload_region = payload["regions"].get(key)
                 if payload_region is None:
-                    failures.append(f"{family_key}: stable region key {key} missing from payload")
+                    failures.append(
+                        f"{family_key}: stable region key {key} missing from payload"
+                    )
                     break
                 if int(payload_region["cellCount"]) != len(region["cells"]):
-                    failures.append(f"{family_key}: stable region {key} cell count mismatch")
+                    failures.append(
+                        f"{family_key}: stable region {key} cell count mismatch"
+                    )
                     break
             stable_display_info = {
                 "min_cells": stable_min_cells,
-                "phase_count": int(len(set(int(value) for value in html_stable.ravel()))),
+                "phase_count": int(
+                    len(set(int(value) for value in html_stable.ravel()))
+                ),
                 "connected_regions": len(stable_regions),
                 "reassigned_cells": int(changed_cells),
                 "single_cell_regions": sum(
@@ -376,13 +425,21 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
         family_checks[family_key] = {
             "records": len(family_records[family_key]),
             "raw_phase_count": int(raw_grid.max()),
-            "stable_phase_count": int(len(set(int(value) for value in stable_grid.ravel()))),
+            "stable_phase_count": int(
+                len(set(int(value) for value in stable_grid.ravel()))
+            ),
             "classic_connected_regions": len(classic_regions),
             "stable_display": stable_display_info,
-            "html_contraction_classes": int(transition["modes"]["contraction"]["classes"]),
-            "html_contraction_regions": int(transition["modes"]["contraction"]["components"]),
+            "html_contraction_classes": int(
+                transition["modes"]["contraction"]["classes"]
+            ),
+            "html_contraction_regions": int(
+                transition["modes"]["contraction"]["components"]
+            ),
             "signature_count": len(signature_to_id),
-            "source_counts": dict(Counter(record["source"] for record in family_records[family_key])),
+            "source_counts": dict(
+                Counter(record["source"] for record in family_records[family_key])
+            ),
         }
 
     html_region_failures = []
@@ -393,7 +450,9 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
         if topology["touches_boundary"]:
             html_region_failures.append(f"{key}: representative touches box boundary")
         if int(region["surface"]["triangle_count"]) <= 0:
-            html_region_failures.append(f"{key}: representative surface has no triangles")
+            html_region_failures.append(
+                f"{key}: representative surface has no triangles"
+            )
         if region["compactDomain"]["key"] == "none":
             html_region_failures.append(f"{key}: missing compact domain metadata")
     failures.extend(html_region_failures)
@@ -426,7 +485,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=DEFAULT_SCAN_DIR / "tpms_compact_phase_map_validation.json",
+        default=Path("_build/new_phase_maps/tpms_validation.json"),
     )
     return parser.parse_args()
 
@@ -434,6 +493,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     report = validate(args)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(f"status: {report['status']}")
     print(f"wrote: {args.output}")
@@ -446,6 +506,8 @@ def main() -> None:
             f"classic_regions={family['classic_connected_regions']}, "
             f"contraction_regions={family['html_contraction_regions']}"
         )
+    if report["failures"]:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

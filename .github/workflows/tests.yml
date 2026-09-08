@@ -69,6 +69,7 @@ jobs:
           tests/inputs/test_optional_dependencies.py
           tests/inputs/test_coordinate_chain.py
           tests/inputs/test_biomolecular.py
+          tests/applications/test_phase_map_examples.py
 
   optional:
     name: Full optional Python stack (Python 3.12)
@@ -205,6 +206,9 @@ jobs:
         run: >
           uv run --no-sync ruff check
           src tests examples/quickstart.py dev/check_repository_consistency.py
+          dev/build_phase_map_demos.py
+          User_guide/applications/NewPhaseMapPlots/RealMaterials/scripts
+          User_guide/applications/NewPhaseMapPlots/TPMS/scripts
 
       - name: Run incremental Pyright checks
         run: uv run --no-sync pyright

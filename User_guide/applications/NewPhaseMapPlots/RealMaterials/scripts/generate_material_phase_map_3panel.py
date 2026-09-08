@@ -1,3 +1,6 @@
+"""Render the historical material panels from saved HTML; no scan is performed."""
+
+import argparse
 import json
 from pathlib import Path
 
@@ -7,16 +10,13 @@ import numpy as np
 from matplotlib.colors import BoundaryNorm, ListedColormap
 
 
-FIGURE_DIR = Path(
-    "/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/Knotted_graph_code_paper/"
-    "FigureGeneration/figures/07_hamiltonian_yamada_phase_maps"
+HTML_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "html"
+    / "07_hamiltonian_yamada_plotly_region_geometry_with_materials.html"
 )
-HTML_PATH = FIGURE_DIR / "07_hamiltonian_yamada_plotly_region_geometry.html"
-OUTPUT_DIR = Path(__file__).resolve().parent / "material_parameter_phase_maps"
-TMP_PDF = OUTPUT_DIR / "07_hamiltonian_yamada_material_phase_maps_3panel_like_porous.pdf"
-TMP_PNG = OUTPUT_DIR / "07_hamiltonian_yamada_material_phase_maps_3panel_like_porous.png"
-FINAL_PDF = FIGURE_DIR / TMP_PDF.name
-FINAL_PNG = FIGURE_DIR / TMP_PNG.name
+OUTPUT_DIR = Path("_build/new_phase_maps/material_figures")
+OUTPUT_STEM = "07_hamiltonian_yamada_material_phase_maps_3panel_like_porous"
 
 MATERIAL_KEYS = ("tib2_d6_F", "co2mnga_t8")
 PANEL_LABELS = ("(a)", "(b)")
@@ -72,7 +72,9 @@ def add_panel_label(ax, label: str) -> None:
     )
 
 
-def draw_phase_boundaries(ax, lambdas: np.ndarray, energies: np.ndarray, labels: np.ndarray) -> None:
+def draw_phase_boundaries(
+    ax, lambdas: np.ndarray, energies: np.ndarray, labels: np.ndarray
+) -> None:
     for phase_id in sorted(set(int(value) for value in labels.ravel())):
         mask = (labels == phase_id).astype(float)
         if mask.min() == mask.max():
@@ -107,7 +109,9 @@ def style_axis(ax, item: dict, *, show_xlabel: bool = True) -> None:
     if show_xlabel:
         ax.set_xlabel(r"$\lambda$", fontsize=24, labelpad=7)
     ax.set_ylabel(r"$E$", fontsize=24, labelpad=8)
-    ax.tick_params(axis="both", which="major", labelsize=17, width=1.5, length=6, direction="out")
+    ax.tick_params(
+        axis="both", which="major", labelsize=17, width=1.5, length=6, direction="out"
+    )
     ax.minorticks_on()
     ax.tick_params(axis="both", which="minor", width=1.0, length=3, direction="out")
     ax.grid(which="major", color="white", linewidth=0.7, alpha=0.22)
@@ -156,7 +160,7 @@ def add_upsilon_colorbar(fig, ax, cmap, norm, phase_count: int) -> None:
     cbar.outline.set_linewidth(1.2)
 
 
-def make_figure(payload: dict) -> None:
+def make_figure(payload: dict, output_dir: Path = OUTPUT_DIR) -> None:
     transitions = {item["key"]: item for item in payload["transitions"]}
     materials = [transitions[key] for key in MATERIAL_KEYS]
 
@@ -168,20 +172,24 @@ def make_figure(payload: dict) -> None:
         colorbar_data = plot_material_panel(ax, item, label)
         add_upsilon_colorbar(fig, ax, *colorbar_data)
 
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    fig.savefig(TMP_PNG, dpi=450, bbox_inches="tight", pad_inches=0.03, facecolor="white")
-    fig.savefig(TMP_PDF, dpi=700, bbox_inches="tight", pad_inches=0.03, facecolor="white")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    png = output_dir / (OUTPUT_STEM + ".png")
+    pdf = output_dir / (OUTPUT_STEM + ".pdf")
+    fig.savefig(png, dpi=450, bbox_inches="tight", pad_inches=0.03, facecolor="white")
+    fig.savefig(pdf, dpi=700, bbox_inches="tight", pad_inches=0.03, facecolor="white")
     plt.close(fig)
-    print("saved:", TMP_PNG)
-    print("saved:", TMP_PDF)
-    print("copy targets:")
-    print(FINAL_PNG)
-    print(FINAL_PDF)
+    print("saved:", png)
+    print("saved:", pdf)
 
 
 def main() -> None:
-    configure_paper_style()
-    make_figure(payload_from_html(HTML_PATH))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--html", type=Path, default=HTML_PATH)
+    parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
+    args = parser.parse_args()
+    with mpl.rc_context():
+        configure_paper_style()
+        make_figure(payload_from_html(args.html), args.output_dir)
 
 
 if __name__ == "__main__":

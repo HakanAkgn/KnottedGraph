@@ -168,6 +168,7 @@ dev/*
 !dev/benchmark_data/.gitkeep
 !dev/benchmark_data/topoly_random_cubic_v1.jsonl
 !dev/check_protected_final_audit.py
+!dev/build_phase_map_demos.py
 assets/*.pdf
 # assets/*.html
 .vscode/
@@ -185,3 +186,6 @@ User_guide/benchmarks/results/04_thick_handlebody_pd_topoly_comparison.csv
 User_guide/benchmarks/results/04_thick_handlebody_library_timing_distributions.*
 assets/paper/handlebody-timing-distributions.png
 assets/paper/handlebody-timing-distributions.svg
+# Losslessly generated from tracked research HTML during Sphinx HTML builds.
+/doc/assets/demos/new_phase_maps/
+/_build/new_phase_maps/

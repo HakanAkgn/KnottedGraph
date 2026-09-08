@@ -8,25 +8,19 @@ import gzip
 import importlib.util
 import json
 import math
-import os
 import sys
 from collections import Counter, defaultdict, deque
 from pathlib import Path
 from typing import Any
 
-os.environ.setdefault("MPLBACKEND", "Agg")
-os.environ.setdefault("MPLCONFIGDIR", "/private/tmp/codex-matplotlib")
-os.environ.setdefault("PYVISTA_OFF_SCREEN", "true")
-
 import networkx as nx
 import numpy as np
 from skimage.measure import marching_cubes
+from knotted_graph.applications.phase_map_examples._runtime import resolve_geometry_path
 
 
 THIS_REPO = Path(__file__).resolve().parents[1]
-DEFAULT_SCAN_DIR = THIS_REPO / "tmp" / "tpms_parameter_phase_maps"
-TPMS_SCAN_SCRIPT = THIS_REPO / "tmp" / "tpms_parameter_phase_maps.py"
-COMPACT_TPMS_SCAN_SCRIPT = THIS_REPO / "tmp" / "tpms_compact_scaffold_phase_maps.py"
+DEFAULT_SCAN_DIR = THIS_REPO / "data"
 DEFAULT_TRANSITION_ORDER = (
     "schwarz_p_to_diamond",
     "gyroid_to_schwarz_p",
@@ -53,7 +47,11 @@ BASE_COLORS = (
 )
 
 
-def load_tpms_module(scan_script: Path):
+def load_tpms_module(scan_script: Path | None):
+    if scan_script is None:
+        from knotted_graph.applications.phase_map_examples import _tpms
+
+        return _tpms
     spec = importlib.util.spec_from_file_location(scan_script.stem, scan_script)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"Could not load {scan_script}")
@@ -67,15 +65,14 @@ def load_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def resolve_path(path_text: str) -> Path:
-    path = Path(path_text)
-    if path.is_absolute():
-        return path
-    return THIS_REPO / path
+def resolve_path(path_text: str, scan_dir: Path = DEFAULT_SCAN_DIR) -> Path:
+    # Legacy records contain the researcher's old tmp/ prefix. Relocate using
+    # the explicitly selected dataset, not a machine-specific fallback repo.
+    return resolve_geometry_path(path_text, scan_dir)
 
 
 def load_geometry(record: dict[str, Any]) -> dict[str, Any]:
-    path = resolve_path(record["geometry_path"])
+    path = Path(record["geometry_path"])
     with gzip.open(path, "rt", encoding="utf-8") as handle:
         return json.load(handle)
 
@@ -347,7 +344,10 @@ def build_record_grid(
     thresholds: list[float],
 ) -> list[list[dict[str, Any]]]:
     lookup = {
-        (round(float(record["lam"]), 12), round(float(record["threshold_c"]), 12)): record
+        (
+            round(float(record["lam"]), 12),
+            round(float(record["threshold_c"]), 12),
+        ): record
         for record in records
         if record["family"] == family_key
     }
@@ -599,10 +599,38 @@ def colors_for_count(count: int) -> list[str]:
     return [BASE_COLORS[index % len(BASE_COLORS)] for index in range(max(1, count))]
 
 
+def family_from_summary(
+    tpms_module: Any, family_summary: dict[str, Any], scan_parameters: dict[str, Any]
+):
+    """Use recorded domain parameters, never silently regenerate a different solid."""
+    allowed = {"domain_kind", "span_half_width", "domain_radius_fraction"}
+    options = {key: value for key, value in scan_parameters.items() if key in allowed}
+    family = next(
+        f
+        for f in tpms_module.tpms_families(
+            dimension=int(family_summary["dimension"]),
+            thresholds=tuple(float(value) for value in family_summary["thresholds"]),
+            **options,
+        )
+        if f.key == family_summary["key"]
+    )
+    domain = family_summary["compact_domain"]
+    if (
+        not np.array_equal(family.span, family_summary["span"])
+        or family.domain.key != domain["key"]
+        or family.domain.formula != domain["formula"]
+    ):
+        raise ValueError(
+            "Recorded TPMS domain differs from the reconstructed family. "
+            "Provide exact scan_parameters in the summary; do not substitute default geometry."
+        )
+    return family
+
+
 def build_payload(
     scan_dir: Path,
     *,
-    scan_script: Path,
+    scan_script: Path | None,
     max_surface_faces: int,
     max_contraction_states: int,
     max_contraction_depth: int,
@@ -611,6 +639,8 @@ def build_payload(
 ) -> dict[str, Any]:
     tpms_module = load_tpms_module(scan_script)
     records = load_json(scan_dir / "tpms_parameter_phase_map_records.json")
+    for record in records:
+        record["geometry_path"] = str(resolve_path(record["geometry_path"], scan_dir))
     source_data = load_json(scan_dir / "tpms_parameter_phase_map_source_data.json")
     summary = load_json(scan_dir / "tpms_parameter_phase_map_summary.json")
     lambdas = [float(value) for value in source_data["lambdas"]]
@@ -619,9 +649,7 @@ def build_payload(
     regions_payload: dict[str, Any] = {}
     global_region_rows = []
 
-    order_index = {
-        key: index for index, key in enumerate(DEFAULT_TRANSITION_ORDER)
-    }
+    order_index = {key: index for index, key in enumerate(DEFAULT_TRANSITION_ORDER)}
     family_summaries = sorted(
         summary["families"],
         key=lambda item: (order_index.get(item["key"], len(order_index)), item["key"]),
@@ -630,14 +658,9 @@ def build_payload(
     for family_summary in family_summaries:
         family_key = family_summary["key"]
         thresholds = [float(value) for value in family_summary["thresholds"]]
-        families = {
-            family.key: family
-            for family in tpms_module.tpms_families(
-                dimension=int(family_summary["dimension"]),
-                thresholds=tuple(thresholds),
-            )
-        }
-        family = families[family_key]
+        family = family_from_summary(
+            tpms_module, family_summary, summary.get("scan_parameters", {})
+        )
         map_data = source_data["phase_maps"][family_key]
         classic_grid = np.asarray(map_data["stable_grid"], dtype=int)
         record_grid = build_record_grid(records, family_key, lambdas, thresholds)
@@ -771,7 +794,9 @@ def build_payload(
             )
             stable_region_grid = np.zeros_like(stable_grid, dtype=int)
             stable_region_keys = [["" for _ in lambdas] for _ in thresholds]
-            stable_colors = colors_for_count(int(max(classic_grid.max(), stable_grid.max())))
+            stable_colors = colors_for_count(
+                int(max(classic_grid.max(), stable_grid.max()))
+            )
             stable_regions = connected_regions(stable_grid)
             for region_index, region_info in enumerate(stable_regions, start=1):
                 for row, col in region_info["cells"]:
@@ -814,7 +839,9 @@ def build_payload(
                 "colors": stable_colors,
                 "classes": int(len(set(int(value) for value in stable_grid.ravel()))),
                 "components": int(len(stable_regions)),
-                "rawClasses": int(len(set(int(value) for value in classic_grid.ravel()))),
+                "rawClasses": int(
+                    len(set(int(value) for value in classic_grid.ravel()))
+                ),
                 "stableMinCells": int(stable_min_cells),
                 "stableReassignedCells": int(stable_changed_cells),
             }
@@ -833,17 +860,23 @@ def build_payload(
             },
         }
         if stable_min_cells > 1:
-            stable_contraction_grid, stable_contraction_changed_cells = tpms_module.stable_labels(
-                contraction_grid,
-                min_cells=int(stable_min_cells),
+            stable_contraction_grid, stable_contraction_changed_cells = (
+                tpms_module.stable_labels(
+                    contraction_grid,
+                    min_cells=int(stable_min_cells),
+                )
             )
-            stable_contraction_region_grid = np.zeros_like(stable_contraction_grid, dtype=int)
+            stable_contraction_region_grid = np.zeros_like(
+                stable_contraction_grid, dtype=int
+            )
             stable_contraction_region_keys = [["" for _ in lambdas] for _ in thresholds]
             stable_contraction_colors = colors_for_count(
                 int(max(contraction_grid.max(), stable_contraction_grid.max()))
             )
             stable_contraction_regions = connected_regions(stable_contraction_grid)
-            for region_index, region_info in enumerate(stable_contraction_regions, start=1):
+            for region_index, region_info in enumerate(
+                stable_contraction_regions, start=1
+            ):
                 for row, col in region_info["cells"]:
                     stable_contraction_region_grid[row, col] = region_index
                     stable_contraction_region_keys[row][col] = (
@@ -864,9 +897,9 @@ def build_payload(
                     color=color,
                     representative_phase_id=None,
                 )
-                regions_payload[
-                    f"stable_contraction:{family.key}:{region_index}"
-                ] = region_payload
+                regions_payload[f"stable_contraction:{family.key}:{region_index}"] = (
+                    region_payload
+                )
                 global_region_rows.append(
                     {
                         "transition": family.key,
@@ -890,7 +923,9 @@ def build_payload(
                     len(set(int(value) for value in stable_contraction_grid.ravel()))
                 ),
                 "components": int(len(stable_contraction_regions)),
-                "rawClasses": int(len(set(int(value) for value in contraction_grid.ravel()))),
+                "rawClasses": int(
+                    len(set(int(value) for value in contraction_grid.ravel()))
+                ),
                 "stableMinCells": int(stable_min_cells),
                 "stableReassignedCells": int(stable_contraction_changed_cells),
                 "sourceMode": "contraction",
@@ -944,7 +979,9 @@ def build_payload(
     return {
         "version": "tpms_yamada_plotly_region_geometry_v1",
         "scanDir": str(scan_dir),
-        "scanScript": str(scan_script),
+        "scanScript": str(scan_script)
+        if scan_script
+        else "knotted_graph.applications.phase_map_examples._tpms",
         "defaultMode": "stable_contraction" if stable_min_cells > 1 else "contraction",
         "lambdas": [round(value, 6) for value in lambdas],
         "modes": modes,
@@ -952,7 +989,9 @@ def build_payload(
         "regions": regions_payload,
         "regionRows": global_region_rows,
         "summary": {
-            "reconstructedVolumes": int(summary["map_info"]["timing"]["reconstructed_volumes"]),
+            "reconstructedVolumes": int(
+                summary["map_info"]["timing"]["reconstructed_volumes"]
+            ),
             "elapsedSeconds": float(summary["map_info"]["timing"]["elapsed_seconds"]),
             "sourceCounts": summary["source_counts"],
             "errors": len(summary["errors"]),
@@ -967,7 +1006,9 @@ def build_payload(
 
 
 def html_document(payload: dict[str, Any]) -> str:
-    payload_json = json.dumps(payload, separators=(",", ":"), ensure_ascii=False, allow_nan=False)
+    payload_json = json.dumps(
+        payload, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+    )
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -1298,15 +1339,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=DEFAULT_SCAN_DIR / "tpms_yamada_plotly_region_geometry.html",
+        default=Path("_build/new_phase_maps/tpms_region_geometry.html"),
     )
     parser.add_argument(
         "--scan-script",
         type=Path,
         default=None,
         help=(
-            "script defining the sampled implicit families; defaults to the "
-            "compact-scaffold script when --scan-dir contains 'compact'"
+            "optional custom Python implementation; by default use the installed compact-TPMS engine"
         ),
     )
     parser.add_argument("--max-surface-faces", type=int, default=2600)
@@ -1332,18 +1372,11 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def default_scan_script(scan_dir: Path) -> Path:
-    if "compact" in str(scan_dir):
-        return COMPACT_TPMS_SCAN_SCRIPT
-    return TPMS_SCAN_SCRIPT
-
-
 def main() -> None:
     args = parse_args()
-    scan_script = args.scan_script or default_scan_script(args.scan_dir)
     payload = build_payload(
         args.scan_dir,
-        scan_script=scan_script,
+        scan_script=args.scan_script,
         max_surface_faces=int(args.max_surface_faces),
         max_contraction_states=int(args.max_contraction_states),
         max_contraction_depth=int(args.max_contraction_depth),
