@@ -41,6 +41,20 @@ Hamiltonian-file reader.
    :members: YamadaPhaseRecord, YamadaPhaseMapResult, MaterialBandEnergySurface, align_material_hamiltonians, pad_material_hamiltonian, make_yamada_phase_map
 ```
 
+## Saved material and compact-TPMS examples
+
+These pre-alpha application helpers read record tables; they do not parse
+general Hamiltonian or TPMS files. Reading and raw plotting use the base stack.
+New scans need the optional scientific dependencies and explicit compute
+resources described in {doc}`../applications/material_and_tpms_phase_maps`.
+The detailed research engines (underscore-prefixed modules) are implementation
+details, not a new stable mathematical API.
+
+```{eval-rst}
+.. automodule:: knotted_graph.applications.phase_map_examples
+   :members: PhaseMapData, load_phase_map, read_phase_map_records, plot_phase_map
+```
+
 ## Nodal and material workflows
 
 Executing `NodalSkeleton` or `MaterialFermiSurface` requires the `nodal` extra;

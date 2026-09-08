@@ -20,8 +20,9 @@
 | {doc}`protein_derived_spatial_graphs` | input user | you have PDB/mmCIF data and need to understand the implemented boundary | adapter is public; domain mapping is not yet generic |
 | {doc}`yamada_formula_discovery` | researcher reproducing a result | you need the exact dataset/held-out symbolic checks | advanced publication reproduction |
 | {doc}`hamiltonian_yamada_phase_maps` | domain researcher | you need a two-parameter Hamiltonian topology scan | advanced, cached, compute-intensive |
+| {doc}`material_and_tpms_phase_maps` | reader of the new material/scaffold plots | you want to inspect saved records, then try a coarse scan | base for saved records; optional and compute-intensive for new scans |
 
-The last two routes are deliberately not presented as beginner tutorials. Read
+Formula Discovery and Hamiltonian Phase Maps are deliberately not presented as beginner tutorials. Read
 their web pages first; each page describes prerequisites, outputs, interpretation,
 and which cells are safe to browse without regenerating publication data.
 
@@ -39,4 +40,5 @@ mathematical_investigations
 analytic_knot_fields
 yamada_formula_discovery
 hamiltonian_yamada_phase_maps
+material_and_tpms_phase_maps
 ```

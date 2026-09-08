@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import sys
+import subprocess
 from pathlib import Path
 import tomllib
 
@@ -83,3 +84,13 @@ else:
     }
 
 os.environ.setdefault("PYVISTA_OFF_SCREEN", "true")
+
+
+def _build_phase_map_demos(app):
+    """Package pinned reference payloads, never regenerate the scientific scans."""
+    if app.builder.format == "html":
+        subprocess.run([sys.executable, str(ROOT / "dev/build_phase_map_demos.py")], check=True)
+
+
+def setup(app):
+    app.connect("builder-inited", _build_phase_map_demos)

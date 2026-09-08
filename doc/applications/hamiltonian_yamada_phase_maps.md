@@ -5,6 +5,11 @@ or Bloch-vector models and records the topology extracted at each grid cell.
 It is not a Hamiltonian-file parser and it is not a proof of a continuum phase
 boundary.
 
+For the additional material-parameter and compact-scaffold plots, continue to
+{doc}`material_and_tpms_phase_maps`. That guide starts from saved records and
+provides a separate bounded compute example; the accepted nodal viewer below is
+unchanged.
+
 <div class="kg-hero">
   <p class="kg-lead">Use the interactive result to select a transition and a phase region, then inspect a representative exceptional surface and its simplified spatial-graph skeleton. Use the notebook when you need to regenerate the grid, caches, audits, or figures.</p>
   <div class="kg-link-row">

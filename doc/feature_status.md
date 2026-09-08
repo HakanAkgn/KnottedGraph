@@ -39,6 +39,7 @@ Status legend:
 | In-memory two-band non-Hermitian Hamiltonian or Bloch vector | Application API · optional | `nodal` | `knotted_graph.applications.nodal.NodalSkeleton` | `NodalSkeleton` | Inspect the sampled surface/mask, then call `.skeleton_graph()`. | Grid work grows with `dimension**3`. |
 | In-memory Hermitian multiband Hamiltonian | Application API · optional | `nodal` | `knotted_graph.applications.materials.MaterialFermiSurface` | `MaterialFermiSurface` | Inspect the gap surface, then call `.skeleton_graph()`. | Depends on grid size and band count. |
 | Knot-field or in-memory Hamiltonian Yamada phase map | Application API · optional | `knot-fields` for knot sources; `nodal` for Hamiltonian/material sources | `knotted_graph.applications.make_yamada_phase_map` | `YamadaPhaseMapResult` | Inspect cell errors, phase signatures, and transition intervals; recompute selected cells only when needed. | Number of phase-map cells multiplied by extraction and Yamada-evaluation cost. |
+| Saved material or compact-TPMS phase-map records | Application API · base | none | `knotted_graph.applications.phase_map_examples.load_phase_map` | `PhaseMapData` | Inspect `.summary()`, then use `plot_phase_map` for a raw categorical plot. | Reads saved rows; no field extraction or invariant recomputation. |
 | Embedded graph needing repulsive relaxation | External backend | none for the direct graph call; separately installed native Repulsor solver | `knotted_graph.layout.repulsive.relax_spatial_graph` | `GraphLayoutResult` | Validate `result.graph` before projection. | Depends on native build and solver options; native runtime has not been independently audited. |
 | Embedded graph needing an interactive 3-D view | Public · optional | `viz` | `knotted_graph.visualization.plot_3D_graph_plotly` | `plotly.graph_objects.Figure` | Display or export the returned figure. | Depends on graph/polyline size and the renderer. |
 
@@ -71,6 +72,13 @@ application-specific conversion step. Their presence in a figure does not add a
 public parser to `knotted_graph.inputs`.
 
 ## Continue from here
+
+The {doc}`applications/material_and_tpms_phase_maps` guide distinguishes saved
+record reading from new optional-dependency scans. Its application-specific
+CSV/JSON schema is not a generic graph or Hamiltonian-file adapter. New scans
+use the package's `phase_map_examples scan` command, require `nodal` and `viz`,
+and should begin with the coarse profile and `--dry-run` on an appropriate
+compute allocation.
 
 - Follow the {doc}`installation` guide to install the required extra.
 - Run the deterministic {doc}`quickstart` for a base-install smoke test.

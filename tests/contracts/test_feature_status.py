@@ -144,6 +144,12 @@ EXPECTED_ROUTE_FIELDS = {
         "`knotted_graph.applications.make_yamada_phase_map`",
         "`YamadaPhaseMapResult`",
     ),
+    "Saved material or compact-TPMS phase-map records": (
+        "Application API · base",
+        "none",
+        "`knotted_graph.applications.phase_map_examples.load_phase_map`",
+        "`PhaseMapData`",
+    ),
     "Embedded graph needing repulsive relaxation": (
         "External backend",
         "none for the direct graph call; separately installed native Repulsor solver",
@@ -158,6 +164,8 @@ EXPECTED_ROUTE_FIELDS = {
     ),
 }
 BASE_CALLS = [
+    ("knotted_graph.applications.phase_map_examples", "load_phase_map"),
+    ("knotted_graph.applications.phase_map_examples", "plot_phase_map"),
     ("knotted_graph.inputs", "from_coordinate_chain"),
     ("knotted_graph.inputs", "from_pdb_backbone"),
     ("knotted_graph.inputs", "from_mmcif_backbone"),
@@ -226,7 +234,7 @@ def test_feature_status_table_has_one_complete_route_per_row():
     rows = _load_rows()
 
     assert [row[HEADERS[0]] for row in rows] == list(EXPECTED_ROUTE_FIELDS)
-    assert len({row[HEADERS[0]] for row in rows}) == 21
+    assert len({row[HEADERS[0]] for row in rows}) == len(EXPECTED_ROUTE_FIELDS)
     assert {row["Status"] for row in rows} <= ALLOWED_STATUSES
     for row in rows:
         assert all(row[column] for column in HEADERS)

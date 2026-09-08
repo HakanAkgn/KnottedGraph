@@ -48,6 +48,11 @@ Choose the row that matches the object you already have:
 The complete availability, extra, return-type, and scaling matrix is in
 [`doc/feature_status.md`](doc/feature_status.md).
 
+For the newly added material/TPMS plots, start with the
+[phase-map walkthrough](doc/applications/material_and_tpms_phase_maps.md), not
+the raw research scripts. It covers saved-result inspection, raw replotting,
+coarse compute examples and the boundary to full research reproduction.
+
 ## The core mental model
 
 Most graph-returning routes meet at one data contract:
