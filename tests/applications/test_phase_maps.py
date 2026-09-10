@@ -1,7 +1,13 @@
 import networkx as nx
+import numpy as np
 import sympy as sp
 
-from knotted_graph.applications.phase_maps import make_yamada_phase_map
+from knotted_graph.applications.phase_maps import (
+    boundary_filling_groups,
+    make_yamada_phase_map,
+    resolve_volume_mask,
+    volume_topology,
+)
 from knotted_graph.inputs import KnotFunction
 
 
@@ -20,10 +26,8 @@ def _patch_yamada(monkeypatch):
     import knotted_graph.invariants.yamada
     import knotted_graph.projection
 
-    A = sp.Symbol("A")
-
     def fake_yamada(graph, variable, **kwargs):
-        return A + graph.number_of_edges()
+        return variable + graph.number_of_edges()
 
     monkeypatch.setattr(
         knotted_graph.invariants.yamada,
@@ -181,6 +185,98 @@ def test_unified_phase_map_collapses_closed_genus_zero_masks_to_vertex(monkeypat
     [record] = result.records
     assert record.error is None
     assert record.nodes == 1
+    assert record.edges == 0
+    assert record.yamada.free_symbols == {sp.Symbol("Y")}
+
+
+def test_volume_topology_distinguishes_ball_shell_and_solid_torus():
+    axis = np.arange(41, dtype=float) - 20.0
+    x, y, z = np.meshgrid(axis, axis, axis, indexing="ij")
+    radius_squared = x * x + y * y + z * z
+
+    ball = radius_squared <= 10.0**2
+    shell = (radius_squared <= 10.0**2) & (radius_squared >= 5.0**2)
+    torus = (np.sqrt(x * x + y * y) - 10.0) ** 2 + z * z <= 3.0**2
+
+    ball_topology = volume_topology(ball)
+    shell_topology = volume_topology(shell)
+    torus_topology = volume_topology(torus)
+
+    assert (
+        ball_topology.connected_components,
+        ball_topology.handle_rank,
+        ball_topology.enclosed_voids,
+        ball_topology.boundary_components,
+    ) == (1, 0, 0, 1)
+    assert (
+        shell_topology.connected_components,
+        shell_topology.handle_rank,
+        shell_topology.enclosed_voids,
+        shell_topology.boundary_components,
+    ) == (1, 0, 1, 2)
+    assert (
+        torus_topology.connected_components,
+        torus_topology.handle_rank,
+        torus_topology.enclosed_voids,
+        torus_topology.boundary_components,
+    ) == (1, 1, 0, 1)
+
+    [(outer_filling, inner_fillings)] = boundary_filling_groups(shell)
+    assert volume_topology(outer_filling).boundary_components == 1
+    assert len(inner_fillings) == 1
+    assert volume_topology(inner_fillings[0]).boundary_components == 1
+
+
+def test_resolve_volume_mask_removes_satellites_and_fills_tiny_voids():
+    mask = np.zeros((25, 25, 25), dtype=bool)
+    mask[4:20, 4:20, 4:20] = True
+    mask[10, 10, 10] = False
+    mask[22, 22, 22] = True
+
+    resolved, diagnostics = resolve_volume_mask(
+        mask,
+        min_component_voxels=8,
+        min_void_voxels=8,
+        dominant_component_only=True,
+    )
+
+    assert resolved[10, 10, 10]
+    assert not resolved[22, 22, 22]
+    assert diagnostics == {
+        "removed_component_voxels": 1,
+        "filled_void_voxels": 1,
+    }
+
+
+def test_unified_phase_map_represents_a_shell_by_two_vertices(monkeypatch):
+    from knotted_graph.applications.nodal.skeleton import NodalSkeleton
+
+    _patch_yamada(monkeypatch)
+
+    axis = np.arange(21, dtype=float) - 10.0
+    x, y, z = np.meshgrid(axis, axis, axis, indexing="ij")
+    radius_squared = x * x + y * y + z * z
+    shell = (radius_squared <= 7.0**2) & (radius_squared >= 3.0**2)
+    monkeypatch.setattr(NodalSkeleton, "_interior_mask", property(lambda self: shell))
+
+    def fail_skeleton_graph(self, **kwargs):
+        raise AssertionError("spherical boundary components should collapse before extraction")
+
+    monkeypatch.setattr(NodalSkeleton, "skeleton_graph", fail_skeleton_graph)
+
+    kx, ky, kz = sp.symbols("kx ky kz", real=True)
+    result = make_yamada_phase_map(
+        (kx, ky, kz),
+        (kx + 1, ky, kz),
+        source_kind="nodal",
+        lambdas=[0.0],
+        parameters=[0.0],
+        dimension=21,
+    )
+
+    [record] = result.records
+    assert record.error is None
+    assert record.nodes == 2
     assert record.edges == 0
 
 
