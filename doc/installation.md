@@ -7,7 +7,8 @@ the 0.2.0 development API on `codex/arbitrary-knot-user-integration`. The
 published website is still an earlier snapshot and is not the source of truth
 for this review.
 
-PyPI currently provides version 0.1.2. That release contains the legacy,
+[PyPI](https://pypi.org/project/knotted_graph/) was checked on 2026-09-11 and
+provides version 0.1.2. That release contains the legacy,
 nodal-only package layout and is not compatible with the imports or examples in
 these 0.2.0 development documents. Until 0.2.0 is published, install the current
 API from GitHub rather than running an unpinned `pip install knotted_graph`.

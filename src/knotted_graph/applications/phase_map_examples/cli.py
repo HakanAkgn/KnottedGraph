@@ -109,7 +109,7 @@ def scan_plan(args: argparse.Namespace) -> dict:
         "workers": args.workers,
         "max_exact_yamada_edges": args.max_exact_yamada_edges or (8 if quick else 18),
         "output_dir": str(args.output_dir),
-        "processing": "all requested cells classified; no island smoothing or manual signature merges",
+        "processing": "all requested cells classified; no resolution calibration, island smoothing, manual signature merges or C6 display grouping",
         "scope": "finite-grid application example; not a convergence result or exact phase-boundary proof",
     }
 

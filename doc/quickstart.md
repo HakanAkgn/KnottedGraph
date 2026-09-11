@@ -118,6 +118,25 @@ The complete, tested version of the code above is stored in
 uv run python examples/quickstart.py
 ```
 
+## Start from files
+
+The companion `examples/input_to_yamada.py` completes the same route from
+paired node/edge CSV files. It creates a small temporary input, calls the
+existing `from_spatial_graph_csv()` adapter, checks `.issues`, validates the
+`pos`/`pts` embedding with `ensure_embedding()`, and prints the selected PD
+code and the polynomial:
+
+```bash
+uv run python examples/input_to_yamada.py
+```
+
+Expect 2 nodes, 3 edges, zero projection crossings and the same nonzero
+polynomial shown above. This route uses the base installation and no external
+data or network access. The script is a source-repository example; copy it
+separately if you installed only the wheel. Replace its temporary CSV creation
+with your two file paths when using your own graph, and inspect input issues
+before continuing. See {doc}`user_guide/input_adapters` for the CSV schema.
+
 After this succeeds, choose the next workflow from the
 {doc}`feature_status` matrix or the {doc}`user_guide/workflow_overview`. If it
 fails, continue with the

@@ -13,13 +13,18 @@ from typing import Any
 
 import networkx as nx
 import numpy as np
-from skimage.measure import euler_number, label as label_volume
+import pyvista as pv
+from skimage.measure import euler_number, label as label_volume, marching_cubes
 
 from knotted_graph.applications.phase_map_examples._materials import (
     K_SYMBOLS,
     MaterialFermiSurface,
     PHASE_COLORS,
     apply_signature_phase_merges,
+    attach_c6_invalid_components_to_lower_phase,
+    boundary_filling_groups,
+    enclosed_void_masks,
+    resolve_mask_components,
     connected_components_for_label,
     material_families,
     remap_labels_contiguous,
@@ -43,7 +48,14 @@ MAX_SURFACE_TRIANGLES = 1200
 ROUND_DIGITS = 5
 MIN_STABLE_CELLS = 8
 ISLAND_MERGE_STRATEGY = "below"
-PRIMARY_COMPONENT_MIN_FRACTION = 0.25
+
+
+C6_REPRESENTATIVE_HINTS = {
+    (
+        "tib2_d6_F",
+        "yamada-set:outer[yamada:Integer(0)]inner[yamada:Integer(-1)]",
+    ): (3.883729, 3.78),
+}
 
 
 def rounded(value: Any, digits: int = ROUND_DIGITS) -> Any:
@@ -119,6 +131,9 @@ def phase_grids(
     stable_old, manual_merges = apply_signature_phase_merges(
         stable_old, old_signature_to_id, str(records[0]["material"])
     )
+    stable_old, c6_symmetry_merges = attach_c6_invalid_components_to_lower_phase(
+        stable_old, old_signature_to_id, str(records[0]["material"])
+    )
     stable, stable_label_lookup = remap_labels_contiguous(stable_old, old_id_to_label)
     used_old = sorted(int(value) for value in set(stable_old.ravel()))
     old_to_new = {old: new for new, old in enumerate(used_old, start=1)}
@@ -138,6 +153,7 @@ def phase_grids(
         "stable_signature_lookup": stable_signature_lookup,
         "changed_cells": int(changed_cells),
         "manual_merges": manual_merges,
+        "c6_symmetry_merges": c6_symmetry_merges,
         "raw_classes": len(signatures),
     }
 
@@ -149,18 +165,32 @@ def choose_representative(
     lookup: dict[tuple[float, float], dict[str, Any]],
     lambdas: np.ndarray,
     energies: list[float],
+    preferred_parameter_energy: tuple[float, float] | None = None,
 ) -> dict[str, Any]:
     center = np.asarray(component, dtype=float).mean(axis=0)
 
-    def score(cell: tuple[int, int]) -> tuple[int, int, float, int, int]:
+    def score(cell: tuple[int, int]) -> tuple[int, int, float, float, int, int]:
         row, col = cell
         same_raw = int(raw_remapped[row, col]) == int(phase_id)
         record = lookup[
             (round(float(energies[row]), 12), round(float(lambdas[col]), 12))
         ]
         computed = bool(record.get("classification_computed", True))
+        preferred_distance = 0.0
+        if preferred_parameter_energy is not None:
+            parameter_value, energy = preferred_parameter_energy
+            preferred_distance = abs(
+                float(record["parameter_value"]) - float(parameter_value)
+            ) + abs(float(record["energy"]) - float(energy))
         distance = float(np.linalg.norm(np.asarray([row, col], dtype=float) - center))
-        return (0 if same_raw else 1, 0 if computed else 1, distance, row, col)
+        return (
+            0 if same_raw else 1,
+            0 if computed else 1,
+            preferred_distance,
+            distance,
+            row,
+            col,
+        )
 
     row, col = min(component, key=score)
     return lookup[(round(float(energies[row]), 12), round(float(lambdas[col]), 12))]
@@ -205,18 +235,23 @@ def topology_for_mask(mask: np.ndarray) -> dict[str, Any]:
             "components": 0,
             "euler_characteristic": 0,
             "handle_rank": 0,
+            "void_components": 0,
+            "boundary_components": 0,
             "boundary_faces": [],
             "touches_boundary": False,
             "closed_in_window": True,
         }
     _, component_count = label_volume(mask, connectivity=3, return_num=True)
+    void_count = len(enclosed_void_masks(mask))
     euler = int(euler_number(mask, connectivity=3))
     faces = boundary_faces_for_mask(mask)
     return {
         "interior_voxels": int(mask.sum()),
         "components": int(component_count),
         "euler_characteristic": euler,
-        "handle_rank": int(max(0, int(component_count) - euler)),
+        "handle_rank": int(max(0, int(component_count) + int(void_count) - euler)),
+        "void_components": int(void_count),
+        "boundary_components": int(component_count) + int(void_count),
         "boundary_faces": faces,
         "touches_boundary": bool(faces),
         "closed_in_window": not bool(faces),
@@ -233,11 +268,11 @@ def component_target_point(span: Any) -> np.ndarray:
 
 
 def selected_volume_component(obj: MaterialFermiSurface) -> dict[str, Any]:
-    mask = np.asarray(obj._interior_mask, dtype=bool)
-    total_voxels = int(mask.sum())
+    raw_mask = np.asarray(obj._interior_mask, dtype=bool)
+    total_voxels = int(raw_mask.sum())
     if total_voxels == 0:
         return {
-            "mask": mask,
+            "mask": raw_mask,
             "component_id": 0,
             "component_count": 0,
             "kept_voxels": 0,
@@ -246,46 +281,21 @@ def selected_volume_component(obj: MaterialFermiSurface) -> dict[str, Any]:
             "centroid": np.asarray(
                 [(lo + hi) * 0.5 for lo, hi in obj.span], dtype=float
             ),
-            "topology": topology_for_mask(mask),
+            "topology": topology_for_mask(raw_mask),
         }
 
-    labels, component_count = label_volume(mask, connectivity=3, return_num=True)
-    counts = np.bincount(labels.ravel(), minlength=int(component_count) + 1)
-    largest = int(counts[1:].max()) if component_count else total_voxels
-    min_count = max(1, int(math.ceil(float(largest) * PRIMARY_COMPONENT_MIN_FRACTION)))
-    target = component_target_point(obj.span)
-
-    candidates = []
-    for component_id in range(1, int(component_count) + 1):
-        count = int(counts[component_id])
-        if count < min_count:
-            continue
-        pts = np.argwhere(labels == component_id)
-        centroid = np.asarray(
-            obj._idx_to_coord(pts.mean(axis=0).reshape(1, 3))[0], dtype=float
-        )
-        distance = float(np.linalg.norm(centroid - target))
-        candidates.append((distance, -count, component_id, centroid))
-    if not candidates:
-        for component_id in range(1, int(component_count) + 1):
-            pts = np.argwhere(labels == component_id)
-            centroid = np.asarray(
-                obj._idx_to_coord(pts.mean(axis=0).reshape(1, 3))[0], dtype=float
-            )
-            distance = float(np.linalg.norm(centroid - target))
-            candidates.append(
-                (distance, -int(counts[component_id]), component_id, centroid)
-            )
-
-    _, neg_count, component_id, centroid = min(candidates)
-    component_mask = labels == int(component_id)
+    _, raw_component_count = label_volume(raw_mask, connectivity=3, return_num=True)
+    component_mask, resolution = resolve_mask_components(raw_mask)
+    kept_voxels = int(component_mask.sum())
+    center_idx = np.argwhere(component_mask).mean(axis=0)
+    centroid = np.asarray(obj._idx_to_coord(center_idx.reshape(1, 3))[0], dtype=float)
     return {
         "mask": component_mask,
-        "component_id": int(component_id),
-        "component_count": int(component_count),
-        "kept_voxels": int(-neg_count),
-        "discarded_voxels": int(total_voxels - int(-neg_count)),
-        "discarded_components": int(max(0, int(component_count) - 1)),
+        "component_id": 1,
+        "component_count": int(raw_component_count),
+        "kept_voxels": kept_voxels,
+        "discarded_voxels": int(resolution["removed_component_voxels"]),
+        "discarded_components": int(max(0, int(raw_component_count) - 1)),
         "centroid": centroid,
         "topology": topology_for_mask(component_mask),
     }
@@ -320,15 +330,25 @@ def surface_payload(
     obj: MaterialFermiSurface, component_info: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     try:
-        mesh = obj.exceptional_surface_pv
-        if mesh.n_points == 0 or mesh.n_cells == 0:
+        mask = np.asarray(
+            component_info["mask"]
+            if component_info is not None
+            else obj._interior_mask,
+            dtype=bool,
+        )
+        if not mask.any() or mask.all():
             return empty_surface()
-        mesh = mesh.extract_surface().triangulate().clean()
-        if component_info and int(component_info.get("component_count", 1)) > 1:
-            mesh = surface_component_near(
-                mesh, np.asarray(component_info["centroid"], dtype=float)
-            )
-            mesh = mesh.extract_surface().triangulate().clean()
+        vertices, faces, _, _ = marching_cubes(mask.astype(np.uint8), level=0.5)
+        points = np.asarray(obj._idx_to_coord(vertices), dtype=float)
+        pv_faces = np.column_stack(
+            [np.full(len(faces), 3, dtype=np.int64), np.asarray(faces, dtype=np.int64)]
+        ).ravel()
+        mesh = (
+            pv.PolyData(points, pv_faces)
+            .extract_surface(algorithm="dataset_surface")
+            .triangulate()
+            .clean()
+        )
         if mesh.n_cells > MAX_SURFACE_TRIANGLES:
             reduction = 1.0 - (MAX_SURFACE_TRIANGLES / float(mesh.n_cells))
             reduction = min(0.96, max(0.0, reduction))
@@ -604,7 +624,7 @@ def geometry_for_record(
     reset_gap_threshold(obj, float(record["energy"]))
     component_info = selected_volume_component(obj)
     surface = surface_payload(obj, component_info)
-    skeleton, core_mode = skeleton_payload(obj, str(record["source"]), component_info)
+    skeleton, core_mode = boundary_resolved_skeleton_payload(obj, component_info)
     return surface, skeleton, core_mode, component_info
 
 
@@ -659,6 +679,7 @@ def build_material_transition(
         )
         for component in components:
             region_id += 1
+            stable_signature = grids["stable_signature_lookup"].get(int(phase_id), "")
             representative = choose_representative(
                 component,
                 phase_id,
@@ -666,6 +687,7 @@ def build_material_transition(
                 grids["lookup"],
                 lambdas,
                 energies,
+                C6_REPRESENTATIVE_HINTS.get((family.key, stable_signature)),
             )
             print(
                 f"  representative {family.key} region {region_id}: phase={phase_id}, "
@@ -783,6 +805,7 @@ def build_material_transition(
             "minIslandCells": int(MIN_STABLE_CELLS),
             "islandMergeStrategy": str(ISLAND_MERGE_STRATEGY),
             "manualPhaseMerges": grids["manual_merges"],
+            "c6SymmetryMerges": grids["c6_symmetry_merges"],
             "contractionAccessiblePairs": 0,
             "contractionMergedClassicRegions": int(region_id),
         }
@@ -812,10 +835,11 @@ def build_material_transition(
         "postProcessing": {
             "minIslandCells": int(MIN_STABLE_CELLS),
             "islandMergeStrategy": str(ISLAND_MERGE_STRATEGY),
-            "islandRule": "connected lambda-E components smaller than the cutoff are relabeled to the closest large phase below in E, falling back to nearest large phase if no lower phase exists",
+            "islandRule": "connected lambda-E components at or below the cutoff are relabeled to the closest large phase below in E, falling back to nearest large phase if no lower phase exists",
             "manualPhaseMerges": grids["manual_merges"],
-            "geometryRule": "click attachments keep only the selected connected volume component; disconnected pieces are ignored unless merged in the mask",
-            "primaryComponentMinFraction": float(PRIMARY_COMPONENT_MIN_FRACTION),
+            "c6SymmetryMerges": grids["c6_symmetry_merges"],
+            "c6SymmetryRule": "for the exactly C6-covariant TiB2 F(lambda) family, audited non-C6 spine components are attached to the closest C6-valid phase strictly below in E",
+            "geometryRule": "click attachments retain the resolved dominant volume component and draw one spine for each outer or nested boundary filling used in its Yamada invariant",
         },
         "modes": modes,
     }
@@ -888,7 +912,7 @@ def patch_controller(html: str) -> str:
 
 
 def main() -> None:
-    global MIN_STABLE_CELLS, ISLAND_MERGE_STRATEGY, PRIMARY_COMPONENT_MIN_FRACTION
+    global MIN_STABLE_CELLS, ISLAND_MERGE_STRATEGY
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-html", type=Path, default=TARGET_HTML)
     parser.add_argument("--data-dir", type=Path, default=MATERIAL_DIR)
@@ -901,21 +925,24 @@ def main() -> None:
     parser.add_argument(
         "--island-merge-strategy", choices=("below", "nearest"), default="below"
     )
-    parser.add_argument("--primary-component-min-fraction", type=float, default=0.25)
+    parser.add_argument(
+        "--primary-component-min-fraction", type=float, help=argparse.SUPPRESS
+    )
     parser.add_argument(
         "--historical-display-processing",
         action="store_true",
         required=True,
-        help="Acknowledge display smoothing, manual signature merges and representative-component selection.",
+        help="Acknowledge smoothing, manual/C6 display merges and resolved dominant-component boundary geometry.",
     )
     args = parser.parse_args()
     MIN_STABLE_CELLS = args.min_stable_cells
     ISLAND_MERGE_STRATEGY = args.island_merge_strategy
-    PRIMARY_COMPONENT_MIN_FRACTION = args.primary_component_min_fraction
-    if MIN_STABLE_CELLS < 1 or not 0 < PRIMARY_COMPONENT_MIN_FRACTION <= 1:
+    if args.primary_component_min_fraction is not None:
         parser.error(
-            "Use min-stable-cells >= 1 and primary-component-min-fraction in (0, 1]."
+            "--primary-component-min-fraction belongs to the older component-selection rule; omit it for the boundary-resolved dominant component."
         )
+    if MIN_STABLE_CELLS < 1:
+        parser.error("Use min-stable-cells >= 1.")
     records_json = args.data_dir / "material_parameter_phase_map_records.json"
     summary_json = args.data_dir / "material_parameter_phase_map_summary.json"
     started = time.perf_counter()
@@ -925,36 +952,29 @@ def main() -> None:
     summary = json.loads(summary_json.read_text(encoding="utf-8"))
     lambdas = np.asarray(summary["lambdas"], dtype=float)
 
-    all_known_material_keys = {
-        family.key
-        for dim in {80, *[int(item["dimension"]) for item in summary["families"]]}
-        for family in material_families(int(dim))
-    }
+    material_keys = {str(item["key"]) for item in summary["families"]}
     payload["transitions"] = [
         item
         for item in payload["transitions"]
-        if str(item.get("key")) not in all_known_material_keys
+        if str(item.get("key")) not in material_keys
     ]
     payload["regions"] = {
         key: region
         for key, region in payload["regions"].items()
-        if str(region.get("transition")) not in all_known_material_keys
+        if str(region.get("transition")) not in material_keys
     }
-    for key in all_known_material_keys:
+    for key in material_keys:
         payload.get("stable_min_component_cells", {}).pop(key, None)
 
     existing_keys = {item["key"] for item in payload["transitions"]}
     payload["version"] = (
-        "hamiltonian_yamada_plotly_region_geometry_v18_manual_phase_merges"
+        "hamiltonian_yamada_plotly_region_geometry_v19_boundary_resolved"
     )
-    payload.setdefault(
-        "material_parameter_scan",
-        {
-            "records": str(records_json),
-            "summary": str(summary_json),
-            "note": "Material Hamiltonian coefficient scans appended from the current material_parameter_phase_maps run.",
-        },
-    )
+    payload["material_parameter_scan"] = {
+        "records": str(records_json),
+        "summary": str(summary_json),
+        "note": "Material Hamiltonian coefficient scans updated from boundary-resolved records; transitions absent from this run are retained from the input HTML.",
+    }
 
     records_by_family: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for record in records:
@@ -992,13 +1012,16 @@ def main() -> None:
     payload["material_parameter_scan"]["post_processing"] = {
         "min_island_cells": int(MIN_STABLE_CELLS),
         "island_merge_strategy": str(ISLAND_MERGE_STRATEGY),
-        "primary_component_min_fraction": float(PRIMARY_COMPONENT_MIN_FRACTION),
-        "island_rule": "small connected lambda-E islands are immersed into the spatially closest large-phase cell below in E, with vertical separation used only as a tie-breaker and nearest-large fallback only when no lower phase exists",
+        "island_rule": "connected lambda-E islands at or below the cutoff are immersed into the spatially closest large-phase cell below in E, with vertical separation used only as a tie-breaker and nearest-large fallback only when no lower phase exists",
         "manual_phase_merges": {
             item["key"]: item["modes"]["classic"].get("manualPhaseMerges", [])
             for item in new_transitions
         },
-        "geometry_rule": "surface/skeleton click attachments are restricted to the selected connected volume component",
+        "c6_symmetry_merges": {
+            item["key"]: item["modes"]["classic"].get("c6SymmetryMerges", [])
+            for item in new_transitions
+        },
+        "geometry_rule": "surface attachments use the resolved dominant volume component; skeletons use the outer and nested-boundary fillings used by the classifier",
     }
 
     merged = (
@@ -1012,6 +1035,74 @@ def main() -> None:
     print(f"total transitions: {len(payload['transitions'])}", flush=True)
     print(f"total regions: {len(payload['regions'])}", flush=True)
     print(f"elapsed: {time.perf_counter() - started:.1f}s", flush=True)
+
+
+def combine_skeleton_payloads(parts: list[dict[str, Any]]) -> dict[str, Any]:
+    combined = {
+        "lines": {"x": [], "y": [], "z": []},
+        "nodes": {"x": [], "y": [], "z": []},
+        "node_count": 0,
+        "edge_count": 0,
+        "components": 0,
+        "cycle_rank": 0,
+    }
+    for part in parts:
+        for axis in ("x", "y", "z"):
+            combined["lines"][axis].extend(part["lines"][axis])
+            combined["nodes"][axis].extend(part["nodes"][axis])
+        for key in ("node_count", "edge_count", "components", "cycle_rank"):
+            combined[key] += int(part[key])
+    return combined
+
+
+def boundary_resolved_skeleton_payload(
+    obj: MaterialFermiSurface,
+    component_info: dict[str, Any],
+) -> tuple[dict[str, Any], str]:
+    """Render the same outer and nested-boundary fillings used by classification."""
+    parts: list[dict[str, Any]] = []
+    fillings = []
+    for outer_filling, voids in boundary_filling_groups(component_info["mask"]):
+        fillings.extend((outer_filling, *voids))
+
+    for filling in fillings:
+        topology = topology_for_mask(filling)
+        if int(topology["handle_rank"]) == 0:
+            center_idx = np.argwhere(filling).mean(axis=0)
+            coord = np.asarray(
+                obj._idx_to_coord(center_idx.reshape(1, 3))[0], dtype=float
+            )
+            parts.append(single_node_skeleton(coord))
+            continue
+        try:
+            skeleton_image = np.asarray(skeletonize_volume(filling), dtype=bool)
+            obj.skeleton_graph_cache = None
+            obj.skeleton_graph_cache_args = None
+            graph = obj.skeleton_graph(
+                skeleton_image=skeleton_image,
+                smooth_epsilon=0,
+                simplify=True,
+                force_small_edge_contraction=True,
+                small_edge_limit=math.pi * 0.1,
+                previous_n_edgepoint=20,
+            )
+            parts.append(skeleton_payload_from_graph(obj, graph))
+        except Exception as exc:
+            print(
+                f"    boundary skeleton extraction failed: {type(exc).__name__}: {exc}",
+                flush=True,
+            )
+            center_idx = np.argwhere(filling).mean(axis=0)
+            coord = np.asarray(
+                obj._idx_to_coord(center_idx.reshape(1, 3))[0], dtype=float
+            )
+            parts.append(single_node_skeleton(coord))
+
+    if not parts:
+        return single_node_skeleton(
+            vertex_coordinate(obj, component_info)
+        ), "boundary-empty"
+    return combine_skeleton_payloads(parts), f"boundary-resolved-{len(parts)}"
 
 
 if __name__ == "__main__":

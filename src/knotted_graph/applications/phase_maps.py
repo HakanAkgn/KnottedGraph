@@ -158,6 +158,32 @@ class YamadaPhaseMapResult:
         return self._object_factory(lam, value)
 
 
+@dataclass(frozen=True)
+class VolumeTopology:
+    """Digital homology summary for a compact voxelized three-dimensional body.
+
+    The occupied set uses 26-connectivity and its complement uses the dual
+    6-connectivity. For a compact subset of R^3, Euler-Poincare gives
+    ``chi = b0 - b1 + b2``. Here ``b2`` is the number of enclosed complement
+    components, so the handle rank is ``b1 = b0 + b2 - chi``.
+    """
+
+    interior_voxels: int
+    connected_components: int
+    euler_characteristic: int
+    handle_rank: int
+    enclosed_voids: int
+    boundary_components: int
+    touches_boundary: bool
+    boundary_faces: tuple[str, ...]
+
+    @property
+    def is_compact(self) -> bool:
+        """Whether the occupied body stays away from every sampling-box face."""
+
+        return not self.touches_boundary
+
+
 class MaterialBandEnergySurface:
     """Hermitian multiband level-set surface for one selected band.
 
@@ -320,9 +346,10 @@ def make_yamada_phase_map(
         ``"energy"`` builds a tube around the selected band level
         ``E_band(k; lambda) == parameter``.
     force_genus_zero_vertex
-        For nodal and material scans, collapse a closed genus-zero filled
-        region to the one-vertex Yamada phase.  This is the handlebody rule used
-        by the benchmark phase maps.
+        For nodal and material scans, collapse every closed spherical boundary
+        component to an isolated graph vertex. A ball therefore gives one
+        vertex while a shell gives two. This is the handlebody rule used by the
+        benchmark phase maps.
     """
     resolved_kind = _resolve_source_kind(
         source_kind,
@@ -336,7 +363,7 @@ def make_yamada_phase_map(
     if np.any((lambdas_arr < 0.0) | (lambdas_arr > 1.0)):
         raise ValueError("all lambda samples must lie in [0, 1]")
 
-    variable = yamada_variable or sp.Symbol("A")
+    variable = yamada_variable or sp.Symbol("Y")
     yamada_kwargs = {"normalize": normalize_yamada, **dict(yamada_options or {})}
     graph_kwargs = dict(graph_options or {})
     surface_kwargs = dict(surface_options or {})
@@ -762,6 +789,13 @@ def _one_vertex_graph() -> nx.MultiGraph:
     return graph
 
 
+def _isolated_vertex_graph(count: int) -> nx.MultiGraph:
+    graph = nx.MultiGraph()
+    for node in range(max(1, int(count))):
+        graph.add_node(node, pos=(float(node), 0.0, 0.0))
+    return graph
+
+
 def _interior_boundary_faces(mask: np.ndarray) -> list[str]:
     mask = np.asarray(mask, dtype=bool)
     faces: list[str] = []
@@ -778,19 +812,180 @@ def _interior_boundary_faces(mask: np.ndarray) -> list[str]:
     return faces
 
 
-def _closed_genus_zero_interior(mask: np.ndarray) -> bool:
+def _labeled_volume_components(
+    mask: np.ndarray,
+    *,
+    connectivity: int = 3,
+) -> list[np.ndarray]:
+    """Return connected component masks in descending voxel-count order."""
+
+    from skimage.measure import label
+
+    labels, count = label(mask, connectivity=connectivity, return_num=True)
+    if count <= 0:
+        return []
+    sizes = np.bincount(labels.ravel(), minlength=int(count) + 1)
+    component_ids = sorted(
+        range(1, int(count) + 1),
+        key=lambda component_id: int(sizes[component_id]),
+        reverse=True,
+    )
+    return [labels == component_id for component_id in component_ids]
+
+
+def enclosed_void_masks(mask: np.ndarray) -> list[np.ndarray]:
+    """Return bounded complement components of a 3D body.
+
+    Occupied voxels are interpreted with 26-connectivity, so the complement is
+    labeled with the dual 6-connectivity. Padding makes the unique unbounded
+    component explicit and prevents a box face from being mistaken for a void.
+    """
+
+    from skimage.measure import label
+
     mask = np.asarray(mask, dtype=bool)
-    if not mask.any():
-        return True
-    boundary_faces = _interior_boundary_faces(mask)
-    if boundary_faces:
-        return False
+    if mask.ndim != 3:
+        raise ValueError("volume masks must be three-dimensional")
+    padded = np.pad(mask, 1, mode="constant", constant_values=False)
+    labels, count = label(~padded, connectivity=1, return_num=True)
+    outside_label = int(labels[0, 0, 0])
+    sizes = np.bincount(labels.ravel(), minlength=int(count) + 1)
+    void_ids = [
+        component_id
+        for component_id in range(1, int(count) + 1)
+        if component_id != outside_label and int(sizes[component_id]) > 0
+    ]
+    void_ids.sort(key=lambda component_id: int(sizes[component_id]), reverse=True)
+    core = labels[1:-1, 1:-1, 1:-1]
+    return [core == component_id for component_id in void_ids]
+
+
+def resolve_volume_mask(
+    mask: np.ndarray,
+    *,
+    min_component_voxels: int = 0,
+    relative_component_fraction: float = 0.0,
+    min_void_voxels: int = 0,
+    dominant_component_only: bool = False,
+) -> tuple[np.ndarray, dict[str, int]]:
+    """Remove unresolved components and fill unresolved enclosed voids.
+
+    The operation is deterministic. Retained occupied components are ordered
+    by size, and only bounded complement components smaller than
+    ``min_void_voxels`` are filled. A caller interested in one physical
+    surface can set ``dominant_component_only=True`` to ignore disconnected
+    satellite pieces.
+    """
+
+    mask = np.asarray(mask, dtype=bool)
+    if mask.ndim != 3:
+        raise ValueError("volume masks must be three-dimensional")
+    if (
+        min_component_voxels < 0
+        or min_void_voxels < 0
+        or relative_component_fraction < 0.0
+    ):
+        raise ValueError("voxel cutoffs must be non-negative")
+
+    components = _labeled_volume_components(mask)
+    if not components:
+        return mask.copy(), {
+            "removed_component_voxels": 0,
+            "filled_void_voxels": 0,
+        }
+
+    component_cutoff = max(
+        int(min_component_voxels),
+        int(np.ceil(float(relative_component_fraction) * int(components[0].sum()))),
+    )
+    retained = [
+        component
+        for component in components
+        if int(component.sum()) >= component_cutoff
+    ]
+    if not retained:
+        retained = [components[0]]
+    if dominant_component_only:
+        retained = retained[:1]
+    resolved = np.logical_or.reduce(retained)
+    removed_component_voxels = int(mask.sum() - resolved.sum())
+
+    filled_void_voxels = 0
+    for void in enclosed_void_masks(resolved):
+        size = int(void.sum())
+        if size < int(min_void_voxels):
+            resolved |= void
+            filled_void_voxels += size
+    return resolved, {
+        "removed_component_voxels": removed_component_voxels,
+        "filled_void_voxels": int(filled_void_voxels),
+    }
+
+
+def volume_topology(mask: np.ndarray) -> VolumeTopology:
+    """Compute connected, handle, void, and boundary counts for a voxel body."""
+
     from skimage.measure import euler_number, label
 
+    mask = np.asarray(mask, dtype=bool)
+    if mask.ndim != 3:
+        raise ValueError("volume masks must be three-dimensional")
+    boundary_faces = tuple(_interior_boundary_faces(mask))
+    if not mask.any():
+        return VolumeTopology(
+            interior_voxels=0,
+            connected_components=0,
+            euler_characteristic=0,
+            handle_rank=0,
+            enclosed_voids=0,
+            boundary_components=0,
+            touches_boundary=False,
+            boundary_faces=(),
+        )
+
     _, component_count = label(mask, connectivity=3, return_num=True)
+    void_count = len(enclosed_void_masks(mask))
     euler = int(euler_number(mask, connectivity=3))
-    handle_rank = max(0, int(component_count) - euler)
-    return handle_rank == 0
+    handle_rank = max(0, int(component_count) + int(void_count) - euler)
+    return VolumeTopology(
+        interior_voxels=int(mask.sum()),
+        connected_components=int(component_count),
+        euler_characteristic=euler,
+        handle_rank=int(handle_rank),
+        enclosed_voids=int(void_count),
+        boundary_components=int(component_count) + int(void_count),
+        touches_boundary=bool(boundary_faces),
+        boundary_faces=boundary_faces,
+    )
+
+
+def boundary_filling_groups(
+    mask: np.ndarray,
+) -> list[tuple[np.ndarray, list[np.ndarray]]]:
+    """Return the outer and nested handlebody fillings of every component.
+
+    Each item is ``(outer_filling, inner_fillings)``. Skeletonizing these
+    fillings separately preserves every boundary component of a compression
+    body; skeletonizing the occupied shell itself cannot encode its ``b2``
+    cavity as a graph cycle.
+    """
+
+    mask = np.asarray(mask, dtype=bool)
+    if mask.ndim != 3:
+        raise ValueError("volume masks must be three-dimensional")
+    groups: list[tuple[np.ndarray, list[np.ndarray]]] = []
+    for component in _labeled_volume_components(mask):
+        voids = enclosed_void_masks(component)
+        outer_filling = component.copy()
+        for void in voids:
+            outer_filling |= void
+        groups.append((outer_filling, voids))
+    return groups
+
+
+def _closed_genus_zero_interior(mask: np.ndarray) -> bool:
+    topology = volume_topology(mask)
+    return topology.is_compact and topology.handle_rank == 0
 
 
 def _graph_from_skeleton_like(
@@ -800,8 +995,10 @@ def _graph_from_skeleton_like(
     force_genus_zero_vertex: bool,
 ) -> nx.MultiGraph:
     if force_genus_zero_vertex and hasattr(obj, "_interior_mask"):
-        if _closed_genus_zero_interior(np.asarray(obj._interior_mask, dtype=bool)):
-            return _one_vertex_graph()
+        mask = np.asarray(obj._interior_mask, dtype=bool)
+        topology = volume_topology(mask)
+        if topology.is_compact and topology.handle_rank == 0:
+            return _isolated_vertex_graph(topology.boundary_components)
     try:
         graph = obj.skeleton_graph(**graph_options)
     except (EmbeddingValidationError, ValueError) as exc:
@@ -887,8 +1084,13 @@ def _phase_signature(
 
 __all__ = [
     "align_material_hamiltonians",
+    "boundary_filling_groups",
+    "enclosed_void_masks",
     "MaterialBandEnergySurface",
     "pad_material_hamiltonian",
+    "resolve_volume_mask",
+    "volume_topology",
+    "VolumeTopology",
     "YamadaPhaseMapResult",
     "YamadaPhaseRecord",
     "make_yamada_phase_map",

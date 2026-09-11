@@ -20,7 +20,7 @@ REFERENCE = ROOT / "User_guide" / "applications" / "NewPhaseMapPlots"
 SOURCES = {
     "materials": (
         "RealMaterials/html/07_hamiltonian_yamada_plotly_region_geometry_with_materials.html",
-        "68f7153ea995d0f46df6986ed129657eced512d56f5e4b27a037344f8e6fcc24",
+        "955603c79a70e9fc4890c21d1c6ead5a9a030367891902f510ce069be18496a0",
         "RealMaterials/figures/07_hamiltonian_yamada_material_phase_maps_3panel_like_porous.png",
     ),
     "tpms": (
@@ -198,7 +198,8 @@ def main(argv: list[str] | None = None) -> None:
     )
     args = parser.parse_args(argv)
     manifest = {
-        "upstream_commit": "2b2ae6d",
+        "upstream_commits": {"materials": "56bfbab", "tpms": "2b2ae6d"},
+        "material_core_commit": "643fef8",
         "processing": "lossless JSON separation; no scientific recalculation",
         "demos": {},
     }

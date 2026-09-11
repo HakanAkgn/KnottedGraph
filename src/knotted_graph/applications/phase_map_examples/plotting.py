@@ -7,14 +7,14 @@ import colorsys
 from pathlib import Path
 from typing import Any
 
-from .records import PhaseMapData
+from .records import PhaseMapData, _classification_status
 
 
 def plot_phase_map(data: PhaseMapData, *, output: str | Path | None = None) -> Any:
     """Plot one raw saved grid and optionally save PNG, PDF and a phase-key JSON.
 
     ``output`` is a filename prefix (not a directory). Missing cells stay white,
-    adaptive fills are shaded, and errors are marked with crosses. Category
+    adaptive fills are shaded, calibrations circled, and errors marked with crosses. Category
     numbers only identify saved signatures; they are not numerical Yamada
     values and do not establish equivalence under contraction.
 
@@ -35,11 +35,19 @@ def plot_phase_map(data: PhaseMapData, *, output: str | Path | None = None) -> A
     grid = np.full((len(ys), len(xs)), np.nan)
     inferred = np.full_like(grid, np.nan)
     errors = []
+    calibrations = []
+    statuses = [["missing" for _ in xs] for _ in ys]
+    calibration_energies = [[None for _ in xs] for _ in ys]
     for record in data.records:
         x, y = record["lam"], record[data.level_field]
         grid[yi[y], xi[x]] = ids[record["phase_signature"]]
-        if record.get("classification_computed") is False:
+        status = _classification_status(record)
+        statuses[yi[y]][xi[x]] = status
+        calibration_energies[yi[y]][xi[x]] = record.get("resolution_calibration_energy")
+        if status == "adaptive_fill":
             inferred[yi[y], xi[x]] = 1.0
+        elif status == "resolution_calibration":
+            calibrations.append((x, y))
         if record.get("error") or record["source"] == "error":
             errors.append((x, y))
 
@@ -76,6 +84,17 @@ def plot_phase_map(data: PhaseMapData, *, output: str | Path | None = None) -> A
             shading="nearest",
             rasterized=True,
         )
+        if calibrations:
+            cx, cy = zip(*calibrations)
+            ax.scatter(
+                cx,
+                cy,
+                marker="o",
+                facecolors="none",
+                edgecolors="black",
+                s=12,
+                linewidths=0.6,
+            )
         if errors:
             ex, ey = zip(*errors)
             ax.scatter(ex, ey, marker="x", c="black", s=12, linewidths=0.8)
@@ -90,7 +109,7 @@ def plot_phase_map(data: PhaseMapData, *, output: str | Path | None = None) -> A
         fig.text(
             0.5,
             0.04,
-            "Raw signatures • white: missing • shading: adaptive fill • ×: error\n"
+            "White: missing • shading: adaptive fill • ○: resolution calibration • ×: error\n"
             f"{len(signatures)} categories; phase-key JSON lists full signatures and sources.",
             ha="center",
             fontsize=9,
@@ -131,6 +150,8 @@ def plot_phase_map(data: PhaseMapData, *, output: str | Path | None = None) -> A
                             [None if np.isnan(v) else int(v) for v in row]
                             for row in grid
                         ],
+                        "classification_status": statuses,
+                        "resolution_calibration_energy": calibration_energies,
                     },
                     indent=2,
                 )

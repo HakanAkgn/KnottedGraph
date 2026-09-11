@@ -25,7 +25,9 @@ uv run python -m knotted_graph.applications.phase_map_examples inspect \
 | `src/knotted_graph/applications/phase_map_examples/` (repository root) | installed application helpers and private compute engines | maintained Python implementation |
 | `dev/build_phase_map_demos.py` (repository root) | lossless, lazy-loading website packaging | no scan; generated assets ignored by Git |
 
-These source assets came from Hakan's `2b2ae6d` update. Recorded absolute paths
+The material reference assets came from Hakan's `56bfbab` update, with the
+required boundary-topology implementation completed in `643fef8`. The TPMS
+assets remain those from `2b2ae6d`. Recorded absolute paths
 inside original data/HTML describe its provenance; they are not required on your
 machine. The separate timing source CSV and `assets/paper/Time_distributions.pdf`
 from `091bfc0` are also retained without alteration.
@@ -42,7 +44,7 @@ files. They require `uv sync --extra nodal --extra viz` except raw record readin
 | `RealMaterials/scripts/material_parameter_phase_maps.py` | detailed material scan; `--output-dir`, `--dimension`, `--lambda-count`, `--energy-count`, `--only`, `--workers` |
 | `RealMaterials/scripts/reproduce_multiband_material_surfaces.py` | original surface-gallery reproduction; `--output-dir`, `--only` |
 | `RealMaterials/scripts/generate_material_phase_map_3panel.py` | reproduce the two material panels from saved region HTML; `--html`, `--output-dir` (historical filename retained) |
-| `RealMaterials/scripts/integrate_material_maps_into_region_geometry.py` | recompute representative material geometry and append to a base viewer; `--input-html`, `--data-dir`, `--output`, mandatory `--historical-display-processing` acknowledgement |
+| `RealMaterials/scripts/integrate_material_maps_into_region_geometry.py` | replace selected material transitions while preserving other base-viewer transitions; `--input-html`, `--data-dir`, `--output`, mandatory `--historical-display-processing` acknowledgement |
 | `TPMS/scripts/tpms_compact_scaffold_phase_maps.py` | detailed compact-scaffold scan; `--output-dir`, `--dimension`, `--threshold-count`, `--threshold-min`, `--threshold-max`, `--domain`, `--only` |
 | `TPMS/scripts/tpms_plotly_region_geometry.py` | build region geometry and bounded contraction groups from records; `--scan-dir`, `--output`, `--max-contraction-states`, `--max-contraction-depth`, `--max-contraction-edges` |
 | `TPMS/scripts/make_tpms_compact_1row3col_figure.py` | render the specialized publication layout from saved HTML; `--html`, `--output`, optional `--include-panel-c-slice`, `--geometry-dir` |
@@ -57,14 +59,25 @@ uv run --no-sync python \
 ```
 
 The detailed material engine defaults to no adaptive fill or display smoothing.
-For the historical processing convention, the relevant switches are
+For historical display processing, the relevant switches include
 `--adaptive-energy-step 0.05 --min-stable-cells 8 --island-merge-strategy below
 --apply-signature-merges`. This is an explicit presentation choice, not a claim
 that the merged polynomials are equal. Match **all** parameters and saved energy
 grids from the reference summaries before claiming full reproduction; the
-historical scan also included incremental extensions. The surface-appending
-script retains the original selected-component geometry convention and requires
-an explicit acknowledgement because it performs this historical processing.
+historical scan also included incremental extensions. The new research switches
+`--apply-c6-review` and `--apply-resolution-calibration` separately enable the
+teacher's C6 display partition and resolution calibration; both are off by
+default. Calibration is recorded with `resolution_calibration_energy` and is
+distinct from ordinary adaptive fill. Reusing records applies any explicitly
+selected processing and writes to the chosen output directory, so use a copy of
+accepted input when exploring these choices.
+
+The material geometry script now uses the dominant resolved volume body and
+its outer/nested boundary fillings, matching the latest teacher implementation.
+It requires an acknowledgement because it also performs historical display
+processing. The former `--primary-component-min-fraction` convention no longer
+applies; supplying that option produces a migration error. The geometry and
+record classifications must be interpreted with the same version and settings.
 
 The guided CLI's `--dry-run` is the safest way to inspect a new run plan. None of
 these tools submit jobs or select a billing account on your behalf.

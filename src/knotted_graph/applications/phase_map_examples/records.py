@@ -19,6 +19,17 @@ def _boolean(value: Any, *, field: str, row: int) -> bool:
     raise ValueError(f"Row {row}: {field} must be a boolean, got {value!r}.")
 
 
+def _classification_status(record: dict[str, Any]) -> str:
+    if record.get("resolution_calibration_energy") is not None:
+        return "resolution_calibration"
+    computed = record.get("classification_computed")
+    if computed is True:
+        return "computed"
+    if computed is False:
+        return "adaptive_fill"
+    return "unrecorded"
+
+
 def read_phase_map_records(path: str | Path) -> tuple[dict[str, Any], ...]:
     """Load a material/TPMS CSV or JSON record list and validate coordinates.
 
@@ -71,6 +82,22 @@ def read_phase_map_records(path: str | Path) -> tuple[dict[str, Any], ...]:
                 field="classification_computed",
                 row=index,
             )
+        if "resolution_calibration_energy" in record:
+            value = record["resolution_calibration_energy"]
+            if value in (None, "", "None", "null"):
+                record["resolution_calibration_energy"] = None
+            else:
+                try:
+                    energy = float(value)
+                except (TypeError, ValueError) as exc:
+                    raise ValueError(
+                        f"Row {index}: resolution_calibration_energy must be finite or empty."
+                    ) from exc
+                if not math.isfinite(energy):
+                    raise ValueError(
+                        f"Row {index}: resolution_calibration_energy must be finite or empty."
+                    )
+                record["resolution_calibration_energy"] = energy
         key = (family_field, record[family_field], record["lam"], record[level_field])
         if key in seen:
             raise ValueError(f"Row {index}: duplicate phase-map coordinate {key!r}.")
@@ -110,9 +137,10 @@ class PhaseMapData:
         return cls(family, fields.pop(), subset)
 
     def summary(self) -> dict[str, Any]:
-        """Return JSON-serializable counts, preserving error and adaptive-fill status."""
+        """Count raw signatures, errors, direct classifications, fills and calibrations."""
         nx = len({r["lam"] for r in self.records})
         ny = len({r[self.level_field] for r in self.records})
+        statuses = Counter(_classification_status(r) for r in self.records)
         return {
             "family": self.family,
             "level_field": self.level_field,
@@ -127,12 +155,10 @@ class PhaseMapData:
             "error_records": sum(
                 bool(r.get("error")) or r["source"] == "error" for r in self.records
             ),
-            "adaptive_fill_records": sum(
-                r.get("classification_computed") is False for r in self.records
-            ),
-            "classification_status_unrecorded": sum(
-                "classification_computed" not in r for r in self.records
-            ),
+            "directly_classified_records": statuses["computed"],
+            "adaptive_fill_records": statuses["adaptive_fill"],
+            "resolution_calibration_records": statuses["resolution_calibration"],
+            "classification_status_unrecorded": statuses["unrecorded"],
             "display_processing": "raw saved signatures; no smoothing or signature merging",
         }
 

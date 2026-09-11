@@ -1,11 +1,77 @@
 # New phase-map integration review
 
-This update incorporates Hakan's `2b2ae6d` phase-map additions and the preceding
+## Boundary-resolved update — 2026-09-11
+
+Hakan's `643fef8` supplies the four helpers required by `56bfbab`:
+`boundary_filling_groups`, `enclosed_void_masks`, `resolve_volume_mask` and
+`volume_topology`. The exact upstream snapshot imported successfully and passed
+all eight core phase-map tests on a PBS compute node. This integration adopts
+that implementation and the `56bfbab` material records/figures/HTML, retaining
+the installed-package engines and portable source-script entry points.
+
+The material reference contains 46,020 records: 14,634 directly classified,
+31,184 adaptive fills and 202 resolution calibrations. TiB2 has 35 raw
+signatures; Co2MnGa has 53. The material viewer contains 88 region entries
+across seven transitions, including its five earlier nodal transitions. TPMS
+retains its 1,323 records and 444 region entries. Region counts are not counts
+of distinct polynomials. CSV/JSON signatures, polynomial strings, source/status
+metadata and all split-viewer payloads have been checked against the accepted
+assets; no dense reference scan was rerun.
+
+The reader and raw plot now distinguish calibrated records from adaptive
+fills, including an anchor energy of zero. Guided scans keep display merges,
+adaptive fill and resolution calibration off. Research CLI flags enable C6
+display grouping and resolution calibration separately. In the relocated
+energy sampler, two unconditional calibration calls have moved to the
+explicit main/reuse/extend handling; the sampling logic and the teacher's
+calibration algorithm remain unchanged. A targeted audit compares this exact
+orchestration difference rather than broadly exempting the function.
+
+Representative material geometry now follows the teacher's dominant resolved
+body and outer/nested boundary fillings. Regenerating selected material
+transitions preserves other transitions in the supplied viewer. The old
+component-fraction option produces an explicit migration error.
+
+Folder READMEs explain the route from saved records to a small scan. A base-only
+CSV-to-Yamada example completes input loading, embedding validation, projection
+and exact evaluation using existing APIs. Notebook export saves execution
+copies, HTML and status files outside the source tree. Mathematics and analytic
+fields are removed from automatic full execution in notebook CI because their
+saved defaults include large galleries or paper-mode scans; source checks and
+the full scientific notebook contents are preserved.
+
+Validation/evidence for this update is recorded in the continuation handoff.
+The first complete gate passed 384 tests (70.67% coverage), style/types,
+portability, repository consistency, Sphinx with warnings as errors, generated
+links, reference audits, coarse representative geometry, saved-panel renderers,
+clean base-wheel installation/examples and Chromium checks. A subsequent
+calibration-routing correction passed the complete suite of 386 tests (71.16%
+coverage), the exact source audit and an updated clean base wheel (29 base-safe
+phase-map tests passed, seven optional-stack cases skipped). Browser checks cover transition/mode switching,
+one-region initial loading, mobile layout, blocked-CDN messaging, failed region
+fetch recovery and the unchanged standalone nodal viewer.
+
+Notebook coverage is deliberately explicit: introductory notebooks, offline
+protein and Yamada sanity checks run with saved defaults; mathematics covers
+original cells 0–16; analytic fields runs all cells with its existing fast
+branch selected in a scratch copy. The excluded scan sections, research
+galleries and native Repulsor solver are not claimed as executed. Visual review
+samples rendered outputs and separately checks the source-page layouts.
+
+This is a local integration review, not a website/PyPI release. The independent
+Input Adapters Guide, publication experiments and deployment retain their
+separate confirmation boundaries. Main/S1/S2, paper sources, protected core
+implementations, benchmark scientific cells and tracked scientific assets are
+preserved.
+
+## Earlier integration — 2026-09-08
+
+The earlier update incorporated Hakan's `2b2ae6d` phase-map additions and the preceding
 `091bfc0` timing-figure data into the user-integration branch. The scope is the
 application/user layer. It does not change the input-format Main/S1/S2 figures,
 Overleaf files, or protected extraction/projection/invariant implementations.
 
-## Changes to review
+### Earlier changes
 
 1. Moved the reusable material and compact-TPMS engines into the installed
    `knotted_graph.applications.phase_map_examples` package. Kept the old script
@@ -38,7 +104,7 @@ Overleaf files, or protected extraction/projection/invariant implementations.
 8. Added application/portability/regression tests and included the base-safe
    cases and new research scripts in the existing CI checks.
 
-## Acceptance scope
+### Earlier acceptance scope
 
 Final local verification on 2026-09-08 used Linux / Python 3.13.7: **376 tests
 passed**, with **69.52%** package coverage (the existing 61% gate is unchanged).
@@ -81,9 +147,9 @@ validation is not the same as a deployed website or a green remote CI run.
 
 ## Scientific feedback requested
 
-- Are the historical manual material signature merges and selected-component
-  geometry conventions described accurately? They are preserved but no longer
-  silently enabled in the introductory route.
+- Are the current C6/manual display groups, calibration provenance and
+  boundary-resolved geometry described accurately? These remain distinct from
+  raw directly classified results in the introductory route.
 - Are the distinctions between exact Yamada, structural signatures, adaptive
   classification and contraction-based display groups clear enough?
 - Should the saved material viewer keep its five earlier nodal transitions

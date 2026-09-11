@@ -65,16 +65,17 @@ Expected reference counts:
 
 | Family key | Records | Grid | Distinct raw signatures |
 | --- | ---: | --- | ---: |
-| `tib2_d6_F` | 30,180 | 60 lambda × 503 energy samples | 38 |
-| `co2mnga_t8` | 8,940 | 60 lambda × 149 energy samples | 38 |
+| `tib2_d6_F` | 30,180 | 60 lambda × 503 energy samples | 35 |
+| `co2mnga_t8` | 15,840 | 60 lambda × 264 energy samples | 53 |
 | `gyroid_to_diamond` | 441 | 21 lambda × 21 threshold samples | 65 |
 | `gyroid_to_schwarz_p` | 441 | 21 lambda × 21 threshold samples | 20 |
 | `schwarz_p_to_diamond` | 441 | 21 lambda × 21 threshold samples | 15 |
 
 For TPMS, substitute
 `User_guide/applications/NewPhaseMapPlots/TPMS/data/tpms_parameter_phase_map_records.csv`.
-The inspector also reports errors, missing cells, source counts and adaptive
-fill status. It never interprets a signature string as executable Python.
+The inspector also reports errors, missing cells, source counts, direct
+classifications, adaptive fills and resolution calibrations. It never
+interprets a signature string as executable Python.
 
 ## Replot without recomputing
 
@@ -89,8 +90,10 @@ phase key: it maps each category ID to its full signature, color, source and
 recorded polynomial, and includes the coordinate axes and the category-ID grid.
 Category IDs are not polynomial values. The plot uses serif labels
 and Computer Modern mathematics without changing your global plotting settings.
-White cells are missing, shaded cells are adaptive fills, and crosses mark
-errors. No small-island smoothing or manual signature merging is applied.
+White cells are missing, shaded cells are adaptive fills, open circles mark
+resolution calibrations, and crosses mark errors. The JSON also records each
+cell's classification status and calibration anchor energy when present.
+No small-island smoothing, C6 grouping or manual signature merging is applied.
 With many categories, use the JSON key rather than relying on color alone.
 
 The same operation from Python:
@@ -155,27 +158,49 @@ memory. Estimate them from a coarse run before requesting larger resources.
 | `source=yamada` | a Yamada result for the extracted finite-grid graph; also inspect `classification_computed` |
 | `source=vertex` | the engine classified a vertex-only core; inspect components and boundary contact |
 | `source=large-core` | a structural signature because an exact attempt was outside the configured limit; not an exact polynomial |
+| `source=yamada-set` | an outer/inner boundary classification collection; inspect each entry because structural fallbacks may also occur |
 | `source=error`, or nonempty `error` | computation failed; this is not a zero invariant |
-| `classification_computed=False` | assigned from the material scan's adaptive energy procedure, not independently evaluated at that cell |
+| `classification_computed=False`, no calibration anchor | assigned by adaptive energy filling, not independently evaluated at that cell |
+| nonempty `resolution_calibration_energy` | assigned using the recorded anchor energy under the upstream TiB2 resolution rule; separate from adaptive filling |
 | small-island smoothing or manual signature merges | historical display postprocessing; distinct raw results may share a displayed class |
+| TiB2 C6 display grouping | groups audited non-C6 representatives under the stated upstream rule; raw signatures remain available |
 | contraction mode | grouping under stated bounded contraction tests; not literal equality of classic Yamada polynomials |
 
-The supplied material records contain 11,935 directly classified and 27,185
-adaptive-fill cells. TPMS records do not carry `classification_computed`; the
+The supplied material records contain 14,634 directly classified, 31,184
+adaptive-fill and 202 resolution-calibration cells. TPMS records do not carry `classification_computed`; the
 inspector reports this as **unrecorded**, rather than silently assuming a value.
-The new guided scans classify every requested cell and disable smoothing and
-manual signature merges. Inspect boundary contact, sampling resolution,
+The new guided scans classify every requested cell and disable adaptive filling,
+resolution calibration, smoothing, C6 display grouping and manual signature
+merges. They still use the upstream volume-resolution rule when extracting a
+material body; `removed_component_voxels` and `filled_void_voxels` describe that
+operation. Inspect boundary contact, sampling resolution,
 components and the representative skeleton before interpreting any class.
 
 ## Research reproduction and provenance
 
-The reference data, figures, geometry and HTML from upstream commit `2b2ae6d`
-are preserved. Their historical path strings are provenance, not runtime
+The latest material reference data, figures and HTML from upstream `56bfbab`
+are preserved, together with the TPMS assets from `2b2ae6d`. The boundary-volume
+helpers are supplied by upstream `643fef8`. Historical path strings are provenance, not runtime
 requirements. Reusable compute engines now live in
 `knotted_graph.applications.phase_map_examples`; the old script paths are
 compatibility entry points. Specialized publication layouts and bounded
 contraction processing remain documented research scripts, not generic public
 APIs. Their map mathematics and Hamiltonian definitions were not redesigned.
+
+Detailed material runs retain explicit research processing options:
+`--apply-signature-merges` enables manual display merges, `--apply-c6-review`
+enables the TiB2 audit grouping, and `--apply-resolution-calibration` applies
+the upstream thin-tube calibration to the records. Adaptive energy scans also
+use the upstream per-column stabilization rule; inspect anchor energies to
+distinguish its assignments. These options serve different purposes and are
+disabled in the guided route.
+
+For `--reuse-records` or `--extend-existing-records`, work on a copy of the
+records and matching summary in one output directory. Reuse rebuilds outputs
+and records the chosen processing in the summary; extension computes missing
+energy rows. The representative-geometry script follows the resolved dominant
+body and its outer/nested fillings. The old
+`--primary-component-min-fraction` selection option no longer applies.
 
 `--profile paper` chooses denser sampling defaults, but does **not** silently
 enable historical display merges, adaptive fills or all families, and is not

@@ -23,6 +23,21 @@ PANEL_LABELS = ("(a)", "(b)")
 TEXT_COLOR = "#111827"
 
 
+TIB2_PHASE_COLORS = [
+    "#0f766e",
+    "#2563eb",
+    "#dc2626",
+    "#7c3aed",
+    "#ea580c",
+    "#059669",
+    "#0ea5e9",
+    "#f59e0b",
+    "#db2777",
+    "#65a30d",
+    "#0891b2",
+]
+
+
 def configure_paper_style() -> None:
     mpl.rcParams.update(
         {
@@ -121,12 +136,21 @@ def style_axis(ax, item: dict, *, show_xlabel: bool = True) -> None:
         spine.set_color("black")
 
 
-def plot_material_panel(ax, item: dict, label: str):
+def plot_material_panel(
+    ax,
+    item: dict,
+    label: str,
+    labels_override: np.ndarray | None = None,
+    colors_override: list[str] | None = None,
+):
     mode_data = item["modes"]["classic"]
-    labels = np.asarray(mode_data["z"], dtype=int)
+    labels = np.asarray(
+        mode_data["z"] if labels_override is None else labels_override,
+        dtype=int,
+    )
     lambdas = np.asarray(item["lambdas"], dtype=float)
     energies = np.asarray(item.get("parameters") or item.get("gammas"), dtype=float)
-    colors = mode_data["colors"]
+    colors = list(mode_data["colors"] if colors_override is None else colors_override)
     cmap = ListedColormap(colors, name=f"{item['key']}_classic_yamada")
     norm = BoundaryNorm(np.arange(0.5, len(colors) + 1.5, 1.0), cmap.N)
     ax.pcolormesh(
@@ -169,7 +193,10 @@ def make_figure(payload: dict, output_dir: Path = OUTPUT_DIR) -> None:
     right = fig.add_axes([0.57, 0.17, 0.34, 0.63])
 
     for ax, item, label in zip((left, right), materials, PANEL_LABELS):
-        colorbar_data = plot_material_panel(ax, item, label)
+        labels, colors = display_partition(item)
+        colorbar_data = plot_material_panel(
+            ax, item, label, labels_override=labels, colors_override=colors
+        )
         add_upsilon_colorbar(fig, ax, *colorbar_data)
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -190,6 +217,20 @@ def main() -> None:
     with mpl.rc_context():
         configure_paper_style()
         make_figure(payload_from_html(args.html), args.output_dir)
+
+
+def display_partition(item: dict) -> tuple[np.ndarray, list[str]]:
+    mode = item["modes"]["classic"]
+    labels = np.asarray(mode["z"], dtype=int)
+    colors = list(mode["colors"])
+    if item["key"] == "tib2_d6_F":
+        phase_count = int(labels.max())
+        if phase_count > len(TIB2_PHASE_COLORS):
+            raise RuntimeError(
+                f"Need {phase_count} TiB2 colors, found {len(TIB2_PHASE_COLORS)}"
+            )
+        colors = TIB2_PHASE_COLORS[:phase_count]
+    return labels, colors
 
 
 if __name__ == "__main__":

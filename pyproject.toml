@@ -129,6 +129,7 @@ docs = [
     "myst-nb",
     "myst-parser",
     "nbclient",
+    "nbconvert",
     "pydata-sphinx-theme",
     "sphinx>=7,<9",
     "sphinx-autodoc-typehints",

@@ -173,7 +173,8 @@ running large calculations.
 - [API reference](doc/api/index.md): public calls grouped by subsystem.
 - [Troubleshooting](doc/troubleshooting.md): symptom-based recovery.
 
-The maintained notebooks live under [`User_guide/`](User_guide/). Introductory
+The maintained notebooks start at the [`User_guide` directory guide](User_guide/README.md),
+with a separate [application directory guide](User_guide/applications/README.md). Introductory
 notebooks are distinct from publication-reproduction and benchmark notebooks;
 the latter may require native backends, cached data, and substantially more
 time or memory.

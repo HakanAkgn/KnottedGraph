@@ -36,9 +36,17 @@ fields, nodal Bloch-vector paths, and in-memory material Hamiltonians. Install
 The source objects remain application-specific; this function is not a generic
 Hamiltonian-file reader.
 
+The default polynomial variable is `Y`. With `force_genus_zero_vertex=True`,
+each closed spherical boundary component becomes an isolated vertex: a ball
+has one, while a shell has two. The volume helpers use 26-connectivity for
+occupied voxels and dual 6-connectivity for the complement; their results refer
+to the sampled volume. Running them needs scikit-image, included in `nodal` and
+`knot-fields`. `resolve_volume_mask` returns the resolved mask and removal/fill
+diagnostics; `boundary_filling_groups` returns outer and nested fillings.
+
 ```{eval-rst}
 .. automodule:: knotted_graph.applications.phase_maps
-   :members: YamadaPhaseRecord, YamadaPhaseMapResult, MaterialBandEnergySurface, align_material_hamiltonians, pad_material_hamiltonian, make_yamada_phase_map
+   :members: YamadaPhaseRecord, YamadaPhaseMapResult, VolumeTopology, MaterialBandEnergySurface, align_material_hamiltonians, pad_material_hamiltonian, make_yamada_phase_map, enclosed_void_masks, resolve_volume_mask, volume_topology, boundary_filling_groups
 ```
 
 ## Saved material and compact-TPMS examples

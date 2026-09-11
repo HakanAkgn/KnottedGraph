@@ -81,6 +81,8 @@ def test_read_and_summarize_preserves_classification(tmp_path, suffix):
         ({"phase_signature": ""}, "required"),
         ({"source": 2}, "text"),
         ({"classification_computed": "perhaps"}, "boolean"),
+        ({"resolution_calibration_energy": "nan"}, "finite"),
+        ({"resolution_calibration_energy": "anchor"}, "finite"),
     ],
 )
 def test_invalid_records_have_actionable_errors(tmp_path, updates, message):
@@ -111,6 +113,40 @@ def test_family_selection_and_material_axis(tmp_path):
     with pytest.raises(ValueError, match="Unknown family"):
         load_phase_map(path, family="missing")
     assert load_phase_map(path, family="tib2_d6_F").level_field == "energy"
+
+
+@pytest.mark.parametrize("suffix", [".json", ".csv"])
+def test_calibration_is_distinct_from_adaptive_fill_and_zero_anchor_is_valid(
+    tmp_path, suffix
+):
+    rows = [
+        row(classification_computed=True, resolution_calibration_energy=None),
+        row(lam=1, classification_computed=False, resolution_calibration_energy=None),
+        row(
+            threshold_c=1,
+            classification_computed=False,
+            resolution_calibration_energy=0.0,
+            source="yamada-set",
+            phase_signature="yamada-set:outer[Y]inner[-1]",
+            polynomial="{Y,-1}",
+        ),
+    ]
+    data = load_phase_map(write_records(tmp_path, rows, suffix))
+    summary = data.summary()
+    assert summary["directly_classified_records"] == 1
+    assert summary["adaptive_fill_records"] == 1
+    assert summary["resolution_calibration_records"] == 1
+    assert summary["classification_status_unrecorded"] == 0
+    assert data.records[2]["resolution_calibration_energy"] == 0.0
+    fig = plot_phase_map(data, output=tmp_path / "provenance")
+    plt.close(fig)
+    exported = json.loads((tmp_path / "provenance.json").read_text())
+    assert exported["classification_status"] == [
+        ["computed", "adaptive_fill"],
+        ["resolution_calibration", "missing"],
+    ]
+    assert exported["resolution_calibration_energy"] == [[None, None], [0.0, None]]
+    assert data.records[2]["polynomial"] == "{Y,-1}"
 
 
 def test_plot_is_raw_and_math_style_scoped(tmp_path):
@@ -237,6 +273,8 @@ def test_cli_families_match_engines():
     assert defaults.adaptive_energy_step == 0
     assert defaults.min_stable_cells == 1
     assert defaults.apply_signature_merges is False
+    assert defaults.apply_c6_review is False
+    assert defaults.apply_resolution_calibration is False
 
 
 @pytest.mark.parametrize(
@@ -267,6 +305,97 @@ def test_quick_scan_round_trip_on_optional_stack(tmp_path, kind, stem):
         assert summary["scan_parameters"]["domain_kind"] == "sphere"
     else:
         assert all(r["classification_computed"] is True for r in data.records)
+        assert data.summary()["resolution_calibration_records"] == 0
+        from knotted_graph.applications.phase_map_examples import _materials
+
+        records_path = output / (stem + "_records.json")
+        before = json.loads(records_path.read_text())
+        _materials.main(["--output-dir", str(output), "--reuse-records"])
+        assert json.loads(records_path.read_text()) == before
+        reused = json.loads((output / (stem + "_summary.json")).read_text())
+        assert (
+            reused["map_info"][data.family][
+                "classification_resolution_calibration_cells"
+            ]
+            == 0
+        )
+        assert reused["map_info"][data.family]["c6_symmetry_merges"] == []
+        assert reused["map_info"]["reprocessed_from_existing_records"] is True
+
+
+def test_c6_display_grouping_requires_explicit_research_option():
+    for dependency in ("pyvista", "poly2graph", "plotly", "skimage"):
+        pytest.importorskip(dependency)
+    import numpy as np
+    from knotted_graph.applications.phase_map_examples import _materials
+
+    invalid = sorted(_materials.C6_INVALID_PHASE_SIGNATURES["tib2_d6_F"])[0]
+    signatures = {"yamada:Integer(-1)": 1, invalid: 2}
+    grid = np.array([[1, 1], [2, 2]])
+    raw, manual, c6 = _materials._reviewed_display_merges(
+        grid.copy(), signatures, "tib2_d6_F", _materials.parse_args([])
+    )
+    assert np.array_equal(raw, grid)
+    assert manual == c6 == []
+    displayed, _, c6 = _materials._reviewed_display_merges(
+        grid.copy(),
+        signatures,
+        "tib2_d6_F",
+        _materials.parse_args(["--apply-c6-review"]),
+    )
+    assert np.all(displayed == 1)
+    assert sum(item["cells"] for item in c6) == 2
+    assert np.array_equal(grid, [[1, 1], [2, 2]])
+
+
+@pytest.mark.parametrize("adaptive_step", [0.0, 0.4])
+def test_energy_sampling_preserves_results_until_explicit_calibration(
+    monkeypatch, adaptive_step
+):
+    for dependency in ("pyvista", "poly2graph", "plotly", "skimage"):
+        pytest.importorskip(dependency)
+    from dataclasses import dataclass, replace
+    from knotted_graph.applications.phase_map_examples import _materials
+
+    @dataclass(frozen=True)
+    class Reading:
+        energy: float
+        phase_signature: str
+        lam: float = 0.0
+        classification_computed: bool = True
+        resolution_calibration_energy: float | None = None
+        boundary_components: int = 1
+        error: str | None = None
+        cycle_rank: int = 1
+        removed_component_voxels: int = 0
+        filled_void_voxels: int = 0
+
+    family = replace(
+        _materials.material_families(8)[0],
+        energies=(0.2, 0.5, 0.75, 1.0),
+        landmark_energies=(),
+    )
+    assert family.key == "tib2_d6_F"
+
+    def classify(family, obj, lam, energy, **kwargs):
+        return Reading(energy, "thin" if energy < 0.5 else "resolved")
+
+    monkeypatch.setattr(_materials, "evaluate_cell", classify)
+    records = _materials.evaluate_energy_grid_adaptive(
+        family,
+        None,
+        0.0,
+        max_exact_yamada_edges=3,
+        adaptive_energy_step=adaptive_step,
+    )
+    assert records[0].phase_signature == "thin"
+    assert all(r.resolution_calibration_energy is None for r in records)
+    assert all(r.classification_computed for r in records)
+    calibrated = _materials.stabilize_tib2_records(records)
+    assert calibrated[0].phase_signature == "resolved"
+    assert calibrated[0].classification_computed is False
+    assert calibrated[0].resolution_calibration_energy == 0.75
+    assert records[0].phase_signature == "thin"
 
 
 def test_tpms_viewer_reconstructs_exact_recorded_domain():
