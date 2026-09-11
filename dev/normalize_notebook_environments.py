@@ -460,12 +460,12 @@ use a compute environment for full regeneration.
 
 The production route is
 
-\[
+$$
 (\lambda,\Gamma) \longrightarrow H(\mathbf{k};\lambda,\Gamma)
 \longrightarrow \text{filled exceptional region}
 \longrightarrow \text{skeleton} \longrightarrow G\subset\mathbb R^3
 \longrightarrow \Upsilon(G;Y).
-\]
+$$
 
 The configured study evaluates five transitions on up to 60 lambda samples and
 50 candidate Gamma samples with a $120^3$ volume per evaluated cell. Row caches
@@ -780,11 +780,11 @@ The notebook asks one practical research question:
 
 It progresses through three regimes:
 
-\[
+$$
 \boxed{\text{homogeneous repetition}
 \longrightarrow \text{Abelian count-only mixing}
 \longrightarrow \text{non-Abelian order-sensitive mixing}.}
-\]
+$$
 
 Each part defines a graph family, constructs embedded graphs, evaluates exact
 Laurent polynomials, exports only the data needed for fitting or audit, freezes a
