@@ -93,7 +93,7 @@ class NodalPhaseScanResult:
     def record_grid(self) -> np.ndarray:
         lambdas, gammas = _axis(self.lambdas, "lambdas"), _axis(self.gammas, "gammas")
         lookup = {}
-        wanted = {(float(g), float(l)) for g in gammas for l in lambdas}
+        wanted = {(float(gamma), float(lam)) for gamma in gammas for lam in lambdas}
         for record in self.records:
             key = (float(record.gamma), float(record.lam))
             if key in lookup or key not in wanted:
@@ -101,7 +101,8 @@ class NodalPhaseScanResult:
             lookup[key] = record
         if set(lookup) != wanted:
             raise ValueError("phase records do not cover the requested grid")
-        return np.asarray([[lookup[float(g), float(l)] for l in lambdas] for g in gammas], dtype=object)
+        return np.asarray([[lookup[float(gamma), float(lam)] for lam in lambdas]
+                           for gamma in gammas], dtype=object)
 
     def phase_grid(self) -> tuple[np.ndarray, dict[int, str]]:
         """Operational polynomial labels; -1 is unavailable, not a phase."""
