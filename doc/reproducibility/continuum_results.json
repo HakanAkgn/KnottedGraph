@@ -1,0 +1,48 @@
+{
+  "base_commit": "fab2673f665796c65a32ec42efdc1bf9b6c37678",
+  "branch": "research/continuum-isotopy-fab2673",
+  "new_module_tests": 47,
+  "new_module_tests_passed": 47,
+  "full_existing_suite_rerun": false,
+  "native_build_rerun": false,
+  "historical_corridors": {
+    "attempted": 9,
+    "certified": 9,
+    "primary_replay_valid": 9,
+    "rational_trigonometric_replay_valid": 9
+  },
+  "parameter_rectangles": {
+    "attempted": 1200,
+    "certified": 914,
+    "unknown": 286,
+    "primary_replay_valid": 914,
+    "rational_trigonometric_replay_valid": 914
+  },
+  "by_family": {
+    "schwarz_p_to_diamond": {
+      "certified": 332,
+      "unknown": 68
+    },
+    "gyroid_to_schwarz_p": {
+      "certified": 317,
+      "unknown": 83
+    },
+    "gyroid_to_diamond": {
+      "certified": 265,
+      "unknown": 135
+    }
+  },
+  "interpretation": "Ambient isotopy of specified analytic sublevel solids under the stated regularity and arithmetic hypotheses; not a complete topology classification or a graph-spine certificate.",
+  "original_manuscript_modified": false,
+  "protected_branch_modified": false,
+  "full_proof_tree_distribution": "Separate downloadable review bundle; regeneration commands and code are committed.",
+  "retained_output_hashes": {
+    "results/historical_nine/plan.json": "5cd5e17e2c08f532d973adf801e1ec81615a69a490cf17c112dec7045fcaec83",
+    "results/historical_nine/records.json": "703e1f3e571be2dc5cd84deb8b47c7abc64661f30e2a049c68735b9bb5ac0c38",
+    "results/tpms_continuum_grid/plan.json": "c3b109fb7a62f1cb0b83431571246734dc9189365400e9c4e0bb6683876cbb4b",
+    "results/tpms_continuum_grid/records.json": "61df3c79f081a67f360c764231b387101b11e192b1aa7542f6fb2833b3cd6313",
+    "results/rational_nine_replay.json": "fee702a01dd674be7b405288a8f8f03e358949a005fb7528d0366e521f86523e",
+    "results/rational_grid_replay.json": "0ffe9e997ad77b8890d4df76575f1077ce8e534bc2014a4c40e85881343704a6",
+    "results/pytest_final.txt": "7d08291dfd911944da755df66c25e5e948852fdf2443526c14b61fd33765d864"
+  }
+}
