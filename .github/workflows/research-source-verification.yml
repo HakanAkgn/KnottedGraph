@@ -18,18 +18,12 @@ jobs:
           python-version: '3.13'
       - name: Supply native-build system dependency
         run: sudo apt-get update -qq && sudo apt-get install -y libboost-dev
-      - name: Archive binary dependencies for offline reproduction
-        shell: bash
-        run: |
-          mkdir -p /tmp/kg-wheels
-          for package in fastrdp==0.3.2 pybind11==3.1.0 scikit-build-core==0.12.2 igraph==1.0.0 texttable pyvista==0.48.4 vtk==9.6.2 scooby topoly==1.1.0; do
-            python -m pip download --only-binary=:all: --no-deps --dest /tmp/kg-wheels "$package" || echo "$package unavailable as a wheel" >> /tmp/kg-wheels/unavailable.txt
-          done
-          sha256sum /tmp/kg-wheels/*.whl > /tmp/kg-wheels/SHA256SUMS
+      - name: Export pinned offline formatter
+        run: python -m pip download --only-binary=:all: --no-deps --dest /tmp/kg-style ruff==0.15.19
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: knottedgraph-offline-build-wheels
-          path: /tmp/kg-wheels
+          name: knottedgraph-code-style-tool
+          path: /tmp/kg-style
           retention-days: 7
       - name: Install pinned environment and run repository checks
         shell: bash
