@@ -6,10 +6,13 @@ on:
       - '.github/workflows/public-spine-verification.yml'
       - 'src/knotted_graph/applications/nodal/deformation.py'
       - 'src/knotted_graph/applications/nodal/_reconstruction.py'
+      - 'src/knotted_graph/core/continuation_atlas.py'
       - 'tests/applications/test_nodal_scoped_reconstruction.py'
-      - 'dev/apply_nodal_spine_patch.py'
+      - 'tests/applications/test_nodal_cache_provenance.py'
+      - 'tests/core/test_continuation_atlas.py'
+      - 'dev/verify_public_spine_and_atlas.py'
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: public-solid-spine-integration
   cancel-in-progress: false
@@ -20,47 +23,34 @@ jobs:
     timeout-minutes: 22
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Materialize the reviewed native-class patch
-        run: python dev/apply_nodal_spine_patch.py
       - name: Install pinned package
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y libboost-dev
           python -m pip install uv==0.12.16
           uv sync --all-extras --group dev --group docs --frozen
-      - name: Run all tests and scoped lint
+      - name: Run complete suite and scoped lint
         run: |
-          uv run --no-sync pytest -q --junitxml=/tmp/public-spine-tests.xml
+          mkdir -p scoped-results
+          uv run --no-sync pytest -q --junitxml=scoped-results/tests.xml
           uv run --no-sync python dev/check_repository_consistency.py
-          uv run --no-sync ruff check src/knotted_graph/applications/nodal/_reconstruction.py src/knotted_graph/applications/nodal/deformation.py tests/applications/test_nodal_scoped_reconstruction.py dev/apply_nodal_spine_patch.py
-      - name: Retain tested native-class edit on the requested branch only
-        env:
-          TARGET_BRANCH: research/solid-spine-maps-41dc87c
+          uv run --no-sync ruff check src/knotted_graph/applications/nodal/_reconstruction.py src/knotted_graph/applications/nodal/deformation.py src/knotted_graph/core/continuation_atlas.py tests/applications/test_nodal_scoped_reconstruction.py tests/applications/test_nodal_cache_provenance.py tests/core/test_continuation_atlas.py dev/verify_public_spine_and_atlas.py
+      - name: Recompute the original nine source-solid corridors
         run: |
-          test "$(git branch --show-current)" = "$TARGET_BRANCH"
-          git diff --check
-          test "$(git diff --name-only | wc -l)" -le 1
-          if ! git diff --quiet -- src/knotted_graph/applications/nodal/skeleton.py; then
-            test "$(git diff --name-only)" = 'src/knotted_graph/applications/nodal/skeleton.py'
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add src/knotted_graph/applications/nodal/skeleton.py
-            git commit -m 'Integrate tested public reconstruction guards and cubical witnesses'
-            git push origin "HEAD:refs/heads/$TARGET_BRANCH"
-          fi
-          git rev-parse HEAD
-      - name: Recheck original fields at original Hamiltonian voxel resolution
+          uv run --no-sync python dev/certify_tpms_continuation.py --mode historical-nine --jobs 2 --out scoped-results/tpms
+      - name: Replay equivalence paths and execute public 120-cubed scans
         run: |
-          uv run --no-sync python dev/run_solid_spine_audit.py --out /tmp/source-spine-120 --dimension 120 --seconds 850 --case-seconds 140
+          uv run --no-sync python dev/verify_public_spine_and_atlas.py --tpms scoped-results/tpms --out scoped-results/public --dimension 120 --case-seconds 180
+      - name: Ensure tests have not modified tracked source
+        run: git diff --exit-code
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: public-solid-spine-verification
           retention-days: 30
-          path: |
-            /tmp/public-spine-tests.xml
-            /tmp/source-spine-120
-            src/knotted_graph/applications/nodal/skeleton.py
+          path: scoped-results
