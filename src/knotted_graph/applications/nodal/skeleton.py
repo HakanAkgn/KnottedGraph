@@ -378,65 +378,30 @@ class NodalSkeleton:
     def skeleton_graph(
         self,
         simplify: bool = True,
-        smooth_epsilon: int = 4,
+        smooth_epsilon: float = 0,
         *,
-        skeleton_image: Optional[NDArray] = None
+        skeleton_image: Optional[NDArray] = None,
+        reconstruction: str = "guarded",
+        cubical_options: dict | None = None,
     ) -> nx.MultiGraph:
+        """Reconstruct an index-coordinate graph with explicit evidence.
+
+        ``guarded`` supplies source component/cycle counts and checks cleanup.
+        ``cubical`` instead replays elementary collapses of the source voxel
+        solid and retains the certificate as ``self.spine_certificate``. It
+        permits neither an external skeleton nor geometric smoothing. Neither
+        mode by itself certifies correspondence to the analytic source field.
+        Existing coordinate conversion and visualization APIs are unchanged.
         """
-        Computes the graph representation of the exceptional surface's skeleton.
+        from ._reconstruction import reconstruct
 
-        This method converts the skeleton image into a `networkx.MultiGraph`, where
-        nodes represent endpoints or junctions and edges represent the paths
-        connecting them. The graph can be simplified and smoothed.
-
-        Parameters
-        ----------
-        simplify : bool, optional
-            If True, removes small leaf nodes (pruning) and simplifies edges
-            by removing redundant intermediate points. Defaults to True.
-        smooth_epsilon : int, optional
-            The tolerance for edge smoothing. A larger value results in
-            smoother, less detailed edge paths. Defaults to 4.
-        skeleton_image : Optional[NDArray], optional
-            An external skeleton image to use instead of the one computed
-            internally. If None, the internally computed skeleton is used.
-            Defaults to None.
-
-        Returns
-        -------
-        nx.MultiGraph
-            The graph representation of the skeleton. Node attributes include
-            'pos' (index coordinates), and edge attributes include 'pts'
-            (a list of index coordinates along the edge).
-        """
-        # Check if the arguments match the cached ones
-        args = (smooth_epsilon, simplify, id(skeleton_image))
-        if self.skeleton_graph_cache is not None and \
-           self.skeleton_graph_cache_args == args:
-            return self.skeleton_graph_cache
-
-        # Compute the graph
-        image = (
-            self._skeleton_image
-            if skeleton_image is None
-            else np.asarray(skeleton_image, dtype=bool)
+        return reconstruct(
+            self, simplify=simplify, smooth_epsilon=smooth_epsilon,
+            skeleton_image=skeleton_image, reconstruction=reconstruction,
+            cubical_options=cubical_options, extract=skeleton_image_to_graph,
+            prune=remove_leaf_nodes, simplify_edges=simplify_edges,
+            smooth_edges=smooth_edges, is_trivalent=is_trivalent,
         )
-        if image.ndim != 3:
-            raise ValueError(
-                "skeleton_image must be a three-dimensional array."
-            )
-        G = skeleton_image_to_graph(image)
-        if simplify:
-            G = remove_leaf_nodes(G)
-            G = simplify_edges(G)
-        G = smooth_edges(G, epsilon=smooth_epsilon, copy=False)
-        G.graph['is_trivalent'] = is_trivalent(G)
-        self.is_graph_trivalent = G.graph['is_trivalent']
-
-        # cache the result
-        self.skeleton_graph_cache = G
-        self.skeleton_graph_cache_args = args
-        return G
 
 
     @property
@@ -458,6 +423,9 @@ class NodalSkeleton:
         self.skeleton_graph_cache = None
         self.skeleton_graph_cache_args = None
         self._pv_data_args = None
+        self._skeleton_graph_digest = None
+        self.spine_certificate = None
+        self.__dict__.pop("PDCode", None)
 
 
     @cached_property
