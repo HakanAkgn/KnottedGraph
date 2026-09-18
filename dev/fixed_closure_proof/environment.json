@@ -1,0 +1,8 @@
+{
+  "python": "3.13.5",
+  "packages": {
+    "sympy": "1.14.0",
+    "networkx": "3.6.1",
+    "pytest": "9.0.2"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "independent_basis_dimension": 15,
+  "H_equals_O_C": true,
+  "H_A_equals_O_MA_C": true,
+  "H_B_equals_O_MB_C": true,
+  "determinant_H_at_2": "2316229704812097955722372843592560015646984158183708827511386954216255306363140665523348383857309818267822265625/1897137590064188545819787018382342682267975428761855001222473056385648716020711424",
+  "rank_15_verified": true,
+  "cubic_A_identity": true,
+  "cubic_B_identity": true,
+  "operators_noncommute": true,
+  "generated_hankel_blob_sha": "ed8d20c2c97d7cdcf62d4e87cae153e658d71224",
+  "expected_archive_hankel_blob_sha": "ed8d20c2c97d7cdcf62d4e87cae153e658d71224",
+  "all_three_hankel_blocks_byte_identical_to_archive": true,
+  "input_training_coefficients_used": false,
+  "scope": "Fixed blackboard-framed three-strand closure only; not a volume/spine certificate.",
+  "proof": "The explicit 15-state skein realization and invertible H imply the all-word Hankel realization by change of basis.",
+  "parent_commit": "2dbac64674b39ae607ad6696f92f91b03ca3cbbd",
+  "new_tests_passed": 50,
+  "legacy_geometry_pairs_tested": 9,
+  "legacy_unintended_contacts_per_graph": 6,
+  "corrected_unintended_contacts_per_graph": 0,
+  "production_suite_rerun": false,
+  "manuscript_modified": false,
+  "algebra_scope": "All-word raw polynomial of explicitly repaired valid fixed diagram family; not certification of legacy intersecting curves.",
+  "full_artifacts": "Downloadable review bundle; complete regeneration supplied in dev/fixed_closure_proof.",
+  "source_sha256": {
+    "audit_realization.py": "187dc2ac1c56265ee06a719e49832bfc20e884097d9aec819a68c447a9e060ce",
+    "boundary_algebra.py": "b7d16d2af9c412d11d2e2fed3822a7196dd49184eabb5868583c7082ccacb343",
+    "canonical_geometry.py": "328a1e88b41d9349d8b7ff276a29b72aafe568bfea496509da23e8b62c2d6cc8",
+    "test_boundary_algebra.py": "ffec4e7f7ecc9ac5c611d114eb2f3f26f6a273ca9f0eb4835e0131f76f6bca77"
+  }
+}
