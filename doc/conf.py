@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import os
 import sys
+import subprocess
 from pathlib import Path
+import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -12,7 +14,9 @@ sys.path.insert(0, str(ROOT / "src"))
 project = "KnottedGraph"
 author = "Xianquan (Sarinstein) Yan, Hakan Akgün"
 copyright = "2026, KnottedGraph contributors"
-release = "0.2.0"
+release = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))[
+    "project"
+]["version"]
 
 extensions = [
     "myst_nb",
@@ -34,6 +38,10 @@ html_static_path = ["_static"]
 html_extra_path = ["assets"]
 html_css_files = ["custom.css"]
 html_theme_options = {
+    "announcement": (
+        "Pre-alpha 0.2 development documentation. The indexed PyPI 0.1.2 "
+        "package uses the legacy API; follow the version-aware Installation page."
+    ),
     "github_url": "https://github.com/sarinstein-yan/KnottedGraph",
     "navigation_depth": 3,
     "show_nav_level": 2,
@@ -65,11 +73,24 @@ autodoc_mock_imports = [
     "tabulate",
 ]
 
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
-    "networkx": ("https://networkx.org/documentation/stable/", None),
-    "numpy": ("https://numpy.org/doc/stable/", None),
-    "sympy": ("https://docs.sympy.org/latest/", None),
-}
+if os.environ.get("KNOTTED_GRAPH_DOCS_OFFLINE") == "1":
+    intersphinx_mapping = {}
+else:
+    intersphinx_mapping = {
+        "python": ("https://docs.python.org/3", None),
+        "networkx": ("https://networkx.org/documentation/stable/", None),
+        "numpy": ("https://numpy.org/doc/stable/", None),
+        "sympy": ("https://docs.sympy.org/latest/", None),
+    }
 
 os.environ.setdefault("PYVISTA_OFF_SCREEN", "true")
+
+
+def _build_phase_map_demos(app):
+    """Package pinned reference payloads, never regenerate the scientific scans."""
+    if app.builder.format == "html":
+        subprocess.run([sys.executable, str(ROOT / "dev/build_phase_map_demos.py")], check=True)
+
+
+def setup(app):
+    app.connect("builder-inited", _build_phase_map_demos)

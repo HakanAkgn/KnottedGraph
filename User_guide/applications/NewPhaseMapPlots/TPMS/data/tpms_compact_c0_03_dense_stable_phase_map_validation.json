@@ -1,0 +1,495 @@
+{
+  "status": "PASS",
+  "failures": [],
+  "warnings": [],
+  "compactness": {
+    "record_count": 1323,
+    "box_boundary_touch_count": 0,
+    "closed_surface_count": 1323,
+    "open_surface_count": 0,
+    "surface_open_edge_max": 0,
+    "surface_nonmanifold_edge_max": 0,
+    "empty_solid_count": 0
+  },
+  "endpoint_failure_count": 0,
+  "source_counts": {
+    "yamada": 614,
+    "large-core": 636,
+    "vertex": 73
+  },
+  "summary_timing": {
+    "elapsed_seconds": 158.742,
+    "reconstructed_volumes": 1323,
+    "sample_seconds": {
+      "sum": 10.321,
+      "min": 0.006451,
+      "median": 0.00684,
+      "max": 0.017833
+    },
+    "skeleton_seconds": {
+      "sum": 14.722,
+      "min": 0.00398,
+      "median": 0.01122,
+      "max": 0.06521
+    },
+    "graph_seconds": {
+      "sum": 13.464,
+      "min": 0.0,
+      "median": 0.010123,
+      "max": 0.058193
+    },
+    "yamada_seconds": {
+      "sum": 50.106,
+      "min": 0.0,
+      "median": 0.0,
+      "max": 0.121937
+    },
+    "surface_seconds": {
+      "sum": 53.277,
+      "min": 0.034471,
+      "median": 0.038771,
+      "max": 0.125347
+    },
+    "total_seconds": {
+      "sum": 148.326,
+      "min": 0.046477,
+      "median": 0.089412,
+      "max": 0.228807
+    }
+  },
+  "html": {
+    "path": "tmp/tpms_compact_scaffold_phase_maps_c0_03_dense/tpms_compact_c0_03_dense_stable_yamada_plotly_region_geometry.html",
+    "transition_count": 3,
+    "region_count": 410,
+    "modes": [
+      "stable",
+      "classic",
+      "contraction"
+    ],
+    "summary": {
+      "reconstructedVolumes": 1323,
+      "elapsedSeconds": 158.742,
+      "sourceCounts": {
+        "yamada": 614,
+        "large-core": 636,
+        "vertex": 73
+      },
+      "errors": 0,
+      "maxSurfaceFacesPerRepresentative": 10000,
+      "maxContractionStatesPerTest": 1000,
+      "maxContractionDepthPerTest": 3,
+      "maxContractionEdgesPerTest": 24,
+      "stableDisplayMinCells": 4,
+      "scopeNote": "Cells sharing a Yamada value are described only as Yamada-distinguished signatures/phases. The run does not claim complete topological equivalence without stronger validation."
+    }
+  },
+  "families": {
+    "gyroid_to_diamond": {
+      "records": 441,
+      "raw_phase_count": 65,
+      "stable_phase_count": 65,
+      "classic_connected_regions": 117,
+      "stable_display": {
+        "min_cells": 4,
+        "phase_count": 18,
+        "connected_regions": 20,
+        "reassigned_cells": 121,
+        "single_cell_regions": 0,
+        "small_regions_le_3_cells": 0
+      },
+      "html_contraction_classes": 52,
+      "html_contraction_regions": 88,
+      "signature_count": 65,
+      "source_counts": {
+        "yamada": 166,
+        "large-core": 274,
+        "vertex": 1
+      }
+    },
+    "gyroid_to_schwarz_p": {
+      "records": 441,
+      "raw_phase_count": 20,
+      "stable_phase_count": 20,
+      "classic_connected_regions": 64,
+      "stable_display": {
+        "min_cells": 4,
+        "phase_count": 11,
+        "connected_regions": 16,
+        "reassigned_cells": 71,
+        "single_cell_regions": 0,
+        "small_regions_le_3_cells": 0
+      },
+      "html_contraction_classes": 20,
+      "html_contraction_regions": 64,
+      "signature_count": 20,
+      "source_counts": {
+        "yamada": 258,
+        "large-core": 183
+      }
+    },
+    "schwarz_p_to_diamond": {
+      "records": 441,
+      "raw_phase_count": 15,
+      "stable_phase_count": 15,
+      "classic_connected_regions": 19,
+      "stable_display": {
+        "min_cells": 4,
+        "phase_count": 3,
+        "connected_regions": 3,
+        "reassigned_cells": 18,
+        "single_cell_regions": 0,
+        "small_regions_le_3_cells": 0
+      },
+      "html_contraction_classes": 15,
+      "html_contraction_regions": 19,
+      "signature_count": 15,
+      "source_counts": {
+        "yamada": 190,
+        "vertex": 72,
+        "large-core": 179
+      }
+    }
+  },
+  "signature_stats": {
+    "exact_yamada_polynomial_conflicts": {},
+    "large_core_records_missing_wl_hash": 0,
+    "grossly_similar_graph_groups_split_by_signature": [
+      {
+        "family": "gyroid_to_diamond",
+        "source": "large-core",
+        "nodes": 17,
+        "edges": 26,
+        "cycle_rank": 10,
+        "interior_components": 1,
+        "handle_rank": 10,
+        "degree_sequence": [
+          4,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "distinct_signatures": 5
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "source": "large-core",
+        "nodes": 15,
+        "edges": 24,
+        "cycle_rank": 10,
+        "interior_components": 1,
+        "handle_rank": 10,
+        "degree_sequence": [
+          4,
+          4,
+          4,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "distinct_signatures": 4
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "source": "yamada",
+        "nodes": 11,
+        "edges": 17,
+        "cycle_rank": 7,
+        "interior_components": 1,
+        "handle_rank": 7,
+        "degree_sequence": [
+          4,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "distinct_signatures": 3
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "source": "large-core",
+        "nodes": 18,
+        "edges": 27,
+        "cycle_rank": 10,
+        "interior_components": 1,
+        "handle_rank": 10,
+        "degree_sequence": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "distinct_signatures": 3
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "source": "yamada",
+        "nodes": 10,
+        "edges": 16,
+        "cycle_rank": 7,
+        "interior_components": 1,
+        "handle_rank": 7,
+        "degree_sequence": [
+          4,
+          4,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "distinct_signatures": 2
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "source": "large-core",
+        "nodes": 14,
+        "edges": 21,
+        "cycle_rank": 8,
+        "interior_components": 1,
+        "handle_rank": 8,
+        "degree_sequence": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "distinct_signatures": 2
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "source": "large-core",
+        "nodes": 19,
+        "edges": 29,
+        "cycle_rank": 11,
+        "interior_components": 1,
+        "handle_rank": 11,
+        "degree_sequence": [
+          4,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "distinct_signatures": 2
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "source": "large-core",
+        "nodes": 20,
+        "edges": 30,
+        "cycle_rank": 11,
+        "interior_components": 1,
+        "handle_rank": 11,
+        "degree_sequence": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "distinct_signatures": 2
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "source": "large-core",
+        "nodes": 16,
+        "edges": 25,
+        "cycle_rank": 10,
+        "interior_components": 1,
+        "handle_rank": 10,
+        "degree_sequence": [
+          4,
+          4,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "distinct_signatures": 4
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "source": "large-core",
+        "nodes": 17,
+        "edges": 26,
+        "cycle_rank": 10,
+        "interior_components": 1,
+        "handle_rank": 10,
+        "degree_sequence": [
+          4,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "distinct_signatures": 3
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "source": "large-core",
+        "nodes": 15,
+        "edges": 24,
+        "cycle_rank": 10,
+        "interior_components": 1,
+        "handle_rank": 10,
+        "degree_sequence": [
+          4,
+          4,
+          4,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "distinct_signatures": 2
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "source": "large-core",
+        "nodes": 20,
+        "edges": 30,
+        "cycle_rank": 11,
+        "interior_components": 1,
+        "handle_rank": 11,
+        "degree_sequence": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "distinct_signatures": 2
+      }
+    ]
+  }
+}

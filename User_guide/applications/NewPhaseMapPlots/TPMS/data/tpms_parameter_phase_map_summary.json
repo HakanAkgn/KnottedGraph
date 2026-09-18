@@ -1,0 +1,610 @@
+{
+  "knotted_graph_root": "/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/Knotted_graph_code_paper/KnottedGraph_1earlier",
+  "pipeline_reuse": {
+    "skeletonization": "knotted_graph.extraction.skeletonize_volume",
+    "graph_extraction": "knotted_graph.extraction.skeleton_image_to_graph",
+    "graph_postprocessing": [
+      "knotted_graph.core.remove_leaf_nodes",
+      "knotted_graph.core.simplify_edges",
+      "knotted_graph.core.smooth_edges"
+    ],
+    "yamada": "knotted_graph.applications.phase_maps._compute_yamada"
+  },
+  "scientific_scope_note": "Cells sharing a Yamada value are described only as Yamada-distinguished signatures/phases. The run does not claim complete topological equivalence without stronger validation.",
+  "literature_basis": [
+    {
+      "claim": "Gyroid, Schwarz primitive, and Schwarz diamond are standard TPMS scaffold fields used for porous-material design.",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8156807/"
+    },
+    {
+      "claim": "Finite TPMS scaffold models should be closed by combining the implicit surface with an outer boundary/design domain.",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5943328/"
+    }
+  ],
+  "lambda_samples": 21,
+  "lambdas": [
+    0.0,
+    0.05,
+    0.1,
+    0.15000000000000002,
+    0.2,
+    0.25,
+    0.30000000000000004,
+    0.35000000000000003,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6000000000000001,
+    0.65,
+    0.7000000000000001,
+    0.75,
+    0.8,
+    0.8500000000000001,
+    0.9,
+    0.9500000000000001,
+    1.0
+  ],
+  "families": [
+    {
+      "key": "gyroid_to_diamond",
+      "title": "Gyroid -> Diamond",
+      "start_field": "gyroid",
+      "end_field": "diamond",
+      "start_formula": "sin(x) cos(y) + sin(y) cos(z) + sin(z) cos(x)",
+      "end_formula": "cos(x) cos(y) cos(z) - sin(x) sin(y) sin(z)",
+      "thresholds": [
+        0.0,
+        0.015,
+        0.03,
+        0.045,
+        0.06,
+        0.075,
+        0.09,
+        0.105,
+        0.12,
+        0.135,
+        0.15,
+        0.16499999999999998,
+        0.18,
+        0.195,
+        0.21,
+        0.22499999999999998,
+        0.24,
+        0.255,
+        0.27,
+        0.285,
+        0.3
+      ],
+      "dimension": 64,
+      "span": [
+        [
+          -7.0685834705770345,
+          7.0685834705770345
+        ],
+        [
+          -7.0685834705770345,
+          7.0685834705770345
+        ],
+        [
+          -7.0685834705770345,
+          7.0685834705770345
+        ]
+      ],
+      "compact_domain": {
+        "key": "sphere",
+        "title": "Finite spherical scaffold coupon",
+        "formula": "sqrt(x^2+y^2+z^2)/5.08938 - 1 <= 0",
+        "reference_note": "Finite TPMS scaffold formed by intersecting the periodic level-set phase with an explicit outer design domain."
+      },
+      "convention": "Omega(lambda,c) = {r : F_lambda(r) <= c and Phi_domain(r) <= 0}",
+      "rationale": "Interpolates a chiral gyroid scaffold into the standard Schwarz-D/diamond TPMS scaffold inside a finite design domain."
+    },
+    {
+      "key": "gyroid_to_schwarz_p",
+      "title": "Gyroid -> Schwarz-P",
+      "start_field": "gyroid",
+      "end_field": "schwarz_p",
+      "start_formula": "sin(x) cos(y) + sin(y) cos(z) + sin(z) cos(x)",
+      "end_formula": "cos(x) + cos(y) + cos(z)",
+      "thresholds": [
+        0.0,
+        0.015,
+        0.03,
+        0.045,
+        0.06,
+        0.075,
+        0.09,
+        0.105,
+        0.12,
+        0.135,
+        0.15,
+        0.16499999999999998,
+        0.18,
+        0.195,
+        0.21,
+        0.22499999999999998,
+        0.24,
+        0.255,
+        0.27,
+        0.285,
+        0.3
+      ],
+      "dimension": 64,
+      "span": [
+        [
+          -7.0685834705770345,
+          7.0685834705770345
+        ],
+        [
+          -7.0685834705770345,
+          7.0685834705770345
+        ],
+        [
+          -7.0685834705770345,
+          7.0685834705770345
+        ]
+      ],
+      "compact_domain": {
+        "key": "sphere",
+        "title": "Finite spherical scaffold coupon",
+        "formula": "sqrt(x^2+y^2+z^2)/5.08938 - 1 <= 0",
+        "reference_note": "Finite TPMS scaffold formed by intersecting the periodic level-set phase with an explicit outer design domain."
+      },
+      "convention": "Omega(lambda,c) = {r : F_lambda(r) <= c and Phi_domain(r) <= 0}",
+      "rationale": "Interpolates the gyroid field into the primitive Schwarz-P porous-material scaffold inside a finite design domain."
+    },
+    {
+      "key": "schwarz_p_to_diamond",
+      "title": "Schwarz-P -> Diamond",
+      "start_field": "schwarz_p",
+      "end_field": "diamond",
+      "start_formula": "cos(x) + cos(y) + cos(z)",
+      "end_formula": "cos(x) cos(y) cos(z) - sin(x) sin(y) sin(z)",
+      "thresholds": [
+        0.0,
+        0.015,
+        0.03,
+        0.045,
+        0.06,
+        0.075,
+        0.09,
+        0.105,
+        0.12,
+        0.135,
+        0.15,
+        0.16499999999999998,
+        0.18,
+        0.195,
+        0.21,
+        0.22499999999999998,
+        0.24,
+        0.255,
+        0.27,
+        0.285,
+        0.3
+      ],
+      "dimension": 64,
+      "span": [
+        [
+          -7.0685834705770345,
+          7.0685834705770345
+        ],
+        [
+          -7.0685834705770345,
+          7.0685834705770345
+        ],
+        [
+          -7.0685834705770345,
+          7.0685834705770345
+        ]
+      ],
+      "compact_domain": {
+        "key": "sphere",
+        "title": "Finite spherical scaffold coupon",
+        "formula": "sqrt(x^2+y^2+z^2)/5.08938 - 1 <= 0",
+        "reference_note": "Finite TPMS scaffold formed by intersecting the periodic level-set phase with an explicit outer design domain."
+      },
+      "convention": "Omega(lambda,c) = {r : F_lambda(r) <= c and Phi_domain(r) <= 0}",
+      "rationale": "Interpolates between two standard cubic TPMS scaffold fields inside a finite design domain."
+    }
+  ],
+  "compactness_audit": {
+    "reconstructed_volumes": 1323,
+    "box_boundary_touch_count": 0,
+    "closed_surface_count": 1323,
+    "open_surface_count": 0,
+    "surface_nonmanifold_edge_max": 0,
+    "surface_open_edge_max": 0
+  },
+  "endpoint_verification": [
+    {
+      "family": "gyroid_to_diamond",
+      "lambda": 0.0,
+      "expected_field": "gyroid",
+      "self_max_abs_error": 0.0,
+      "correlations": {
+        "gyroid": 1.0,
+        "schwarz_p": 1.6039427449930844e-18,
+        "diamond": -7.613961117932452e-17
+      },
+      "threshold_c": 0.0,
+      "compact_domain": "sphere",
+      "volume_fraction": 0.093170166015625,
+      "interior": {
+        "interior_voxels": 24424,
+        "interior_fraction": 0.093170166015625,
+        "interior_components": 4,
+        "euler_characteristic": -1,
+        "handle_rank": 5,
+        "touches_boundary": false,
+        "boundary_faces": []
+      },
+      "skeleton_voxels": 235,
+      "graph": {
+        "nodes": 8,
+        "edges": 12,
+        "components": 1,
+        "cycle_rank": 5,
+        "total_edge_points": 132,
+        "degree_sequence": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ]
+      },
+      "surface": {
+        "surface_points": 13308,
+        "surface_cells": 26560,
+        "surface_open_edges": 0,
+        "surface_nonmanifold_edges": 0,
+        "surface_is_closed": true
+      }
+    },
+    {
+      "family": "gyroid_to_diamond",
+      "lambda": 1.0,
+      "expected_field": "diamond",
+      "self_max_abs_error": 0.0,
+      "correlations": {
+        "gyroid": -7.613961117932452e-17,
+        "schwarz_p": 0.02959623162792461,
+        "diamond": 0.9999999999999998
+      },
+      "threshold_c": 0.0,
+      "compact_domain": "sphere",
+      "volume_fraction": 0.088958740234375,
+      "interior": {
+        "interior_voxels": 23320,
+        "interior_fraction": 0.088958740234375,
+        "interior_components": 1,
+        "euler_characteristic": -10,
+        "handle_rank": 11,
+        "touches_boundary": false,
+        "boundary_faces": []
+      },
+      "skeleton_voxels": 259,
+      "graph": {
+        "nodes": 14,
+        "edges": 24,
+        "components": 1,
+        "cycle_rank": 11,
+        "total_edge_points": 158,
+        "degree_sequence": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ]
+      },
+      "surface": {
+        "surface_points": 14208,
+        "surface_cells": 28456,
+        "surface_open_edges": 0,
+        "surface_nonmanifold_edges": 0,
+        "surface_is_closed": true
+      }
+    },
+    {
+      "family": "gyroid_to_schwarz_p",
+      "lambda": 0.0,
+      "expected_field": "gyroid",
+      "self_max_abs_error": 0.0,
+      "correlations": {
+        "gyroid": 1.0,
+        "schwarz_p": 1.6039427449930844e-18,
+        "diamond": -7.613961117932452e-17
+      },
+      "threshold_c": 0.0,
+      "compact_domain": "sphere",
+      "volume_fraction": 0.093170166015625,
+      "interior": {
+        "interior_voxels": 24424,
+        "interior_fraction": 0.093170166015625,
+        "interior_components": 4,
+        "euler_characteristic": -1,
+        "handle_rank": 5,
+        "touches_boundary": false,
+        "boundary_faces": []
+      },
+      "skeleton_voxels": 235,
+      "graph": {
+        "nodes": 8,
+        "edges": 12,
+        "components": 1,
+        "cycle_rank": 5,
+        "total_edge_points": 132,
+        "degree_sequence": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ]
+      },
+      "surface": {
+        "surface_points": 13308,
+        "surface_cells": 26560,
+        "surface_open_edges": 0,
+        "surface_nonmanifold_edges": 0,
+        "surface_is_closed": true
+      }
+    },
+    {
+      "family": "gyroid_to_schwarz_p",
+      "lambda": 1.0,
+      "expected_field": "schwarz_p",
+      "self_max_abs_error": 0.0,
+      "correlations": {
+        "gyroid": 1.6039427449930844e-18,
+        "schwarz_p": 1.0,
+        "diamond": 0.02959623162792461
+      },
+      "threshold_c": 0.0,
+      "compact_domain": "sphere",
+      "volume_fraction": 0.106201171875,
+      "interior": {
+        "interior_voxels": 27840,
+        "interior_fraction": 0.106201171875,
+        "interior_components": 1,
+        "euler_characteristic": -4,
+        "handle_rank": 5,
+        "touches_boundary": false,
+        "boundary_faces": []
+      },
+      "skeleton_voxels": 236,
+      "graph": {
+        "nodes": 8,
+        "edges": 12,
+        "components": 1,
+        "cycle_rank": 5,
+        "total_edge_points": 190,
+        "degree_sequence": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ]
+      },
+      "surface": {
+        "surface_points": 13176,
+        "surface_cells": 26368,
+        "surface_open_edges": 0,
+        "surface_nonmanifold_edges": 0,
+        "surface_is_closed": true
+      }
+    },
+    {
+      "family": "schwarz_p_to_diamond",
+      "lambda": 0.0,
+      "expected_field": "schwarz_p",
+      "self_max_abs_error": 0.0,
+      "correlations": {
+        "gyroid": 1.6039427449930844e-18,
+        "schwarz_p": 1.0,
+        "diamond": 0.02959623162792461
+      },
+      "threshold_c": 0.0,
+      "compact_domain": "sphere",
+      "volume_fraction": 0.106201171875,
+      "interior": {
+        "interior_voxels": 27840,
+        "interior_fraction": 0.106201171875,
+        "interior_components": 1,
+        "euler_characteristic": -4,
+        "handle_rank": 5,
+        "touches_boundary": false,
+        "boundary_faces": []
+      },
+      "skeleton_voxels": 236,
+      "graph": {
+        "nodes": 8,
+        "edges": 12,
+        "components": 1,
+        "cycle_rank": 5,
+        "total_edge_points": 190,
+        "degree_sequence": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ]
+      },
+      "surface": {
+        "surface_points": 13176,
+        "surface_cells": 26368,
+        "surface_open_edges": 0,
+        "surface_nonmanifold_edges": 0,
+        "surface_is_closed": true
+      }
+    },
+    {
+      "family": "schwarz_p_to_diamond",
+      "lambda": 1.0,
+      "expected_field": "diamond",
+      "self_max_abs_error": 0.0,
+      "correlations": {
+        "gyroid": -7.613961117932452e-17,
+        "schwarz_p": 0.02959623162792461,
+        "diamond": 0.9999999999999998
+      },
+      "threshold_c": 0.0,
+      "compact_domain": "sphere",
+      "volume_fraction": 0.088958740234375,
+      "interior": {
+        "interior_voxels": 23320,
+        "interior_fraction": 0.088958740234375,
+        "interior_components": 1,
+        "euler_characteristic": -10,
+        "handle_rank": 11,
+        "touches_boundary": false,
+        "boundary_faces": []
+      },
+      "skeleton_voxels": 259,
+      "graph": {
+        "nodes": 14,
+        "edges": 24,
+        "components": 1,
+        "cycle_rank": 11,
+        "total_edge_points": 158,
+        "degree_sequence": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ]
+      },
+      "surface": {
+        "surface_points": 14208,
+        "surface_cells": 28456,
+        "surface_open_edges": 0,
+        "surface_nonmanifold_edges": 0,
+        "surface_is_closed": true
+      }
+    }
+  ],
+  "map_info": {
+    "gyroid_to_diamond": {
+      "raw_phase_count": 65,
+      "stable_phase_count": 65,
+      "stable_reassigned_cells": 0,
+      "source_counts": {
+        "yamada": 166,
+        "large-core": 274,
+        "vertex": 1
+      },
+      "distinct_signatures": 65,
+      "reconstructed_volumes": 441
+    },
+    "gyroid_to_schwarz_p": {
+      "raw_phase_count": 20,
+      "stable_phase_count": 20,
+      "stable_reassigned_cells": 0,
+      "source_counts": {
+        "yamada": 258,
+        "large-core": 183
+      },
+      "distinct_signatures": 20,
+      "reconstructed_volumes": 441
+    },
+    "schwarz_p_to_diamond": {
+      "raw_phase_count": 15,
+      "stable_phase_count": 15,
+      "stable_reassigned_cells": 0,
+      "source_counts": {
+        "yamada": 190,
+        "vertex": 72,
+        "large-core": 179
+      },
+      "distinct_signatures": 15,
+      "reconstructed_volumes": 441
+    },
+    "timing": {
+      "elapsed_seconds": 158.742,
+      "reconstructed_volumes": 1323,
+      "sample_seconds": {
+        "sum": 10.321,
+        "min": 0.006451,
+        "median": 0.00684,
+        "max": 0.017833
+      },
+      "skeleton_seconds": {
+        "sum": 14.722,
+        "min": 0.00398,
+        "median": 0.01122,
+        "max": 0.06521
+      },
+      "graph_seconds": {
+        "sum": 13.464,
+        "min": 0.0,
+        "median": 0.010123,
+        "max": 0.058193
+      },
+      "yamada_seconds": {
+        "sum": 50.106,
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.121937
+      },
+      "surface_seconds": {
+        "sum": 53.277,
+        "min": 0.034471,
+        "median": 0.038771,
+        "max": 0.125347
+      },
+      "total_seconds": {
+        "sum": 148.326,
+        "min": 0.046477,
+        "median": 0.089412,
+        "max": 0.228807
+      }
+    },
+    "static_png": "tmp/tpms_compact_scaffold_phase_maps_c0_03_dense/tpms_compact_scaffold_phase_maps_overview.png",
+    "static_pdf": "tmp/tpms_compact_scaffold_phase_maps_c0_03_dense/tpms_compact_scaffold_phase_maps_overview.pdf",
+    "endpoint_png": "tmp/tpms_compact_scaffold_phase_maps_c0_03_dense/tpms_compact_endpoint_geometries.png",
+    "endpoint_pdf": "tmp/tpms_compact_scaffold_phase_maps_c0_03_dense/tpms_compact_endpoint_geometries.pdf",
+    "interactive_html": "tmp/tpms_compact_scaffold_phase_maps_c0_03_dense/tpms_compact_scaffold_phase_maps.html"
+  },
+  "source_counts": {
+    "yamada": 614,
+    "large-core": 636,
+    "vertex": 73
+  },
+  "errors": []
+}

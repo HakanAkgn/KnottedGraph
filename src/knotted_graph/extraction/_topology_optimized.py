@@ -1,16 +1,17 @@
-"""Persistence-based topology repair for sparse 3-D skeleton graphs.
+"""Persistence-based topology selection for sparse 3-D skeleton graphs.
 
 A digital junction can occupy several voxels and thereby create a locally
-fragmented graph even when every visible vertex satisfies a nominal valence
-bound. The selector traces the same sparse skeleton at adjacent junction-zone
-scales and prefers corrections that persist. If strict two-scale persistence is
-unavailable, a clean one-hop-safe bounded-valence candidate is preferred over a
-zero-radius graph that is already known to violate the requested valence
-constraint. Candidate geometry is validated before selection so a topologically
+fragmented graph. The selector traces the same sparse skeleton at adjacent
+junction-zone scales and prefers graph structures that persist. Persistence is
+available with or without a valence prior: a supplied maximum degree is treated
+as an additional physical constraint, not as a prerequisite for multi-scale
+selection. Candidate geometry is validated before selection so a topologically
 plausible trace cannot later fail because an embedded edge has collapsed.
 """
 
 from __future__ import annotations
+
+from numbers import Integral
 
 import networkx as nx
 import numpy as np
@@ -53,7 +54,7 @@ def _trace_prepared(
         local = nx.relabel_nodes(local, mapping, copy=True)
         graph = nx.compose(graph, local)
         next_id += local.number_of_nodes()
-    graph.remove_nodes_from([node for node, degree in graph.degree() if degree == 0])
+    # Isolated nodes represent connected skeleton components and must survive.
     return graph
 
 
@@ -103,7 +104,10 @@ def _anomaly_from_reduced(reduced: nx.MultiGraph, ratio: float) -> int:
     return count
 
 
-def _drop_consecutive_duplicates(points: np.ndarray, tolerance: float = 1e-10) -> np.ndarray:
+def _drop_consecutive_duplicates(
+    points: np.ndarray,
+    tolerance: float = 1e-10,
+) -> np.ndarray:
     """Return a polyline with adjacent duplicate samples removed."""
     if len(points) == 0:
         return points
@@ -174,39 +178,75 @@ def _embedded_geometry_safe(graph: nx.MultiGraph) -> bool:
 def _diagnostic_summary(
     graph: nx.MultiGraph,
     *,
-    max_degree: int,
+    max_degree: int | None,
     anomaly_ratio: float,
 ) -> tuple[nx.MultiGraph, bool, tuple, bool]:
-    """Return reduced topology, cleanliness, fingerprint and one-hop safety."""
-    pruned = remove_leaves_for_diagnostic(graph)
-    reduced = reduced_weighted(pruned)
-    max_observed_degree = max((degree for _, degree in reduced.degree()), default=0)
+    """Return comparison topology, cleanliness, fingerprint and local safety.
+
+    With a valence prior, the historical leaf-pruned diagnostic core is retained
+    so constrained benchmark behaviour is not weakened by terminal voxel
+    artefacts. Without a valence prior, leaves may be scientifically meaningful,
+    so persistence compares the full graph after degree-two chain reduction.
+    """
+    if max_degree is None:
+        diagnostic_graph = nx.MultiGraph(graph)
+    else:
+        diagnostic_graph = remove_leaves_for_diagnostic(graph)
+
+    reduced = reduced_weighted(diagnostic_graph)
+    max_observed_degree = max(
+        (degree for _, degree in reduced.degree()),
+        default=0,
+    )
     anomaly_count = _anomaly_from_reduced(reduced, anomaly_ratio)
+    valence_ok = max_degree is None or max_observed_degree <= max_degree
     clean = (
-        max_observed_degree <= max_degree
+        graph.number_of_nodes() > 0
+        and valence_ok
         and anomaly_count == 0
         and _embedded_geometry_safe(graph)
     )
 
-    survivors = set(pruned.nodes())
-    has_mergeable_short_edge = any(
-        u != v
-        and u in survivors
-        and v in survivors
-        and len(data.get("pts", ())) < 5
-        for u, v, data in graph.edges(data=True)
-    )
-    return reduced, clean, _core_fingerprint(reduced), not has_mergeable_short_edge
+    if max_degree is None:
+        # Without a valence prior, a physically real pair of nearby junctions
+        # must not be merged merely because its connecting polyline contains
+        # fewer than a fixed number of voxel samples. The scale-relative
+        # junction anomaly test above remains active; persistence itself decides
+        # whether the nearby-junction topology is stable.
+        one_hop_safe = True
+    else:
+        # Preserve the constrained selector's existing short-edge diagnostic.
+        survivors = set(diagnostic_graph.nodes())
+        has_mergeable_short_edge = any(
+            u != v
+            and u in survivors
+            and v in survivors
+            and len(data.get("pts", ())) < 5
+            for u, v, data in graph.edges(data=True)
+        )
+        one_hop_safe = not has_mergeable_short_edge
+
+    return reduced, clean, _core_fingerprint(reduced), one_hop_safe
 
 
-def _best_clean_candidate(candidates):
+def _best_clean_candidate(
+    candidates,
+    *,
+    min_occurrences: int = 2,
+):
     """Choose the most persistent isomorphism class, then the smallest scale.
 
-    The coarse fingerprint is only a cheap prefilter.  Degree sequences do not
+    The coarse fingerprint is only a cheap prefilter. Degree sequences do not
     determine graph topology (for example, K3,3 and the triangular prism have
     the same node/edge counts and degree sequence), so recurrence is counted
     only after an actual multigraph-isomorphism check.
+
+    A class must occur at least ``min_occurrences`` times. A singleton candidate
+    is not persistence evidence and therefore cannot displace the zero-radius
+    fallback by itself.
     """
+    if min_occurrences < 1:
+        raise ValueError("min_occurrences must be positive")
     if not candidates:
         return None
 
@@ -224,34 +264,68 @@ def _best_clean_candidate(candidates):
         else:
             classes.append([candidate])
 
+    eligible = [
+        group for group in classes
+        if len(group) >= min_occurrences
+    ]
+    if not eligible:
+        return None
+
     best_group = min(
-        classes,
+        eligible,
         key=lambda group: (-len(group), min(item[0] for item in group)),
     )
     return min(best_group, key=lambda item: item[0])[1]
 
 
-def constrained_persistent_extract(
+def persistent_extract(
     coords: np.ndarray,
     adjacency: list[list[int]],
     *,
-    max_degree: int,
+    max_degree: int | None = None,
     max_hops: int = 4,
     anomaly_ratio: float = 0.15,
+    expected_cycle_rank: int | None = None,
+    expected_components: int | None = None,
 ) -> nx.MultiGraph:
-    """Return the best supported valence-valid digital-junction correction.
+    """Return the smallest well-supported multi-scale skeleton reconstruction.
 
-    Strict consecutive-scale persistence remains the highest-confidence route.
-    Every candidate must also carry nondegenerate embedded edge geometry.
-    Diagonal adjacency artefacts are removed before this stage, so the
-    persistence search remains deliberately local rather than compensating for
-    shortcut cycles by aggressively enlarging junction zones.
+    Every scale must carry nondegenerate embedded edge geometry and pass local
+    digital-junction anomaly checks. When ``max_degree`` is supplied, satisfying
+    that valence ceiling is an additional validity condition. Otherwise no
+    valence is inferred.
 
-    If strict persistence is unavailable, the most frequently recurring clean,
-    one-hop-safe bounded-valence topology is chosen, breaking ties toward the
-    smallest repair scale. The zero-radius graph is used only when no validated
-    bounded-valence repair exists.
+    Consecutive valid isomorphic scales provide the strongest persistence signal
+    and the smaller-scale representative is returned. If no consecutive pair is
+    available, the most recurrent valid isomorphism class is selected, again
+    preferring its smallest scale. A topology observed only once is not treated
+    as persistent; if no recurring valid class exists, the direct zero-radius
+    graph is returned as the conservative fallback. Optional externally
+    supplied component/cycle counts filter candidates and the fallback. These
+    counts constrain homology only, not the three-dimensional embedding.
     """
+    if max_hops < 0:
+        raise ValueError("max_hops must be non-negative")
+    if max_degree is not None and max_degree < 1:
+        raise ValueError("max_degree must be positive when supplied")
+
+    for name, value in (
+        ("expected_cycle_rank", expected_cycle_rank),
+        ("expected_components", expected_components),
+    ):
+        if value is not None and (not isinstance(value, Integral) or value < 0):
+            raise ValueError(f"{name} must be a non-negative integer when supplied")
+
+    def homology_matches(graph: nx.MultiGraph) -> bool:
+        if expected_cycle_rank is None and expected_components is None:
+            return True
+        components = nx.number_connected_components(graph) if graph else 0
+        cycle_rank = graph.number_of_edges() - graph.number_of_nodes() + components
+        return (
+            (expected_components is None or components == expected_components)
+            and (expected_cycle_rank is None or cycle_rank == expected_cycle_rank)
+        )
+
     prepared = _prepared_components(coords, adjacency)
 
     def build(hops: int):
@@ -261,13 +335,14 @@ def constrained_persistent_extract(
             max_degree=max_degree,
             anomaly_ratio=anomaly_ratio,
         )
+        clean = clean and homology_matches(graph)
         return graph, reduced, clean, fingerprint, one_hop_safe
 
     base = build(0)
-    if base[2] and base[4]:
-        return base[0]
-
     clean_candidates = []
+    if base[2] and base[4]:
+        clean_candidates.append((0, base))
+
     previous = base
     for hops in range(1, max_hops + 1):
         current = build(hops)
@@ -284,7 +359,38 @@ def constrained_persistent_extract(
             return previous[0]
         previous = current
 
-    fallback = _best_clean_candidate(clean_candidates)
+    fallback = _best_clean_candidate(
+        clean_candidates,
+        min_occurrences=2,
+    )
     if fallback is not None:
         return fallback[0]
-    return base[0]
+    if homology_matches(base[0]):
+        return base[0]
+    raise ValueError(
+        "No persistent or zero-radius skeleton reconstruction satisfies "
+        f"expected_components={expected_components!r}, "
+        f"expected_cycle_rank={expected_cycle_rank!r}"
+    )
+
+
+def constrained_persistent_extract(
+    coords: np.ndarray,
+    adjacency: list[list[int]],
+    *,
+    max_degree: int,
+    max_hops: int = 4,
+    anomaly_ratio: float = 0.15,
+    expected_cycle_rank: int | None = None,
+    expected_components: int | None = None,
+) -> nx.MultiGraph:
+    """Compatibility wrapper for persistence with a required valence prior."""
+    return persistent_extract(
+        coords,
+        adjacency,
+        max_degree=max_degree,
+        max_hops=max_hops,
+        anomaly_ratio=anomaly_ratio,
+        expected_cycle_rank=expected_cycle_rank,
+        expected_components=expected_components,
+    )

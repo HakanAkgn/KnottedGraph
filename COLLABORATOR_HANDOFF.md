@@ -10,13 +10,16 @@ This repository contains the current KnottedGraph library, the reorganized user-
   - `User_guide/applications/01_physics_applications.ipynb`
   - `User_guide/applications/02_mathematics_applications.ipynb`
   - `User_guide/applications/03_protein_applications.ipynb`
+  - `User_guide/applications/04_analytic_knot_fields.ipynb`
+  - `User_guide/applications/05_yamada_formula_discovery.ipynb`
+  - `User_guide/applications/06_hamiltonian_yamada_phase_maps.ipynb`
+  - `doc/applications/material_and_tpms_phase_maps.md` (guided saved-result / coarse-compute route)
+  - `User_guide/applications/NewPhaseMapPlots/README.md` (research-script and provenance map)
 - Correctness/performance notebooks:
-  - `User_guide/benchmarks/01_sanity_checks.ipynb`
-  - `User_guide/benchmarks/02_application_output_regression.ipynb`
-  - `User_guide/benchmarks/03_knottedgraph_vs_topoly_scaling_final_push.ipynb`
-  - `User_guide/benchmarks/04_synthetic_ground_truth_validation.ipynb`
-  - `User_guide/benchmarks/05_same_abstract_graph_distinct_embeddings.ipynb`
-  - `User_guide/benchmarks/06_paper_scaling_publication_figure_final_push.ipynb`
+  - `User_guide/benchmarks/01_yamada_sanity_checks.ipynb`
+  - `User_guide/benchmarks/02_application_regression_checks.ipynb`
+  - `User_guide/benchmarks/03_knottedgraph_vs_topoly_scaling.ipynb`
+  - `User_guide/benchmarks/04_thick_handlebody_validation.ipynb`
 - Website source: `doc/`
 
 ## Generated Website Output
@@ -42,6 +45,12 @@ open site_preview/index.html
 
 The built preview is local. Publication to GitHub Pages is handled by `.github/workflows/docs.yml` on the configured deployment branch.
 
+Sphinx HTML builds also run `dev/build_phase_map_demos.py` to split the pinned
+material/TPMS reference HTML into on-demand region assets. This is packaging,
+not a phase-map scan. Generated assets under
+`doc/assets/demos/new_phase_maps/` are ignored by Git. On a cluster, build and
+validate on a compute node; do not run this workload on a login node.
+
 ## Validation Before Integration
 
 Run the complete test suite and the repository consistency audit before accepting a branch:
@@ -52,4 +61,4 @@ uv run --no-sync pytest -q
 uv run --no-sync python dev/check_repository_consistency.py
 ```
 
-For changes affecting application outputs, also execute `User_guide/benchmarks/02_application_output_regression.ipynb` through `dev/execute_notebook.py`.
+For changes affecting application outputs, also execute `User_guide/benchmarks/02_application_regression_checks.ipynb` through `dev/execute_notebook.py`.

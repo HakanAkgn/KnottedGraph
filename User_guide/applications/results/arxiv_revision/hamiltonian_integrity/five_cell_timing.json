@@ -1,0 +1,129 @@
+[
+  {
+    "transition": "hopf_to_trefoil",
+    "lam": 0.0,
+    "gamma": 0.3,
+    "dimension": 64,
+    "seconds": 0.3195439169649035,
+    "status": "betti-consistent-extraction",
+    "volume": {
+      "interior_voxels": 3174,
+      "components": 1,
+      "euler_characteristic": -1,
+      "handle_rank": 2,
+      "enclosed_voids": 0,
+      "boundary_faces": [],
+      "touches_boundary": false,
+      "closed_in_window": true,
+      "forces_vertex": false,
+      "regular_neighborhood_certified": false
+    },
+    "graph_betti": [
+      1,
+      2
+    ],
+    "error": null
+  },
+  {
+    "transition": "hopf_to_trefoil",
+    "lam": 0.5,
+    "gamma": 0.8,
+    "dimension": 64,
+    "seconds": 0.27745500003220513,
+    "status": "betti-consistent-extraction",
+    "volume": {
+      "interior_voxels": 18498,
+      "components": 1,
+      "euler_characteristic": 0,
+      "handle_rank": 1,
+      "enclosed_voids": 0,
+      "boundary_faces": [],
+      "touches_boundary": false,
+      "closed_in_window": true,
+      "forces_vertex": false,
+      "regular_neighborhood_certified": false
+    },
+    "graph_betti": [
+      1,
+      1
+    ],
+    "error": null
+  },
+  {
+    "transition": "hopf_to_solomon",
+    "lam": 0.7,
+    "gamma": 1.1,
+    "dimension": 64,
+    "seconds": 0.3079264999832958,
+    "status": "unsupported",
+    "volume": {
+      "interior_voxels": 28550,
+      "components": 1,
+      "euler_characteristic": -3,
+      "handle_rank": 4,
+      "enclosed_voids": 0,
+      "boundary_faces": [
+        "axis2_min"
+      ],
+      "touches_boundary": true,
+      "closed_in_window": false,
+      "forces_vertex": false,
+      "regular_neighborhood_certified": false
+    },
+    "graph_betti": null,
+    "error": "sampled volume meets finite-window boundary; periodic topology is not implemented"
+  },
+  {
+    "transition": "unknot_to_solomon",
+    "lam": 0.5,
+    "gamma": 1.3,
+    "dimension": 64,
+    "seconds": 0.2968663329957053,
+    "status": "unsupported",
+    "volume": {
+      "interior_voxels": 60495,
+      "components": 1,
+      "euler_characteristic": 0,
+      "handle_rank": 1,
+      "enclosed_voids": 0,
+      "boundary_faces": [
+        "axis0_min",
+        "axis0_max",
+        "axis1_min",
+        "axis1_max",
+        "axis2_min"
+      ],
+      "touches_boundary": true,
+      "closed_in_window": false,
+      "forces_vertex": false,
+      "regular_neighborhood_certified": false
+    },
+    "graph_betti": null,
+    "error": "sampled volume meets finite-window boundary; periodic topology is not implemented"
+  },
+  {
+    "transition": "trefoil_to_cinquefoil",
+    "lam": 0.25,
+    "gamma": 0.3,
+    "dimension": 64,
+    "seconds": 0.32152687502093613,
+    "status": "betti-consistent-extraction",
+    "volume": {
+      "interior_voxels": 4941,
+      "components": 1,
+      "euler_characteristic": -2,
+      "handle_rank": 3,
+      "enclosed_voids": 0,
+      "boundary_faces": [],
+      "touches_boundary": false,
+      "closed_in_window": true,
+      "forces_vertex": false,
+      "regular_neighborhood_certified": false
+    },
+    "graph_betti": [
+      1,
+      3
+    ],
+    "error": null
+  }
+]

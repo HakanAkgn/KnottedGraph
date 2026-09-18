@@ -1,0 +1,39 @@
+{
+  "status": "complete",
+  "completed_cells": 1309,
+  "planned_cells": 1309,
+  "seconds": 386.51098129100865,
+  "status_counts": {
+    "betti-consistent-extraction": 245,
+    "unsupported-boundary": 1064
+  },
+  "by_transition": {
+    "hopf_to_trefoil": {
+      "betti-consistent-extraction": 83,
+      "unsupported-boundary": 93
+    },
+    "hopf_to_solomon": {
+      "betti-consistent-extraction": 84,
+      "unsupported-boundary": 180
+    },
+    "unknot_to_trefoil": {
+      "betti-consistent-extraction": 34,
+      "unsupported-boundary": 142
+    },
+    "unknot_to_solomon": {
+      "betti-consistent-extraction": 43,
+      "unsupported-boundary": 221
+    },
+    "trefoil_to_cinquefoil": {
+      "unsupported-boundary": 428,
+      "betti-consistent-extraction": 1
+    }
+  },
+  "yamada_evaluated": false,
+  "convergence_established": false,
+  "historical_7140_rerun": false,
+  "targeted_rerun_cells": 7,
+  "targeted_rerun_reason": "preserve isolated components in notebook cleanup",
+  "targeted_rerun_seconds": 2.219984541996382,
+  "targeted_rerun_notebook_sha256": "63d6ea44da6a5bf792534781ee4ccdd258d88ce19bae86c1bd1375779346ef93"
+}

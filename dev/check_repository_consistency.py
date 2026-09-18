@@ -4,6 +4,7 @@ import ast
 import importlib
 import json
 import re
+import runpy
 import subprocess
 import tomllib
 from pathlib import Path
@@ -25,6 +26,7 @@ STALE_TEXT = {
 
 GENERATED_PATHS = {
     "doc/_build/",
+    "doc/assets/demos/new_phase_maps/",
     "site_preview/",
 }
 
@@ -51,6 +53,21 @@ ABSOLUTE_LOCAL_RE = re.compile(
     r"(?:/Users/[^\s\"'`]+|/home/[^\s\"'`]+|[A-Za-z]:\\\\Users\\\\[^\s\"'`]+)"
 )
 NOTEBOOK_CI_PATH_RE = re.compile(r"User_guide/[A-Za-z0-9_./-]+\.ipynb")
+
+OPTIONAL_IMPORT_ROOTS = {
+    "Bio",
+    "igraph",
+    "kaleido",
+    "minorminer",
+    "pandas",
+    "PIL",
+    "plotly",
+    "poly2graph",
+    "pyvista",
+    "skimage",
+    "tabulate",
+    "topoly",
+}
 
 
 def tracked_files() -> list[Path]:
@@ -104,6 +121,13 @@ def resolve_repo_link(source: Path, target: str) -> Path | None:
     if candidate.exists():
         return candidate
 
+    # Raw HTML buttons in Sphinx source point at built pages. During a source
+    # audit, resolve them to the corresponding Markdown document.
+    if source.is_relative_to(ROOT / "doc") and candidate.suffix == ".html":
+        markdown_candidate = candidate.with_suffix(".md")
+        if markdown_candidate.exists():
+            return markdown_candidate
+
     if source.is_relative_to(ROOT / "doc"):
         stripped = target
         while stripped.startswith("../"):
@@ -112,6 +136,16 @@ def resolve_repo_link(source: Path, target: str) -> Path | None:
         asset_candidate = ROOT / "doc" / "assets" / stripped
         if asset_candidate.exists():
             return asset_candidate
+        # Sphinx generates these four outputs from pinned tracked inputs.
+        # Validate their source files in a fresh checkout without requiring a
+        # documentation build; unknown generated filenames remain failures.
+        parts = Path(stripped).parts
+        if len(parts) == 4 and parts[:2] == ("demos", "new_phase_maps"):
+            demo = runpy.run_path(str(ROOT / "dev/build_phase_map_demos.py"))
+            entry = demo["SOURCES"].get(parts[2])
+            if entry and parts[3] in {"index.html", "preview.png"}:
+                relative = entry[0] if parts[3] == "index.html" else entry[2]
+                return demo["REFERENCE"] / relative
 
     return candidate
 
@@ -182,8 +216,27 @@ def _plain_python_source(source: str) -> str:
     )
 
 
+def _missing_optional_dependency(exc: BaseException) -> bool:
+    if not isinstance(exc, ModuleNotFoundError) or not exc.name:
+        return False
+    if exc.name.startswith("knotted_graph.invariants.yamada._yamada_"):
+        return True
+    return exc.name.split(".", 1)[0] in OPTIONAL_IMPORT_ROOTS
+
+
+def _module_declares_symbol(module, name: str) -> bool:
+    namespace = vars(module)
+    if name in namespace:
+        return True
+    declared = namespace.get("__all__", ())
+    return name in declared
+
+
 def check_knotted_graph_imports(
-    notebook: Path, code_cells: list[str], failures: list[str]
+    notebook: Path,
+    code_cells: list[str],
+    failures: list[str],
+    optional_skips: list[str],
 ) -> None:
     for cell_index, source in enumerate(code_cells):
         try:
@@ -200,6 +253,12 @@ def check_knotted_graph_imports(
                         try:
                             importlib.import_module(alias.name)
                         except Exception as exc:
+                            if _missing_optional_dependency(exc):
+                                optional_skips.append(
+                                    f"{notebook.relative_to(ROOT)} cell {cell_index}: "
+                                    f"import {alias.name} requires optional dependency {exc.name}"
+                                )
+                                continue
                             failures.append(
                                 f"stale import in {notebook.relative_to(ROOT)} cell {cell_index}: "
                                 f"import {alias.name} ({type(exc).__name__}: {exc})"
@@ -211,6 +270,12 @@ def check_knotted_graph_imports(
                 try:
                     imported_module = importlib.import_module(module)
                 except Exception as exc:
+                    if _missing_optional_dependency(exc):
+                        optional_skips.append(
+                            f"{notebook.relative_to(ROOT)} cell {cell_index}: "
+                            f"from {module} requires optional dependency {exc.name}"
+                        )
+                        continue
                     failures.append(
                         f"stale import module in {notebook.relative_to(ROOT)} cell {cell_index}: "
                         f"{module} ({type(exc).__name__}: {exc})"
@@ -219,7 +284,7 @@ def check_knotted_graph_imports(
                 for alias in node.names:
                     if alias.name == "*":
                         continue
-                    if not hasattr(imported_module, alias.name):
+                    if not _module_declares_symbol(imported_module, alias.name):
                         failures.append(
                             f"missing imported symbol in {notebook.relative_to(ROOT)} cell {cell_index}: "
                             f"from {module} import {alias.name}"
@@ -228,6 +293,7 @@ def check_knotted_graph_imports(
 
 def main() -> None:
     failures: list[str] = []
+    optional_skips: list[str] = []
     paths = tracked_files()
     texts: dict[Path, str] = {}
 
@@ -259,7 +325,7 @@ def main() -> None:
                 f"invalid notebook {notebook.relative_to(ROOT)}: {type(exc).__name__}: {exc}"
             )
             continue
-        check_knotted_graph_imports(notebook, code_cells, failures)
+        check_knotted_graph_imports(notebook, code_cells, failures, optional_skips)
         for source in [*markdown_cells, *code_cells]:
             check_source_hygiene(notebook, source, failures)
         for markdown in markdown_cells:
@@ -292,11 +358,10 @@ def main() -> None:
     version = pyproject["project"]["version"]
     package_init = texts[ROOT / "src" / "knotted_graph" / "__init__.py"]
     package_match = re.search(r'^__version__\s*=\s*[\"\']([^\"\']+)', package_init, re.M)
-    conf = texts[ROOT / "doc" / "conf.py"]
-    docs_match = re.search(r'^release\s*=\s*[\"\']([^\"\']+)', conf, re.M)
+    docs_release = runpy.run_path(str(ROOT / "doc" / "conf.py")).get("release")
     if not package_match or package_match.group(1) != version:
         failures.append(f"package __version__ does not match pyproject version {version}")
-    if not docs_match or docs_match.group(1) != version:
+    if docs_release != version:
         failures.append(f"doc release does not match pyproject version {version}")
 
     if failures:
@@ -304,6 +369,10 @@ def main() -> None:
         for index, failure in enumerate(sorted(set(failures)), start=1):
             print(f"{index:02d}. {failure}")
         raise SystemExit(1)
+    if optional_skips:
+        print("Optional-dependency import checks skipped:")
+        for note in sorted(set(optional_skips)):
+            print(f"- {note}")
     print("Repository consistency audit passed.")
 
 

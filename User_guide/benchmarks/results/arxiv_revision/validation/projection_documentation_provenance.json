@@ -1,0 +1,18 @@
+[
+  {
+    "file": "/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/Knotted_graph_code_paper/KnottedGraph_arxiv_revision/src/knotted_graph/projection/rotations.py",
+    "recorded_source_sha256": "d02d16cfe87d2dd85227eb15ac33d5698bca6eca932e9f3797a4a9aa9e51a25a",
+    "current_source_sha256": "73e9055c361d0ac2f8ff546977e25714597f23a1195c7e795f11ff01de4ed7b8",
+    "recorded_executable_ast_sha256": "20588d02d9a9dee3d91839aa7d7e95dab12c683b10d2d8de4fe39e06d6249fde",
+    "current_executable_ast_sha256": "20588d02d9a9dee3d91839aa7d7e95dab12c683b10d2d8de4fe39e06d6249fde",
+    "diff": "--- \n+++ \n@@ -83,7 +83,7 @@\n     >>> yaw, pitch, roll = 30, 15, 5    # degrees\n     >>> R = get_rotation_matrix((yaw, pitch, roll), order=\"ZYX\")\n \n-    2) Extrinsic roll\u2011pitch\u2011yaw for camera pose (x\u2011y\u2011z in body frame)\n+    2) Extrinsic roll\u2011pitch\u2011yaw for camera pose (x\u2011y\u2011z in world frame)\n     >>> R_cam = get_rotation_matrix((5, 15, 30), order=\"xyz\")\n \n     3) Euler ZXZ (commonly used in molecular crystallography)\n"
+  },
+  {
+    "file": "/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/Knotted_graph_code_paper/KnottedGraph_arxiv_revision/src/knotted_graph/projection/pd_code.py",
+    "recorded_source_sha256": "e0a0f8228d25dda1617fc764a5ae0080c93e60b8217c30c5cb298381f3ed2cbe",
+    "current_source_sha256": "7fe308bbc06a861e63d5f95ea1f579eadf0ffbb41527019a01237ee5f855f14d",
+    "recorded_executable_ast_sha256": "94f0b8c5a8064b4d0afa8263be6b01b851c359eb69f5ecc39f6bd366850f97fb",
+    "current_executable_ast_sha256": "94f0b8c5a8064b4d0afa8263be6b01b851c359eb69f5ecc39f6bd366850f97fb",
+    "diff": "--- \n+++ \n@@ -747,8 +747,8 @@\n         Three Euler angles in degrees. If ``None``, sample\n         ``num_rotation_samples`` viewing directions.\n     rotation_order\n-        Three-character Euler-axis sequence. Use uppercase for extrinsic\n-        rotations (for example ``\"ZYX\"``) or lowercase for intrinsic rotations\n+        Three-character Euler-axis sequence. Use uppercase for intrinsic\n+        rotations (for example ``\"ZYX\"``) or lowercase for extrinsic rotations\n         (for example ``\"xyz\"``).\n     num_rotation_samples\n         Positive integer number of candidate projections considered when\n"
+  }
+]

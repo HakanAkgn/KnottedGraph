@@ -233,17 +233,18 @@ def remove_leaf_nodes(G: nx.MultiGraph) -> nx.MultiGraph:
     """Remove degree-1 leaves from a copy of an embedded graph."""
 
     H = G.copy()
-    while True:
-        leaf_nodes = [node for node, degree in H.degree() if degree == 1]
-        if not leaf_nodes:
-            break
-        if len(leaf_nodes) == H.number_of_nodes():
-            random_node = leaf_nodes[0]
-            result = nx.MultiGraph()
-            result.add_node(random_node, **H.nodes[random_node])
-            return result
-        for node in leaf_nodes:
-            H.remove_node(node)
+    for component in list(nx.connected_components(H)):
+        remaining = set(component)
+        while True:
+            leaves = [node for node in H if node in remaining and H.degree(node) == 1]
+            if not leaves:
+                break
+            if len(leaves) == len(remaining):
+                # A tree's final edge contracts to a point, separately for
+                # every component. Never discard unrelated tree components.
+                leaves = leaves[1:]
+            H.remove_nodes_from(leaves)
+            remaining.difference_update(leaves)
     return H
 
 
@@ -476,26 +477,44 @@ def _collapse_cycle_component(
     H.add_edge(rep, rep, pts=np.asarray(path_pts))
 
 
+def _copy_component(
+    G: nx.MultiGraph,
+    comp: set,
+    H: nx.MultiGraph,
+) -> None:
+    """Copy one component, including all node and keyed-edge metadata."""
+
+    for node in comp:
+        H.add_node(node, **G.nodes[node])
+    for u, v, key, data in G.subgraph(comp).edges(keys=True, data=True):
+        H.add_edge(u, v, key=key, **data)
+
+
 def simplify_edges(G: nx.MultiGraph) -> nx.MultiGraph:
-    """Collapse degree-2 chains while preserving embedded geometry."""
+    """Simplify degree-2 chains without discarding embedded connectivity.
+
+    Components containing cycles or junctions are represented by embedded
+    edges between their significant vertices. Acyclic components are returned
+    normalized but otherwise unchanged so that paths, trees, and per-edge
+    metadata cannot disappear implicitly. Use :func:`remove_leaf_nodes`
+    explicitly when terminal branches should be removed.
+    """
 
     G = ensure_embedding(G, copy=True, normalize=True)
 
-    if not _has_cycles(G):
-        logging.info(
-            "No cycles found; returning node-only graph. "
-            "This may imply no knot or link structure."
-        )
-        H = nx.MultiGraph()
-        for node, data in G.nodes(data=True):
-            H.add_node(node, **data)
-        return nx.convert_node_labels_to_integers(H)
-
     H = nx.MultiGraph()
+    H.graph.update(G.graph)
     for comp in nx.connected_components(G):
-        if any(G.degree(node) > 2 for node in comp):
+        component = G.subgraph(comp)
+        if not _has_cycles(component):
+            logging.info(
+                "Preserving one normalized acyclic component. Degree-2 chains "
+                "are not collapsed because doing so could discard per-edge metadata."
+            )
+            _copy_component(G, comp, H)
+        elif any(G.degree(node) > 2 for node in comp):
             _collapse_component_with_junctions(G, comp, H)
         else:
             _collapse_cycle_component(G, comp, H)
 
-    return nx.convert_node_labels_to_integers(H, ordering="sorted")
+    return nx.convert_node_labels_to_integers(H)

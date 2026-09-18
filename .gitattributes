@@ -1,0 +1,10 @@
+
+# Preserve archived CSV byte hashes; recognize the standard CRLF record ending.
+*.csv whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# These retained audit scripts are hashed execution artifacts; ignore only
+# their extra terminal blank line without changing the archived bytes.
+dev/audit_discovery_long_words.py whitespace=-blank-at-eof,blank-at-eol,space-before-tab
+dev/audit_mixed_family.py whitespace=-blank-at-eof,blank-at-eol,space-before-tab
+dev/plot_hamiltonian_homology_pilot.py whitespace=-blank-at-eof,blank-at-eol,space-before-tab
+User_guide/applications/results/arxiv_revision/hamiltonian_homology/source_snapshots/first_pass_runner.py whitespace=-blank-at-eof,blank-at-eol,space-before-tab

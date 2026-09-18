@@ -1,0 +1,750 @@
+[
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.0,
+    "c": 0.0,
+    "mask": {
+      "b0": 1,
+      "b1": 5,
+      "b2": 0,
+      "voxels": 1160,
+      "euler": -4
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 7,
+      "E": 11,
+      "b0": 1,
+      "b1": 5
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.0,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 5,
+      "b2": 0,
+      "voxels": 1218,
+      "euler": -4
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 7,
+      "E": 11,
+      "b0": 1,
+      "b1": 5
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.0,
+    "c": 0.3,
+    "mask": {
+      "b0": 1,
+      "b1": 8,
+      "b2": 0,
+      "voxels": 1389,
+      "euler": -7
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 3,
+    "result": {
+      "V": 14,
+      "E": 21,
+      "b0": 1,
+      "b1": 8
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.25,
+    "c": 0.0,
+    "mask": {
+      "b0": 1,
+      "b1": 5,
+      "b2": 0,
+      "voxels": 1133,
+      "euler": -4
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 7,
+      "E": 11,
+      "b0": 1,
+      "b1": 5
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.25,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 5,
+      "b2": 0,
+      "voxels": 1256,
+      "euler": -4
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 3,
+    "result": {
+      "V": 8,
+      "E": 12,
+      "b0": 1,
+      "b1": 5
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.25,
+    "c": 0.3,
+    "mask": {
+      "b0": 1,
+      "b1": 5,
+      "b2": 0,
+      "voxels": 1458,
+      "euler": -4
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 7,
+      "E": 11,
+      "b0": 1,
+      "b1": 5
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.5,
+    "c": 0.0,
+    "mask": {
+      "b0": 1,
+      "b1": 5,
+      "b2": 0,
+      "voxels": 1180,
+      "euler": -4
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 3,
+    "result": {
+      "V": 8,
+      "E": 12,
+      "b0": 1,
+      "b1": 5
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.5,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 5,
+      "b2": 0,
+      "voxels": 1283,
+      "euler": -4
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 7,
+      "E": 11,
+      "b0": 1,
+      "b1": 5
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.5,
+    "c": 0.3,
+    "mask": {
+      "b0": 1,
+      "b1": 7,
+      "b2": 0,
+      "voxels": 1560,
+      "euler": -6
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 11,
+      "E": 17,
+      "b0": 1,
+      "b1": 7
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.75,
+    "c": 0.0,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 1093,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 5,
+    "result": {
+      "V": 11,
+      "E": 21,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.75,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 7,
+      "b2": 0,
+      "voxels": 1282,
+      "euler": -6
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 9,
+      "E": 15,
+      "b0": 1,
+      "b1": 7
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.75,
+    "c": 0.3,
+    "mask": {
+      "b0": 1,
+      "b1": 7,
+      "b2": 0,
+      "voxels": 1608,
+      "euler": -6
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 11,
+      "E": 17,
+      "b0": 1,
+      "b1": 7
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 1.0,
+    "c": 0.0,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 1100,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 14,
+      "E": 24,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 1.0,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 1196,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 14,
+      "E": 24,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_diamond",
+    "lambda": 1.0,
+    "c": 0.3,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 1544,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 14,
+      "E": 24,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_schwarz_p",
+    "lambda": 0.0,
+    "c": 0.0,
+    "mask": {
+      "b0": 1,
+      "b1": 5,
+      "b2": 0,
+      "voxels": 1160,
+      "euler": -4
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 7,
+      "E": 11,
+      "b0": 1,
+      "b1": 5
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_schwarz_p",
+    "lambda": 0.0,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 5,
+      "b2": 0,
+      "voxels": 1218,
+      "euler": -4
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 7,
+      "E": 11,
+      "b0": 1,
+      "b1": 5
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_schwarz_p",
+    "lambda": 0.0,
+    "c": 0.3,
+    "mask": {
+      "b0": 1,
+      "b1": 8,
+      "b2": 0,
+      "voxels": 1389,
+      "euler": -7
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 3,
+    "result": {
+      "V": 14,
+      "E": 21,
+      "b0": 1,
+      "b1": 8
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_schwarz_p",
+    "lambda": 0.25,
+    "c": 0.0,
+    "mask": {
+      "b0": 1,
+      "b1": 8,
+      "b2": 0,
+      "voxels": 1222,
+      "euler": -7
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 12,
+      "E": 19,
+      "b0": 1,
+      "b1": 8
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_schwarz_p",
+    "lambda": 0.25,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 13,
+      "b2": 0,
+      "voxels": 1336,
+      "euler": -12
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 21,
+      "E": 33,
+      "b0": 1,
+      "b1": 13
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_schwarz_p",
+    "lambda": 0.25,
+    "c": 0.3,
+    "mask": {
+      "b0": 1,
+      "b1": 10,
+      "b2": 0,
+      "voxels": 1498,
+      "euler": -9
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 15,
+      "E": 24,
+      "b0": 1,
+      "b1": 10
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_schwarz_p",
+    "lambda": 0.5,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 5,
+      "b2": 0,
+      "voxels": 1485,
+      "euler": -4
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 3,
+    "result": {
+      "V": 8,
+      "E": 12,
+      "b0": 1,
+      "b1": 5
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "gyroid_to_schwarz_p",
+    "lambda": 0.5,
+    "c": 0.3,
+    "mask": {
+      "b0": 1,
+      "b1": 5,
+      "b2": 0,
+      "voxels": 1627,
+      "euler": -4
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 3,
+    "result": {
+      "V": 8,
+      "E": 12,
+      "b0": 1,
+      "b1": 5
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "schwarz_p_to_diamond",
+    "lambda": 0.75,
+    "c": 0.0,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 1148,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 14,
+      "E": 24,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "schwarz_p_to_diamond",
+    "lambda": 0.75,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 1352,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 14,
+      "E": 24,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "schwarz_p_to_diamond",
+    "lambda": 0.75,
+    "c": 0.3,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 1752,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 14,
+      "E": 24,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "schwarz_p_to_diamond",
+    "lambda": 1.0,
+    "c": 0.0,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 1100,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 14,
+      "E": 24,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "schwarz_p_to_diamond",
+    "lambda": 1.0,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 1196,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 14,
+      "E": 24,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 24,
+    "family": "schwarz_p_to_diamond",
+    "lambda": 1.0,
+    "c": 0.3,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 1544,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 14,
+      "E": 24,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 96,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.0,
+    "c": 0.0,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 83780,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 3,
+    "result": {
+      "V": 20,
+      "E": 30,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 96,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.0,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 89490,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 20,
+      "E": 30,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 96,
+    "family": "gyroid_to_diamond",
+    "lambda": 0.25,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 8,
+      "b2": 0,
+      "voxels": 90590,
+      "euler": -7
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 3,
+    "result": {
+      "V": 14,
+      "E": 21,
+      "b0": 1,
+      "b1": 8
+    },
+    "matches": true
+  },
+  {
+    "dimension": 96,
+    "family": "gyroid_to_schwarz_p",
+    "lambda": 0.0,
+    "c": 0.0,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 83780,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 3,
+    "result": {
+      "V": 20,
+      "E": 30,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  },
+  {
+    "dimension": 96,
+    "family": "gyroid_to_schwarz_p",
+    "lambda": 0.0,
+    "c": 0.105,
+    "mask": {
+      "b0": 1,
+      "b1": 11,
+      "b2": 0,
+      "voxels": 89490,
+      "euler": -10
+    },
+    "base_geometry_safe": true,
+    "base_max_degree": 4,
+    "result": {
+      "V": 20,
+      "E": 30,
+      "b0": 1,
+      "b1": 11
+    },
+    "matches": true
+  }
+]

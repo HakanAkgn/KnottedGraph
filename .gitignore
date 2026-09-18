@@ -82,8 +82,9 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 User_guide/benchmarks/.benchmark_checkpoints/
-# Notebook 03 timing rows are a local resume ledger, not a versioned publication snapshot.
-User_guide/benchmarks/results/03_knottedgraph_vs_topoly_scaling_rows.csv
+# Figure input snapshots under User_guide/benchmarks/results are versioned.
+# Local-only publication figure workspace lives next to this repo.
+/FigureGeneration/
 
 # IPython
 profile_default/
@@ -166,6 +167,50 @@ dev/*
 !dev/benchmark_data/
 !dev/benchmark_data/.gitkeep
 !dev/benchmark_data/topoly_random_cubic_v1.jsonl
+!dev/check_protected_final_audit.py
+!dev/build_phase_map_demos.py
 assets/*.pdf
 # assets/*.html
 .vscode/
+# Local regenerated handlebody ground-truth artifacts can exceed GitHub's file size limit.
+User_guide/benchmarks/results/handlebody_ground_truth/certified_thick_handlebody_embeddings.json.gz
+User_guide/benchmarks/results/handlebody_ground_truth/certified_thick_handlebody_embeddings_manifest.csv
+
+# Local raw handlebody timing intermediates. The compact plotting source above
+# is versioned instead:
+# User_guide/benchmarks/results/04_thick_handlebody_timing_distributions_source.csv
+User_guide/benchmarks/results/04_thick_handlebody_pipeline_timings.csv
+User_guide/benchmarks/results/04_thick_handlebody_pipeline_timing_summary.csv
+User_guide/benchmarks/results/04_thick_handlebody_recovered_yamada_split_timings.csv
+User_guide/benchmarks/results/04_thick_handlebody_pd_topoly_comparison.csv
+User_guide/benchmarks/results/04_thick_handlebody_library_timing_distributions.*
+assets/paper/handlebody-timing-distributions.png
+assets/paper/handlebody-timing-distributions.svg
+# Losslessly generated from tracked research HTML during Sphinx HTML builds.
+/doc/assets/demos/new_phase_maps/
+/_build/new_phase_maps/
+
+# Local builds and private manuscript working copy
+/_build/
+/paper/
+!dev/audit_handlebody_recovery.py
+!dev/audit_discovery_artifacts.py
+!dev/audit_reproducibility_inventory.py
+!dev/diagnose_tpms_base_fallback.py
+!dev/plot_tpms_audited_main.py
+!dev/analyze_tpms_sampling.py
+!dev/legacy_tpms_filter.py
+!dev/audit_archived_tpms_filter.py
+!dev/diagnose_tpms_extraction.py
+!dev/analyze_tpms_dense_scan.py
+!dev/diagnose_tpms_extraction_constrained.py
+!dev/evaluate_embedded_contraction.py
+!dev/evaluate_contraction_pairs.py
+!dev/build_handlebody_timing_figure.py
+
+!dev/shard_handlebody_inputs.py
+!dev/audit_mixed_family.py
+!dev/audit_discovery_long_words.py
+!dev/audit_hamiltonian_notebook.py
+!dev/run_hamiltonian_homology_pilot.py
+!dev/plot_hamiltonian_homology_pilot.py

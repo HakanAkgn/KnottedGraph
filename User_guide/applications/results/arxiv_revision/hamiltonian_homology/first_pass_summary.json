@@ -1,0 +1,38 @@
+{
+  "status": "complete",
+  "completed_cells": 1309,
+  "planned_cells": 1309,
+  "seconds": 386.51098129100865,
+  "status_counts": {
+    "betti-consistent-extraction": 238,
+    "unsupported-boundary": 1064,
+    "unavailable-extraction": 7
+  },
+  "by_transition": {
+    "hopf_to_trefoil": {
+      "betti-consistent-extraction": 83,
+      "unsupported-boundary": 93
+    },
+    "hopf_to_solomon": {
+      "betti-consistent-extraction": 82,
+      "unavailable-extraction": 2,
+      "unsupported-boundary": 180
+    },
+    "unknot_to_trefoil": {
+      "betti-consistent-extraction": 34,
+      "unsupported-boundary": 142
+    },
+    "unknot_to_solomon": {
+      "betti-consistent-extraction": 38,
+      "unavailable-extraction": 5,
+      "unsupported-boundary": 221
+    },
+    "trefoil_to_cinquefoil": {
+      "unsupported-boundary": 428,
+      "betti-consistent-extraction": 1
+    }
+  },
+  "yamada_evaluated": false,
+  "convergence_established": false,
+  "historical_7140_rerun": false
+}
