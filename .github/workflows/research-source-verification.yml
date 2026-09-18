@@ -19,7 +19,8 @@ jobs:
       - name: Supply native-build system dependency
         run: sudo apt-get update -qq && sudo apt-get install -y libboost-dev
       - name: Export pinned offline formatter
-        run: python -m pip download --only-binary=:all: --no-deps --dest /tmp/kg-style ruff==0.15.19
+        run: |
+          python -m pip download --only-binary=:all: --no-deps --dest /tmp/kg-style ruff==0.15.19
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: knottedgraph-code-style-tool
