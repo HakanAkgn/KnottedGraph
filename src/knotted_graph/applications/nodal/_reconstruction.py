@@ -16,8 +16,16 @@ def geometry_digest(graph):
         h.update(np.asarray(data["pos"], dtype="<f8").tobytes())
     for u, v, key, data in sorted(graph.edges(keys=True, data=True), key=lambda e: repr(e[:3])):
         h.update(repr((u, v, key)).encode())
-        h.update(np.asarray(data.get("pts", []), dtype="<f8").tobytes())
+        points = np.asarray(data.get("pts", []), dtype="<f8")
+        h.update(repr(points.shape).encode())
+        h.update(points.tobytes())
     return h.hexdigest()
+
+
+def evidence_digest(graph, certificate):
+    payload = {"reconstruction": graph.graph.get("reconstruction"),
+               "is_trivalent": graph.graph.get("is_trivalent"), "certificate": certificate}
+    return sha256(json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
 
 def counts(graph):
@@ -50,26 +58,34 @@ def reconstruct(model, *, simplify, smooth_epsilon, skeleton_image,
         if not mask.any():
             raise ValueError("the source volume is empty")
         input_hash = sha256(mask.astype(np.uint8).tobytes()).hexdigest()
+        input_shape = mask.shape
     else:
         mask = None
         image = np.asarray(skeleton_image, dtype=bool)
         if image.ndim != 3:
             raise ValueError("skeleton_image must be a three-dimensional array")
         input_hash = sha256(image.astype(np.uint8).tobytes()).hexdigest()
+        input_shape = image.shape
     key = (reconstruction, bool(simplify), epsilon, input_hash,
-           None if mask is None else mask.shape, json.dumps(options, sort_keys=True))
+           input_shape, json.dumps(options, sort_keys=True))
     cached = getattr(model, "skeleton_graph_cache", None)
     if cached is not None and getattr(model, "skeleton_graph_cache_args", None) == key:
-        if getattr(model, "_skeleton_graph_digest", None) == geometry_digest(cached):
-            return cached
+        try:
+            geometry_ok = getattr(model, "_skeleton_graph_digest", None) == geometry_digest(cached)
+            evidence_ok = getattr(model, "_skeleton_evidence_digest", None) == evidence_digest(
+                cached, getattr(model, "spine_certificate", None))
+            if geometry_ok and evidence_ok:
+                return cached
+        except (KeyError, TypeError, ValueError):
+            # Public graph/certificate objects may have been modified by a caller.
+            # Such an object must be reconstructed, not treated as cached evidence.
+            pass
 
     certificate = None
     if reconstruction == "cubical":
         from knotted_graph.extraction.cubical_spine import (
             cubical_retract, verify_cubical_retract, sample_grid_breaks, certificate_json,
         )
-        # Keep the public graph's established index-coordinate convention.
-        # The existing physical-coordinate map is affine with positive spacing.
         gridlines = tuple(sample_grid_breaks(np.arange(n, dtype=float)) for n in mask.shape)
         result = cubical_retract(mask, gridlines=gridlines, **options)
         replay = verify_cubical_retract(mask, result.certificate, gridlines=gridlines, **options)
@@ -86,7 +102,11 @@ def reconstruct(model, *, simplify, smooth_epsilon, skeleton_image,
         }
     else:
         if mask is not None:
-            image = np.asarray(model._skeleton_image, dtype=bool)
+            from knotted_graph.extraction import skeletonize_volume
+            # A previously cached thinning may belong to a modified spectrum.
+            # Reconstruct from the exact mask whose identity was checked above.
+            image = skeletonize_volume(mask)
+            model.__dict__["_skeleton_image"] = image
             skeleton_topology = volume_topology(image)
             if (skeleton_topology.connected_components, skeleton_topology.handle_rank) != target:
                 raise ValueError("source-mask and thinned-skeleton Betti counts disagree")
@@ -96,7 +116,6 @@ def reconstruct(model, *, simplify, smooth_epsilon, skeleton_image,
         if simplify:
             original = graph
             candidate = prune(deepcopy(graph))
-            # Reinsert an original representative of any entirely pruned tree.
             for component in nx.connected_components(original):
                 if not any(n in candidate for n in component):
                     node = min(component, key=repr)
@@ -113,7 +132,8 @@ def reconstruct(model, *, simplify, smooth_epsilon, skeleton_image,
     if target is not None and counts(graph) != target:
         raise ValueError("postprocessed graph disagrees with source component/cycle counts")
     evidence.update({
-        "source_mask_sha256": input_hash, "component_cycle_check": target is not None,
+        "source_mask_sha256": input_hash, "source_shape": list(input_shape),
+        "component_cycle_check": target is not None,
         "analytic_source_correspondence_certified": False,
         "periodic_identification": False,
         "source_touches_boundary": bool(topology.touches_boundary) if mask is not None else None,
@@ -125,6 +145,7 @@ def reconstruct(model, *, simplify, smooth_epsilon, skeleton_image,
     model.skeleton_graph_cache = graph
     model.skeleton_graph_cache_args = key
     model._skeleton_graph_digest = geometry_digest(graph)
+    model._skeleton_evidence_digest = evidence_digest(graph, certificate)
     model.__dict__.pop("PDCode", None)
     model._pv_data_args = None
     return graph
