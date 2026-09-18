@@ -189,3 +189,28 @@ assets/paper/handlebody-timing-distributions.svg
 # Losslessly generated from tracked research HTML during Sphinx HTML builds.
 /doc/assets/demos/new_phase_maps/
 /_build/new_phase_maps/
+
+# Local builds and private manuscript working copy
+/_build/
+/paper/
+!dev/audit_handlebody_recovery.py
+!dev/audit_discovery_artifacts.py
+!dev/audit_reproducibility_inventory.py
+!dev/diagnose_tpms_base_fallback.py
+!dev/plot_tpms_audited_main.py
+!dev/analyze_tpms_sampling.py
+!dev/legacy_tpms_filter.py
+!dev/audit_archived_tpms_filter.py
+!dev/diagnose_tpms_extraction.py
+!dev/analyze_tpms_dense_scan.py
+!dev/diagnose_tpms_extraction_constrained.py
+!dev/evaluate_embedded_contraction.py
+!dev/evaluate_contraction_pairs.py
+!dev/build_handlebody_timing_figure.py
+
+!dev/shard_handlebody_inputs.py
+!dev/audit_mixed_family.py
+!dev/audit_discovery_long_words.py
+!dev/audit_hamiltonian_notebook.py
+!dev/run_hamiltonian_homology_pilot.py
+!dev/plot_hamiltonian_homology_pilot.py

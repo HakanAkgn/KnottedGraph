@@ -73,18 +73,31 @@ def skeleton_image_to_graph(
     max_junction_degree: int | None = None,
     adaptive_max_hops: int = 4,
     anomaly_ratio: float = 0.15,
+    expected_cycle_rank: int | None = None,
+    expected_components: int | None = None,
 ) -> nx.MultiGraph:
     """Convert a 3-D skeleton image with multi-scale topology selection.
 
     Nearby junction-zone scales are compared by default even when no valence is
     known. ``max_junction_degree`` supplies an optional physical prior; ``None``
     leaves valence unconstrained rather than disabling persistence.
+
+    Optional expected component/cycle counts constrain every selected candidate,
+    including the zero-radius fallback. They are necessary consistency checks,
+    not certificates of embedding equivalence or of a volume-to-spine reduction.
+    If no persistent or zero-radius candidate matches, raise ``ValueError``.
     """
+    homology_options = {}
+    if expected_cycle_rank is not None:
+        homology_options["expected_cycle_rank"] = expected_cycle_rank
+    if expected_components is not None:
+        homology_options["expected_components"] = expected_components
     return _optimized_extract(
         np.asarray(skeleton_image),
         max_junction_degree=max_junction_degree,
         adaptive_max_hops=adaptive_max_hops,
         anomaly_ratio=anomaly_ratio,
+        **homology_options,
     )
 
 
@@ -94,11 +107,19 @@ def topology_aware_skeleton_image_to_graph(
     max_junction_degree: int | None = None,
     adaptive_max_hops: int = 4,
     anomaly_ratio: float = 0.15,
+    expected_cycle_rank: int | None = None,
+    expected_components: int | None = None,
 ) -> nx.MultiGraph:
     """Alias for :func:`skeleton_image_to_graph` with explicit topology controls."""
+    homology_options = {}
+    if expected_cycle_rank is not None:
+        homology_options["expected_cycle_rank"] = expected_cycle_rank
+    if expected_components is not None:
+        homology_options["expected_components"] = expected_components
     return skeleton_image_to_graph(
         skeleton_image,
         max_junction_degree=max_junction_degree,
         adaptive_max_hops=adaptive_max_hops,
         anomaly_ratio=anomaly_ratio,
+        **homology_options,
     )

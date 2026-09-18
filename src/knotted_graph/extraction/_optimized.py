@@ -200,6 +200,8 @@ def extract(
     max_junction_degree: int | None = None,
     adaptive_max_hops: int = 4,
     anomaly_ratio: float = 0.15,
+    expected_cycle_rank: int | None = None,
+    expected_components: int | None = None,
 ) -> nx.MultiGraph:
     """Extract a 3-D embedded graph with multi-scale topology selection."""
     image = np.asarray(image, dtype=bool)
@@ -217,4 +219,6 @@ def extract(
         max_degree=max_junction_degree,
         max_hops=adaptive_max_hops,
         anomaly_ratio=anomaly_ratio,
+        expected_cycle_rank=expected_cycle_rank,
+        expected_components=expected_components,
     )

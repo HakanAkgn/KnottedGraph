@@ -1,0 +1,1296 @@
+{
+  "source": "User_guide/applications/NewPhaseMapPlots/RealMaterials/html/07_hamiltonian_yamada_plotly_region_geometry_with_materials.html",
+  "source_sha256": "955603c79a70e9fc4890c21d1c6ead5a9a030367891902f510ce069be18496a0",
+  "payload_version": "hamiltonian_yamada_plotly_region_geometry_v19_boundary_resolved",
+  "cache_key": "0e5ed15faedbeee9",
+  "notebook_controls": {
+    "PHASE_LAMBDAS": "np.linspace(0.0, 1.0, 60)",
+    "PHASE_GAMMAS": "np.linspace(0.3, 5.25, 50)",
+    "SKELETON_DIMENSION": "120",
+    "N_JOBS": "2",
+    "SMOOTHING_RETRIES": "(4.0, 1.0, 0.25, 0.0)",
+    "PROJECTION_RETRY_SAMPLES": "(32, 96, 256)",
+    "STABLE_MIN_COMPONENT_FRACTION": "0.01"
+  },
+  "lambda_step_exact": "1/59",
+  "candidate_gamma_step_exact": "99/980",
+  "lambdas_exact": [
+    {
+      "numerator": 0,
+      "denominator": 59
+    },
+    {
+      "numerator": 1,
+      "denominator": 59
+    },
+    {
+      "numerator": 2,
+      "denominator": 59
+    },
+    {
+      "numerator": 3,
+      "denominator": 59
+    },
+    {
+      "numerator": 4,
+      "denominator": 59
+    },
+    {
+      "numerator": 5,
+      "denominator": 59
+    },
+    {
+      "numerator": 6,
+      "denominator": 59
+    },
+    {
+      "numerator": 7,
+      "denominator": 59
+    },
+    {
+      "numerator": 8,
+      "denominator": 59
+    },
+    {
+      "numerator": 9,
+      "denominator": 59
+    },
+    {
+      "numerator": 10,
+      "denominator": 59
+    },
+    {
+      "numerator": 11,
+      "denominator": 59
+    },
+    {
+      "numerator": 12,
+      "denominator": 59
+    },
+    {
+      "numerator": 13,
+      "denominator": 59
+    },
+    {
+      "numerator": 14,
+      "denominator": 59
+    },
+    {
+      "numerator": 15,
+      "denominator": 59
+    },
+    {
+      "numerator": 16,
+      "denominator": 59
+    },
+    {
+      "numerator": 17,
+      "denominator": 59
+    },
+    {
+      "numerator": 18,
+      "denominator": 59
+    },
+    {
+      "numerator": 19,
+      "denominator": 59
+    },
+    {
+      "numerator": 20,
+      "denominator": 59
+    },
+    {
+      "numerator": 21,
+      "denominator": 59
+    },
+    {
+      "numerator": 22,
+      "denominator": 59
+    },
+    {
+      "numerator": 23,
+      "denominator": 59
+    },
+    {
+      "numerator": 24,
+      "denominator": 59
+    },
+    {
+      "numerator": 25,
+      "denominator": 59
+    },
+    {
+      "numerator": 26,
+      "denominator": 59
+    },
+    {
+      "numerator": 27,
+      "denominator": 59
+    },
+    {
+      "numerator": 28,
+      "denominator": 59
+    },
+    {
+      "numerator": 29,
+      "denominator": 59
+    },
+    {
+      "numerator": 30,
+      "denominator": 59
+    },
+    {
+      "numerator": 31,
+      "denominator": 59
+    },
+    {
+      "numerator": 32,
+      "denominator": 59
+    },
+    {
+      "numerator": 33,
+      "denominator": 59
+    },
+    {
+      "numerator": 34,
+      "denominator": 59
+    },
+    {
+      "numerator": 35,
+      "denominator": 59
+    },
+    {
+      "numerator": 36,
+      "denominator": 59
+    },
+    {
+      "numerator": 37,
+      "denominator": 59
+    },
+    {
+      "numerator": 38,
+      "denominator": 59
+    },
+    {
+      "numerator": 39,
+      "denominator": 59
+    },
+    {
+      "numerator": 40,
+      "denominator": 59
+    },
+    {
+      "numerator": 41,
+      "denominator": 59
+    },
+    {
+      "numerator": 42,
+      "denominator": 59
+    },
+    {
+      "numerator": 43,
+      "denominator": 59
+    },
+    {
+      "numerator": 44,
+      "denominator": 59
+    },
+    {
+      "numerator": 45,
+      "denominator": 59
+    },
+    {
+      "numerator": 46,
+      "denominator": 59
+    },
+    {
+      "numerator": 47,
+      "denominator": 59
+    },
+    {
+      "numerator": 48,
+      "denominator": 59
+    },
+    {
+      "numerator": 49,
+      "denominator": 59
+    },
+    {
+      "numerator": 50,
+      "denominator": 59
+    },
+    {
+      "numerator": 51,
+      "denominator": 59
+    },
+    {
+      "numerator": 52,
+      "denominator": 59
+    },
+    {
+      "numerator": 53,
+      "denominator": 59
+    },
+    {
+      "numerator": 54,
+      "denominator": 59
+    },
+    {
+      "numerator": 55,
+      "denominator": 59
+    },
+    {
+      "numerator": 56,
+      "denominator": 59
+    },
+    {
+      "numerator": 57,
+      "denominator": 59
+    },
+    {
+      "numerator": 58,
+      "denominator": 59
+    },
+    {
+      "numerator": 59,
+      "denominator": 59
+    }
+  ],
+  "candidate_gammas_exact": [
+    {
+      "numerator": 294,
+      "denominator": 980
+    },
+    {
+      "numerator": 393,
+      "denominator": 980
+    },
+    {
+      "numerator": 492,
+      "denominator": 980
+    },
+    {
+      "numerator": 591,
+      "denominator": 980
+    },
+    {
+      "numerator": 690,
+      "denominator": 980
+    },
+    {
+      "numerator": 789,
+      "denominator": 980
+    },
+    {
+      "numerator": 888,
+      "denominator": 980
+    },
+    {
+      "numerator": 987,
+      "denominator": 980
+    },
+    {
+      "numerator": 1086,
+      "denominator": 980
+    },
+    {
+      "numerator": 1185,
+      "denominator": 980
+    },
+    {
+      "numerator": 1284,
+      "denominator": 980
+    },
+    {
+      "numerator": 1383,
+      "denominator": 980
+    },
+    {
+      "numerator": 1482,
+      "denominator": 980
+    },
+    {
+      "numerator": 1581,
+      "denominator": 980
+    },
+    {
+      "numerator": 1680,
+      "denominator": 980
+    },
+    {
+      "numerator": 1779,
+      "denominator": 980
+    },
+    {
+      "numerator": 1878,
+      "denominator": 980
+    },
+    {
+      "numerator": 1977,
+      "denominator": 980
+    },
+    {
+      "numerator": 2076,
+      "denominator": 980
+    },
+    {
+      "numerator": 2175,
+      "denominator": 980
+    },
+    {
+      "numerator": 2274,
+      "denominator": 980
+    },
+    {
+      "numerator": 2373,
+      "denominator": 980
+    },
+    {
+      "numerator": 2472,
+      "denominator": 980
+    },
+    {
+      "numerator": 2571,
+      "denominator": 980
+    },
+    {
+      "numerator": 2670,
+      "denominator": 980
+    },
+    {
+      "numerator": 2769,
+      "denominator": 980
+    },
+    {
+      "numerator": 2868,
+      "denominator": 980
+    },
+    {
+      "numerator": 2967,
+      "denominator": 980
+    },
+    {
+      "numerator": 3066,
+      "denominator": 980
+    },
+    {
+      "numerator": 3165,
+      "denominator": 980
+    },
+    {
+      "numerator": 3264,
+      "denominator": 980
+    },
+    {
+      "numerator": 3363,
+      "denominator": 980
+    },
+    {
+      "numerator": 3462,
+      "denominator": 980
+    },
+    {
+      "numerator": 3561,
+      "denominator": 980
+    },
+    {
+      "numerator": 3660,
+      "denominator": 980
+    },
+    {
+      "numerator": 3759,
+      "denominator": 980
+    },
+    {
+      "numerator": 3858,
+      "denominator": 980
+    },
+    {
+      "numerator": 3957,
+      "denominator": 980
+    },
+    {
+      "numerator": 4056,
+      "denominator": 980
+    },
+    {
+      "numerator": 4155,
+      "denominator": 980
+    },
+    {
+      "numerator": 4254,
+      "denominator": 980
+    },
+    {
+      "numerator": 4353,
+      "denominator": 980
+    },
+    {
+      "numerator": 4452,
+      "denominator": 980
+    },
+    {
+      "numerator": 4551,
+      "denominator": 980
+    },
+    {
+      "numerator": 4650,
+      "denominator": 980
+    },
+    {
+      "numerator": 4749,
+      "denominator": 980
+    },
+    {
+      "numerator": 4848,
+      "denominator": 980
+    },
+    {
+      "numerator": 4947,
+      "denominator": 980
+    },
+    {
+      "numerator": 5046,
+      "denominator": 980
+    },
+    {
+      "numerator": 5145,
+      "denominator": 980
+    }
+  ],
+  "embedded_lambdas_rounded": [
+    0.0,
+    0.016949,
+    0.033898,
+    0.050847,
+    0.067797,
+    0.084746,
+    0.101695,
+    0.118644,
+    0.135593,
+    0.152542,
+    0.169492,
+    0.186441,
+    0.20339,
+    0.220339,
+    0.237288,
+    0.254237,
+    0.271186,
+    0.288136,
+    0.305085,
+    0.322034,
+    0.338983,
+    0.355932,
+    0.372881,
+    0.389831,
+    0.40678,
+    0.423729,
+    0.440678,
+    0.457627,
+    0.474576,
+    0.491525,
+    0.508475,
+    0.525424,
+    0.542373,
+    0.559322,
+    0.576271,
+    0.59322,
+    0.610169,
+    0.627119,
+    0.644068,
+    0.661017,
+    0.677966,
+    0.694915,
+    0.711864,
+    0.728814,
+    0.745763,
+    0.762712,
+    0.779661,
+    0.79661,
+    0.813559,
+    0.830508,
+    0.847458,
+    0.864407,
+    0.881356,
+    0.898305,
+    0.915254,
+    0.932203,
+    0.949153,
+    0.966102,
+    0.983051,
+    1.0
+  ],
+  "embedded_candidate_gammas_rounded": [
+    0.3,
+    0.40102,
+    0.502041,
+    0.603061,
+    0.704082,
+    0.805102,
+    0.906122,
+    1.007143,
+    1.108163,
+    1.209184,
+    1.310204,
+    1.411224,
+    1.512245,
+    1.613265,
+    1.714286,
+    1.815306,
+    1.916327,
+    2.017347,
+    2.118367,
+    2.219388,
+    2.320408,
+    2.421429,
+    2.522449,
+    2.623469,
+    2.72449,
+    2.82551,
+    2.926531,
+    3.027551,
+    3.128571,
+    3.229592,
+    3.330612,
+    3.431633,
+    3.532653,
+    3.633673,
+    3.734694,
+    3.835714,
+    3.936735,
+    4.037755,
+    4.138776,
+    4.239796,
+    4.340816,
+    4.441837,
+    4.542857,
+    4.643878,
+    4.744898,
+    4.845918,
+    4.946939,
+    5.047959,
+    5.14898,
+    5.25
+  ],
+  "analytic_transitions": [
+    {
+      "key": "hopf_to_trefoil",
+      "title": "Hopf link to trefoil",
+      "lambdas": [
+        0.0,
+        0.016949,
+        0.033898,
+        0.050847,
+        0.067797,
+        0.084746,
+        0.101695,
+        0.118644,
+        0.135593,
+        0.152542,
+        0.169492,
+        0.186441,
+        0.20339,
+        0.220339,
+        0.237288,
+        0.254237,
+        0.271186,
+        0.288136,
+        0.305085,
+        0.322034,
+        0.338983,
+        0.355932,
+        0.372881,
+        0.389831,
+        0.40678,
+        0.423729,
+        0.440678,
+        0.457627,
+        0.474576,
+        0.491525,
+        0.508475,
+        0.525424,
+        0.542373,
+        0.559322,
+        0.576271,
+        0.59322,
+        0.610169,
+        0.627119,
+        0.644068,
+        0.661017,
+        0.677966,
+        0.694915,
+        0.711864,
+        0.728814,
+        0.745763,
+        0.762712,
+        0.779661,
+        0.79661,
+        0.813559,
+        0.830508,
+        0.847458,
+        0.864407,
+        0.881356,
+        0.898305,
+        0.915254,
+        0.932203,
+        0.949153,
+        0.966102,
+        0.983051,
+        1.0
+      ],
+      "gammas": [
+        0.3,
+        0.40102,
+        0.502041,
+        0.603061,
+        0.704082,
+        0.805102,
+        0.906122,
+        1.007143,
+        1.108163,
+        1.209184,
+        1.310204,
+        1.411224,
+        1.512245,
+        1.613265,
+        1.714286,
+        1.815306
+      ],
+      "parameters": [
+        0.3,
+        0.40102,
+        0.502041,
+        0.603061,
+        0.704082,
+        0.805102,
+        0.906122,
+        1.007143,
+        1.108163,
+        1.209184,
+        1.310204,
+        1.411224,
+        1.512245,
+        1.613265,
+        1.714286,
+        1.815306
+      ],
+      "parameterName": "Gamma",
+      "parameterLabel": "\u0393",
+      "terminalGamma": 1.815306,
+      "startName": "Hopf link",
+      "endName": "Trefoil",
+      "lambdaSamples": 60,
+      "mode_metadata": {
+        "classic": {
+          "classes": 4,
+          "components": 4,
+          "smallComponents": 0,
+          "rawClasses": 9,
+          "classicStableComponents": 4,
+          "contractionAccessiblePairs": 0,
+          "contractionMergedClassicRegions": 0
+        },
+        "contraction": {
+          "classes": 4,
+          "components": 4,
+          "smallComponents": 0,
+          "rawClasses": 9,
+          "classicStableComponents": 4,
+          "contractionAccessiblePairs": 0,
+          "contractionMergedClassicRegions": 0
+        }
+      }
+    },
+    {
+      "key": "hopf_to_solomon",
+      "title": "Hopf link to Solomon link",
+      "lambdas": [
+        0.0,
+        0.016949,
+        0.033898,
+        0.050847,
+        0.067797,
+        0.084746,
+        0.101695,
+        0.118644,
+        0.135593,
+        0.152542,
+        0.169492,
+        0.186441,
+        0.20339,
+        0.220339,
+        0.237288,
+        0.254237,
+        0.271186,
+        0.288136,
+        0.305085,
+        0.322034,
+        0.338983,
+        0.355932,
+        0.372881,
+        0.389831,
+        0.40678,
+        0.423729,
+        0.440678,
+        0.457627,
+        0.474576,
+        0.491525,
+        0.508475,
+        0.525424,
+        0.542373,
+        0.559322,
+        0.576271,
+        0.59322,
+        0.610169,
+        0.627119,
+        0.644068,
+        0.661017,
+        0.677966,
+        0.694915,
+        0.711864,
+        0.728814,
+        0.745763,
+        0.762712,
+        0.779661,
+        0.79661,
+        0.813559,
+        0.830508,
+        0.847458,
+        0.864407,
+        0.881356,
+        0.898305,
+        0.915254,
+        0.932203,
+        0.949153,
+        0.966102,
+        0.983051,
+        1.0
+      ],
+      "gammas": [
+        0.3,
+        0.40102,
+        0.502041,
+        0.603061,
+        0.704082,
+        0.805102,
+        0.906122,
+        1.007143,
+        1.108163,
+        1.209184,
+        1.310204,
+        1.411224,
+        1.512245,
+        1.613265,
+        1.714286,
+        1.815306,
+        1.916327,
+        2.017347,
+        2.118367,
+        2.219388,
+        2.320408,
+        2.421429,
+        2.522449,
+        2.623469
+      ],
+      "parameters": [
+        0.3,
+        0.40102,
+        0.502041,
+        0.603061,
+        0.704082,
+        0.805102,
+        0.906122,
+        1.007143,
+        1.108163,
+        1.209184,
+        1.310204,
+        1.411224,
+        1.512245,
+        1.613265,
+        1.714286,
+        1.815306,
+        1.916327,
+        2.017347,
+        2.118367,
+        2.219388,
+        2.320408,
+        2.421429,
+        2.522449,
+        2.623469
+      ],
+      "parameterName": "Gamma",
+      "parameterLabel": "\u0393",
+      "terminalGamma": 2.623469,
+      "startName": "Hopf link",
+      "endName": "Solomon link",
+      "lambdaSamples": 60,
+      "mode_metadata": {
+        "classic": {
+          "classes": 7,
+          "components": 8,
+          "smallComponents": 0,
+          "rawClasses": 28,
+          "classicStableComponents": 8,
+          "contractionAccessiblePairs": 0,
+          "contractionMergedClassicRegions": 0
+        },
+        "contraction": {
+          "classes": 4,
+          "components": 4,
+          "smallComponents": 0,
+          "rawClasses": 28,
+          "classicStableComponents": 8,
+          "contractionAccessiblePairs": 10,
+          "contractionMergedClassicRegions": 4
+        }
+      }
+    },
+    {
+      "key": "unknot_to_trefoil",
+      "title": "Unknot to trefoil",
+      "lambdas": [
+        0.0,
+        0.016949,
+        0.033898,
+        0.050847,
+        0.067797,
+        0.084746,
+        0.101695,
+        0.118644,
+        0.135593,
+        0.152542,
+        0.169492,
+        0.186441,
+        0.20339,
+        0.220339,
+        0.237288,
+        0.254237,
+        0.271186,
+        0.288136,
+        0.305085,
+        0.322034,
+        0.338983,
+        0.355932,
+        0.372881,
+        0.389831,
+        0.40678,
+        0.423729,
+        0.440678,
+        0.457627,
+        0.474576,
+        0.491525,
+        0.508475,
+        0.525424,
+        0.542373,
+        0.559322,
+        0.576271,
+        0.59322,
+        0.610169,
+        0.627119,
+        0.644068,
+        0.661017,
+        0.677966,
+        0.694915,
+        0.711864,
+        0.728814,
+        0.745763,
+        0.762712,
+        0.779661,
+        0.79661,
+        0.813559,
+        0.830508,
+        0.847458,
+        0.864407,
+        0.881356,
+        0.898305,
+        0.915254,
+        0.932203,
+        0.949153,
+        0.966102,
+        0.983051,
+        1.0
+      ],
+      "gammas": [
+        0.3,
+        0.40102,
+        0.502041,
+        0.603061,
+        0.704082,
+        0.805102,
+        0.906122,
+        1.007143,
+        1.108163,
+        1.209184,
+        1.310204,
+        1.411224,
+        1.512245,
+        1.613265,
+        1.714286,
+        1.815306
+      ],
+      "parameters": [
+        0.3,
+        0.40102,
+        0.502041,
+        0.603061,
+        0.704082,
+        0.805102,
+        0.906122,
+        1.007143,
+        1.108163,
+        1.209184,
+        1.310204,
+        1.411224,
+        1.512245,
+        1.613265,
+        1.714286,
+        1.815306
+      ],
+      "parameterName": "Gamma",
+      "parameterLabel": "\u0393",
+      "terminalGamma": 1.815306,
+      "startName": "Unknot",
+      "endName": "Trefoil",
+      "lambdaSamples": 60,
+      "mode_metadata": {
+        "classic": {
+          "classes": 5,
+          "components": 6,
+          "smallComponents": 0,
+          "rawClasses": 8,
+          "classicStableComponents": 6,
+          "contractionAccessiblePairs": 0,
+          "contractionMergedClassicRegions": 0
+        },
+        "contraction": {
+          "classes": 4,
+          "components": 5,
+          "smallComponents": 0,
+          "rawClasses": 8,
+          "classicStableComponents": 6,
+          "contractionAccessiblePairs": 2,
+          "contractionMergedClassicRegions": 2
+        }
+      }
+    },
+    {
+      "key": "unknot_to_solomon",
+      "title": "Unknot to Solomon link",
+      "lambdas": [
+        0.0,
+        0.016949,
+        0.033898,
+        0.050847,
+        0.067797,
+        0.084746,
+        0.101695,
+        0.118644,
+        0.135593,
+        0.152542,
+        0.169492,
+        0.186441,
+        0.20339,
+        0.220339,
+        0.237288,
+        0.254237,
+        0.271186,
+        0.288136,
+        0.305085,
+        0.322034,
+        0.338983,
+        0.355932,
+        0.372881,
+        0.389831,
+        0.40678,
+        0.423729,
+        0.440678,
+        0.457627,
+        0.474576,
+        0.491525,
+        0.508475,
+        0.525424,
+        0.542373,
+        0.559322,
+        0.576271,
+        0.59322,
+        0.610169,
+        0.627119,
+        0.644068,
+        0.661017,
+        0.677966,
+        0.694915,
+        0.711864,
+        0.728814,
+        0.745763,
+        0.762712,
+        0.779661,
+        0.79661,
+        0.813559,
+        0.830508,
+        0.847458,
+        0.864407,
+        0.881356,
+        0.898305,
+        0.915254,
+        0.932203,
+        0.949153,
+        0.966102,
+        0.983051,
+        1.0
+      ],
+      "gammas": [
+        0.3,
+        0.40102,
+        0.502041,
+        0.603061,
+        0.704082,
+        0.805102,
+        0.906122,
+        1.007143,
+        1.108163,
+        1.209184,
+        1.310204,
+        1.411224,
+        1.512245,
+        1.613265,
+        1.714286,
+        1.815306,
+        1.916327,
+        2.017347,
+        2.118367,
+        2.219388,
+        2.320408,
+        2.421429,
+        2.522449,
+        2.623469
+      ],
+      "parameters": [
+        0.3,
+        0.40102,
+        0.502041,
+        0.603061,
+        0.704082,
+        0.805102,
+        0.906122,
+        1.007143,
+        1.108163,
+        1.209184,
+        1.310204,
+        1.411224,
+        1.512245,
+        1.613265,
+        1.714286,
+        1.815306,
+        1.916327,
+        2.017347,
+        2.118367,
+        2.219388,
+        2.320408,
+        2.421429,
+        2.522449,
+        2.623469
+      ],
+      "parameterName": "Gamma",
+      "parameterLabel": "\u0393",
+      "terminalGamma": 2.623469,
+      "startName": "Unknot",
+      "endName": "Solomon link",
+      "lambdaSamples": 60,
+      "mode_metadata": {
+        "classic": {
+          "classes": 5,
+          "components": 5,
+          "smallComponents": 0,
+          "rawClasses": 40,
+          "classicStableComponents": 5,
+          "contractionAccessiblePairs": 0,
+          "contractionMergedClassicRegions": 0
+        },
+        "contraction": {
+          "classes": 5,
+          "components": 5,
+          "smallComponents": 0,
+          "rawClasses": 40,
+          "classicStableComponents": 5,
+          "contractionAccessiblePairs": 0,
+          "contractionMergedClassicRegions": 0
+        }
+      }
+    },
+    {
+      "key": "trefoil_to_cinquefoil",
+      "title": "Trefoil to cinquefoil",
+      "lambdas": [
+        0.0,
+        0.016949,
+        0.033898,
+        0.050847,
+        0.067797,
+        0.084746,
+        0.101695,
+        0.118644,
+        0.135593,
+        0.152542,
+        0.169492,
+        0.186441,
+        0.20339,
+        0.220339,
+        0.237288,
+        0.254237,
+        0.271186,
+        0.288136,
+        0.305085,
+        0.322034,
+        0.338983,
+        0.355932,
+        0.372881,
+        0.389831,
+        0.40678,
+        0.423729,
+        0.440678,
+        0.457627,
+        0.474576,
+        0.491525,
+        0.508475,
+        0.525424,
+        0.542373,
+        0.559322,
+        0.576271,
+        0.59322,
+        0.610169,
+        0.627119,
+        0.644068,
+        0.661017,
+        0.677966,
+        0.694915,
+        0.711864,
+        0.728814,
+        0.745763,
+        0.762712,
+        0.779661,
+        0.79661,
+        0.813559,
+        0.830508,
+        0.847458,
+        0.864407,
+        0.881356,
+        0.898305,
+        0.915254,
+        0.932203,
+        0.949153,
+        0.966102,
+        0.983051,
+        1.0
+      ],
+      "gammas": [
+        0.3,
+        0.40102,
+        0.502041,
+        0.603061,
+        0.704082,
+        0.805102,
+        0.906122,
+        1.007143,
+        1.108163,
+        1.209184,
+        1.310204,
+        1.411224,
+        1.512245,
+        1.613265,
+        1.714286,
+        1.815306,
+        1.916327,
+        2.017347,
+        2.118367,
+        2.219388,
+        2.320408,
+        2.421429,
+        2.522449,
+        2.623469,
+        2.72449,
+        2.82551,
+        2.926531,
+        3.027551,
+        3.128571,
+        3.229592,
+        3.330612,
+        3.431633,
+        3.532653,
+        3.633673,
+        3.734694,
+        3.835714,
+        3.936735,
+        4.037755,
+        4.138776
+      ],
+      "parameters": [
+        0.3,
+        0.40102,
+        0.502041,
+        0.603061,
+        0.704082,
+        0.805102,
+        0.906122,
+        1.007143,
+        1.108163,
+        1.209184,
+        1.310204,
+        1.411224,
+        1.512245,
+        1.613265,
+        1.714286,
+        1.815306,
+        1.916327,
+        2.017347,
+        2.118367,
+        2.219388,
+        2.320408,
+        2.421429,
+        2.522449,
+        2.623469,
+        2.72449,
+        2.82551,
+        2.926531,
+        3.027551,
+        3.128571,
+        3.229592,
+        3.330612,
+        3.431633,
+        3.532653,
+        3.633673,
+        3.734694,
+        3.835714,
+        3.936735,
+        4.037755,
+        4.138776
+      ],
+      "parameterName": "Gamma",
+      "parameterLabel": "\u0393",
+      "terminalGamma": 4.138776,
+      "startName": "Trefoil",
+      "endName": "Cinquefoil",
+      "lambdaSamples": 60,
+      "mode_metadata": {
+        "classic": {
+          "classes": 6,
+          "components": 8,
+          "smallComponents": 0,
+          "rawClasses": 19,
+          "classicStableComponents": 8,
+          "contractionAccessiblePairs": 0,
+          "contractionMergedClassicRegions": 0
+        },
+        "contraction": {
+          "classes": 5,
+          "components": 7,
+          "smallComponents": 0,
+          "rawClasses": 19,
+          "classicStableComponents": 8,
+          "contractionAccessiblePairs": 4,
+          "contractionMergedClassicRegions": 3
+        }
+      }
+    }
+  ],
+  "scope": "Retained embedded HTML data and current notebook controls; not a new phase-map rerun or certification of manuscript figure provenance."
+}

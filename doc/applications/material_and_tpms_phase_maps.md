@@ -21,6 +21,8 @@ checkout when supplied with your own records file.
 
 ## Saved research results
 
+The saved displays below are historical artifacts. The [scientific revision](../reproducibility/arxiv_revision.md) supplies corrected unfiltered TPMS data, cavity and component checks, and explicit evaluation scopes. Its results supersede the historical TPMS class interpretation. [Reproduction commands and filtering audits](../reproducibility/tpms.md) retain the original display records separately.
+
 The material examples interpolate one Hamiltonian coefficient with $\lambda$
 and vary an energy/gap threshold $E$. The compact-TPMS examples interpolate
 between gyroid, Schwarz-P and diamond scalar fields with $\lambda$, then vary a
@@ -155,7 +157,8 @@ memory. Estimate them from a coarse run before requesting larger resources.
 
 | Record or display status | Interpretation |
 | --- | --- |
-| `source=yamada` | a Yamada result for the extracted finite-grid graph; also inspect `classification_computed` |
+| `source=yamada` | in revised TPMS scans, a normalized subcubic spatial-graph polynomial; historical records require their original scope audit |
+| `source=diagram-yamada` | a higher-valence fixed-diagram polynomial; retain its projection and local vertex convention |
 | `source=vertex` | the engine classified a vertex-only core; inspect components and boundary contact |
 | `source=large-core` | a structural signature because an exact attempt was outside the configured limit; not an exact polynomial |
 | `source=yamada-set` | an outer/inner boundary classification collection; inspect each entry because structural fallbacks may also occur |
@@ -164,7 +167,7 @@ memory. Estimate them from a coarse run before requesting larger resources.
 | nonempty `resolution_calibration_energy` | assigned using the recorded anchor energy under the upstream TiB2 resolution rule; separate from adaptive filling |
 | small-island smoothing or manual signature merges | historical display postprocessing; distinct raw results may share a displayed class |
 | TiB2 C6 display grouping | groups audited non-C6 representatives under the stated upstream rule; raw signatures remain available |
-| contraction mode | grouping under stated bounded contraction tests; not literal equality of classic Yamada polynomials |
+| historical contraction mode | abstract graph grouping that discards embedding information; not certified spatial or handlebody equivalence |
 
 The supplied material records contain 14,634 directly classified, 31,184
 adaptive-fill and 202 resolution-calibration cells. TPMS records do not carry `classification_computed`; the

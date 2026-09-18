@@ -1,0 +1,297 @@
+{
+  "evaluated_parameter_cells": 45,
+  "vary_between_any_resolution": 13,
+  "pairwise_changes": {
+    "24_64": 12,
+    "64_96": 8,
+    "24_96": 13
+  },
+  "changes": [
+    {
+      "family": "gyroid_to_diamond",
+      "lambda": 0.0,
+      "c": 0.0,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          5,
+          0
+        ],
+        "64": [
+          4,
+          5,
+          0
+        ],
+        "96": [
+          1,
+          11,
+          0
+        ]
+      }
+    },
+    {
+      "family": "gyroid_to_diamond",
+      "lambda": 0.0,
+      "c": 0.105,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          5,
+          0
+        ],
+        "64": [
+          1,
+          14,
+          0
+        ],
+        "96": [
+          1,
+          11,
+          0
+        ]
+      }
+    },
+    {
+      "family": "gyroid_to_diamond",
+      "lambda": 0.25,
+      "c": 0.105,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          5,
+          0
+        ],
+        "64": [
+          1,
+          5,
+          0
+        ],
+        "96": [
+          1,
+          8,
+          0
+        ]
+      }
+    },
+    {
+      "family": "gyroid_to_diamond",
+      "lambda": 0.25,
+      "c": 0.3,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          5,
+          0
+        ],
+        "64": [
+          1,
+          14,
+          0
+        ],
+        "96": [
+          1,
+          13,
+          0
+        ]
+      }
+    },
+    {
+      "family": "gyroid_to_diamond",
+      "lambda": 0.5,
+      "c": 0.0,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          5,
+          0
+        ],
+        "64": [
+          1,
+          7,
+          0
+        ],
+        "96": [
+          1,
+          7,
+          0
+        ]
+      }
+    },
+    {
+      "family": "gyroid_to_diamond",
+      "lambda": 0.5,
+      "c": 0.105,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          5,
+          0
+        ],
+        "64": [
+          1,
+          7,
+          0
+        ],
+        "96": [
+          1,
+          7,
+          0
+        ]
+      }
+    },
+    {
+      "family": "gyroid_to_diamond",
+      "lambda": 0.5,
+      "c": 0.3,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          7,
+          0
+        ],
+        "64": [
+          1,
+          13,
+          0
+        ],
+        "96": [
+          1,
+          10,
+          0
+        ]
+      }
+    },
+    {
+      "family": "gyroid_to_diamond",
+      "lambda": 0.75,
+      "c": 0.105,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          7,
+          0
+        ],
+        "64": [
+          1,
+          17,
+          0
+        ],
+        "96": [
+          1,
+          20,
+          0
+        ]
+      }
+    },
+    {
+      "family": "gyroid_to_schwarz_p",
+      "lambda": 0.0,
+      "c": 0.0,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          5,
+          0
+        ],
+        "64": [
+          4,
+          5,
+          0
+        ],
+        "96": [
+          1,
+          11,
+          0
+        ]
+      }
+    },
+    {
+      "family": "gyroid_to_schwarz_p",
+      "lambda": 0.0,
+      "c": 0.105,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          5,
+          0
+        ],
+        "64": [
+          1,
+          14,
+          0
+        ],
+        "96": [
+          1,
+          11,
+          0
+        ]
+      }
+    },
+    {
+      "family": "gyroid_to_schwarz_p",
+      "lambda": 0.25,
+      "c": 0.0,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          8,
+          0
+        ],
+        "64": [
+          1,
+          10,
+          0
+        ],
+        "96": [
+          1,
+          10,
+          0
+        ]
+      }
+    },
+    {
+      "family": "gyroid_to_schwarz_p",
+      "lambda": 0.25,
+      "c": 0.105,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          13,
+          0
+        ],
+        "64": [
+          1,
+          10,
+          0
+        ],
+        "96": [
+          1,
+          10,
+          0
+        ]
+      }
+    },
+    {
+      "family": "schwarz_p_to_diamond",
+      "lambda": 0.75,
+      "c": 0.3,
+      "betti_by_dimension": {
+        "24": [
+          1,
+          11,
+          0
+        ],
+        "64": [
+          1,
+          35,
+          0
+        ],
+        "96": [
+          1,
+          35,
+          0
+        ]
+      }
+    }
+  ]
+}

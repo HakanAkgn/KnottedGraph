@@ -186,7 +186,7 @@ def test_unified_phase_map_collapses_closed_genus_zero_masks_to_vertex(monkeypat
     assert record.error is None
     assert record.nodes == 1
     assert record.edges == 0
-    assert record.yamada.free_symbols == {sp.Symbol("Y")}
+    assert record.yamada == -1
 
 
 def test_volume_topology_distinguishes_ball_shell_and_solid_torus():
@@ -280,7 +280,7 @@ def test_unified_phase_map_represents_a_shell_by_two_vertices(monkeypatch):
     assert record.edges == 0
 
 
-def test_unified_phase_map_collapses_no_core_skeletons_to_vertex(monkeypatch):
+def test_unified_phase_map_retains_unresolved_noncompact_skeleton_error(monkeypatch):
     from knotted_graph.applications.nodal.skeleton import NodalSkeleton
     from knotted_graph.core import EmbeddingValidationError
 
@@ -306,6 +306,7 @@ def test_unified_phase_map_collapses_no_core_skeletons_to_vertex(monkeypatch):
     )
 
     [record] = result.records
-    assert record.error is None
-    assert record.nodes == 1
-    assert record.edges == 0
+    assert "graph has no edges" in record.error
+    assert record.nodes == 0
+    assert record.yamada is None
+    assert record.evaluation_kind == "failed"

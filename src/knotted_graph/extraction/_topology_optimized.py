@@ -11,6 +11,8 @@ plausible trace cannot later fail because an embedded edge has collapsed.
 
 from __future__ import annotations
 
+from numbers import Integral
+
 import networkx as nx
 import numpy as np
 
@@ -52,7 +54,7 @@ def _trace_prepared(
         local = nx.relabel_nodes(local, mapping, copy=True)
         graph = nx.compose(graph, local)
         next_id += local.number_of_nodes()
-    graph.remove_nodes_from([node for node, degree in graph.degree() if degree == 0])
+    # Isolated nodes represent connected skeleton components and must survive.
     return graph
 
 
@@ -283,6 +285,8 @@ def persistent_extract(
     max_degree: int | None = None,
     max_hops: int = 4,
     anomaly_ratio: float = 0.15,
+    expected_cycle_rank: int | None = None,
+    expected_components: int | None = None,
 ) -> nx.MultiGraph:
     """Return the smallest well-supported multi-scale skeleton reconstruction.
 
@@ -296,12 +300,31 @@ def persistent_extract(
     available, the most recurrent valid isomorphism class is selected, again
     preferring its smallest scale. A topology observed only once is not treated
     as persistent; if no recurring valid class exists, the direct zero-radius
-    graph is returned as the conservative fallback.
+    graph is returned as the conservative fallback. Optional externally
+    supplied component/cycle counts filter candidates and the fallback. These
+    counts constrain homology only, not the three-dimensional embedding.
     """
     if max_hops < 0:
         raise ValueError("max_hops must be non-negative")
     if max_degree is not None and max_degree < 1:
         raise ValueError("max_degree must be positive when supplied")
+
+    for name, value in (
+        ("expected_cycle_rank", expected_cycle_rank),
+        ("expected_components", expected_components),
+    ):
+        if value is not None and (not isinstance(value, Integral) or value < 0):
+            raise ValueError(f"{name} must be a non-negative integer when supplied")
+
+    def homology_matches(graph: nx.MultiGraph) -> bool:
+        if expected_cycle_rank is None and expected_components is None:
+            return True
+        components = nx.number_connected_components(graph) if graph else 0
+        cycle_rank = graph.number_of_edges() - graph.number_of_nodes() + components
+        return (
+            (expected_components is None or components == expected_components)
+            and (expected_cycle_rank is None or cycle_rank == expected_cycle_rank)
+        )
 
     prepared = _prepared_components(coords, adjacency)
 
@@ -312,6 +335,7 @@ def persistent_extract(
             max_degree=max_degree,
             anomaly_ratio=anomaly_ratio,
         )
+        clean = clean and homology_matches(graph)
         return graph, reduced, clean, fingerprint, one_hop_safe
 
     base = build(0)
@@ -341,7 +365,13 @@ def persistent_extract(
     )
     if fallback is not None:
         return fallback[0]
-    return base[0]
+    if homology_matches(base[0]):
+        return base[0]
+    raise ValueError(
+        "No persistent or zero-radius skeleton reconstruction satisfies "
+        f"expected_components={expected_components!r}, "
+        f"expected_cycle_rank={expected_cycle_rank!r}"
+    )
 
 
 def constrained_persistent_extract(
@@ -351,6 +381,8 @@ def constrained_persistent_extract(
     max_degree: int,
     max_hops: int = 4,
     anomaly_ratio: float = 0.15,
+    expected_cycle_rank: int | None = None,
+    expected_components: int | None = None,
 ) -> nx.MultiGraph:
     """Compatibility wrapper for persistence with a required valence prior."""
     return persistent_extract(
@@ -359,4 +391,6 @@ def constrained_persistent_extract(
         max_degree=max_degree,
         max_hops=max_hops,
         anomaly_ratio=anomaly_ratio,
+        expected_cycle_rank=expected_cycle_rank,
+        expected_components=expected_components,
     )

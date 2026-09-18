@@ -1,0 +1,1434 @@
+{
+  "interpretation": "Nested subsampling measures loss of resolved features at coarser parameter spacing; it is not independent parameter-grid convergence. Voxel Betti variation measures the masks themselves, independently of graph extraction.",
+  "source_sha256": {
+    "/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/Knotted_graph_code_paper/KnottedGraph_arxiv_revision/_build/arxiv_revision/tpms_n64/tpms_parameter_phase_map_records.json": "b4a8dc6c4feb8905f2c17e8b0567f5a9112135e537f85f764e5af45c0bf09eb2",
+    "output/arxiv_revision_work/tpms_extraction_stage_diagnosis.json": "d94079b2464ada46abb32360dfe2dd325dc94a1ca8e7b0e305697efa80e2fda7"
+  },
+  "parameter_subsampling": {
+    "gyroid_to_diamond": {
+      "21": {
+        "cells": 441,
+        "lambda_spacing": 0.05,
+        "c_spacing": 0.015,
+        "betti_tuple_count": 15,
+        "betti_regions_4neighbor": {
+          "connected_regions": 76,
+          "singleton_regions": 39
+        },
+        "nonerror_signature_count": 77,
+        "nonerror_signature_regions_4neighbor": {
+          "connected_regions": 142,
+          "singleton_regions": 102
+        },
+        "cavity_positive_cells": 1,
+        "unresolved_cells": 1,
+        "selected_lambda_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "selected_c_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ]
+      },
+      "11": {
+        "cells": 121,
+        "lambda_spacing": 0.1,
+        "c_spacing": 0.03,
+        "betti_tuple_count": 13,
+        "betti_regions_4neighbor": {
+          "connected_regions": 37,
+          "singleton_regions": 24
+        },
+        "nonerror_signature_count": 41,
+        "nonerror_signature_regions_4neighbor": {
+          "connected_regions": 59,
+          "singleton_regions": 50
+        },
+        "cavity_positive_cells": 0,
+        "unresolved_cells": 0,
+        "selected_lambda_indices": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ],
+        "selected_c_indices": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ]
+      },
+      "6": {
+        "cells": 36,
+        "lambda_spacing": 0.2,
+        "c_spacing": 0.06,
+        "betti_tuple_count": 10,
+        "betti_regions_4neighbor": {
+          "connected_regions": 20,
+          "singleton_regions": 15
+        },
+        "nonerror_signature_count": 19,
+        "nonerror_signature_regions_4neighbor": {
+          "connected_regions": 21,
+          "singleton_regions": 16
+        },
+        "cavity_positive_cells": 0,
+        "unresolved_cells": 0,
+        "selected_lambda_indices": [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "selected_c_indices": [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    },
+    "gyroid_to_schwarz_p": {
+      "21": {
+        "cells": 441,
+        "lambda_spacing": 0.05,
+        "c_spacing": 0.015,
+        "betti_tuple_count": 8,
+        "betti_regions_4neighbor": {
+          "connected_regions": 20,
+          "singleton_regions": 8
+        },
+        "nonerror_signature_count": 27,
+        "nonerror_signature_regions_4neighbor": {
+          "connected_regions": 64,
+          "singleton_regions": 42
+        },
+        "cavity_positive_cells": 1,
+        "unresolved_cells": 1,
+        "selected_lambda_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "selected_c_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ]
+      },
+      "11": {
+        "cells": 121,
+        "lambda_spacing": 0.1,
+        "c_spacing": 0.03,
+        "betti_tuple_count": 8,
+        "betti_regions_4neighbor": {
+          "connected_regions": 12,
+          "singleton_regions": 6
+        },
+        "nonerror_signature_count": 18,
+        "nonerror_signature_regions_4neighbor": {
+          "connected_regions": 25,
+          "singleton_regions": 16
+        },
+        "cavity_positive_cells": 1,
+        "unresolved_cells": 1,
+        "selected_lambda_indices": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ],
+        "selected_c_indices": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ]
+      },
+      "6": {
+        "cells": 36,
+        "lambda_spacing": 0.2,
+        "c_spacing": 0.06,
+        "betti_tuple_count": 7,
+        "betti_regions_4neighbor": {
+          "connected_regions": 8,
+          "singleton_regions": 5
+        },
+        "nonerror_signature_count": 12,
+        "nonerror_signature_regions_4neighbor": {
+          "connected_regions": 13,
+          "singleton_regions": 9
+        },
+        "cavity_positive_cells": 1,
+        "unresolved_cells": 1,
+        "selected_lambda_indices": [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "selected_c_indices": [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    },
+    "schwarz_p_to_diamond": {
+      "21": {
+        "cells": 441,
+        "lambda_spacing": 0.05,
+        "c_spacing": 0.015,
+        "betti_tuple_count": 5,
+        "betti_regions_4neighbor": {
+          "connected_regions": 11,
+          "singleton_regions": 4
+        },
+        "nonerror_signature_count": 14,
+        "nonerror_signature_regions_4neighbor": {
+          "connected_regions": 14,
+          "singleton_regions": 12
+        },
+        "cavity_positive_cells": 72,
+        "unresolved_cells": 72,
+        "selected_lambda_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "selected_c_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ]
+      },
+      "11": {
+        "cells": 121,
+        "lambda_spacing": 0.1,
+        "c_spacing": 0.03,
+        "betti_tuple_count": 5,
+        "betti_regions_4neighbor": {
+          "connected_regions": 6,
+          "singleton_regions": 2
+        },
+        "nonerror_signature_count": 5,
+        "nonerror_signature_regions_4neighbor": {
+          "connected_regions": 5,
+          "singleton_regions": 3
+        },
+        "cavity_positive_cells": 20,
+        "unresolved_cells": 20,
+        "selected_lambda_indices": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ],
+        "selected_c_indices": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ]
+      },
+      "6": {
+        "cells": 36,
+        "lambda_spacing": 0.2,
+        "c_spacing": 0.06,
+        "betti_tuple_count": 4,
+        "betti_regions_4neighbor": {
+          "connected_regions": 4,
+          "singleton_regions": 1
+        },
+        "nonerror_signature_count": 2,
+        "nonerror_signature_regions_4neighbor": {
+          "connected_regions": 2,
+          "singleton_regions": 0
+        },
+        "cavity_positive_cells": 5,
+        "unresolved_cells": 5,
+        "selected_lambda_indices": [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "selected_c_indices": [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    }
+  },
+  "voxel_resolution": {
+    "matched_parameter_cells": 45,
+    "family_endpoint_duplicates_included": true,
+    "pairwise_changed_cells": {
+      "24_64": 12,
+      "64_96": 8,
+      "24_96": 13
+    },
+    "changed_between_any": 13,
+    "all_matched_cells": [
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.0,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            4,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.0,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            14,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.0,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            8,
+            0
+          ],
+          "64": [
+            1,
+            8,
+            0
+          ],
+          "96": [
+            1,
+            8,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.25,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.25,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            8,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.25,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            14,
+            0
+          ],
+          "96": [
+            1,
+            13,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.5,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            7,
+            0
+          ],
+          "96": [
+            1,
+            7,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.5,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            7,
+            0
+          ],
+          "96": [
+            1,
+            7,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.5,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            7,
+            0
+          ],
+          "64": [
+            1,
+            13,
+            0
+          ],
+          "96": [
+            1,
+            10,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.75,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            11,
+            0
+          ],
+          "64": [
+            1,
+            11,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.75,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            7,
+            0
+          ],
+          "64": [
+            1,
+            17,
+            0
+          ],
+          "96": [
+            1,
+            20,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.75,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            7,
+            0
+          ],
+          "64": [
+            1,
+            7,
+            0
+          ],
+          "96": [
+            1,
+            7,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 1.0,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            11,
+            0
+          ],
+          "64": [
+            1,
+            11,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 1.0,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            11,
+            0
+          ],
+          "64": [
+            1,
+            11,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 1.0,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            11,
+            0
+          ],
+          "64": [
+            1,
+            11,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.0,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            4,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.0,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            14,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.0,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            8,
+            0
+          ],
+          "64": [
+            1,
+            8,
+            0
+          ],
+          "96": [
+            1,
+            8,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.25,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            8,
+            0
+          ],
+          "64": [
+            1,
+            10,
+            0
+          ],
+          "96": [
+            1,
+            10,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.25,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            13,
+            0
+          ],
+          "64": [
+            1,
+            10,
+            0
+          ],
+          "96": [
+            1,
+            10,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.25,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            10,
+            0
+          ],
+          "64": [
+            1,
+            10,
+            0
+          ],
+          "96": [
+            1,
+            10,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.5,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.5,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.5,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.75,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.75,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.75,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 1.0,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 1.0,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 1.0,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.0,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.0,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.0,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.25,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.25,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.25,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            5,
+            0
+          ],
+          "64": [
+            1,
+            5,
+            0
+          ],
+          "96": [
+            1,
+            5,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            0,
+            1
+          ],
+          "64": [
+            1,
+            0,
+            1
+          ],
+          "96": [
+            1,
+            0,
+            1
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            0,
+            1
+          ],
+          "64": [
+            1,
+            0,
+            1
+          ],
+          "96": [
+            1,
+            0,
+            1
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.75,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            11,
+            0
+          ],
+          "64": [
+            1,
+            11,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.75,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            11,
+            0
+          ],
+          "64": [
+            1,
+            11,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.75,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            11,
+            0
+          ],
+          "64": [
+            1,
+            35,
+            0
+          ],
+          "96": [
+            1,
+            35,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 1.0,
+        "c": 0.0,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            11,
+            0
+          ],
+          "64": [
+            1,
+            11,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 1.0,
+        "c": 0.105,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            11,
+            0
+          ],
+          "64": [
+            1,
+            11,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 1.0,
+        "c": 0.3,
+        "betti_by_dimension": {
+          "24": [
+            1,
+            11,
+            0
+          ],
+          "64": [
+            1,
+            11,
+            0
+          ],
+          "96": [
+            1,
+            11,
+            0
+          ]
+        }
+      }
+    ]
+  }
+}

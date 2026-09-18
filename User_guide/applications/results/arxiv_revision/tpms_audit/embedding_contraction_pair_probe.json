@@ -1,0 +1,154 @@
+{
+  "scope": "Nine neighboring pairs sharing an old stabilized contraction label; archived rounded PL geometry only",
+  "limits": {
+    "max_depth": 1,
+    "max_states": 8,
+    "max_attempts": 16,
+    "max_predicates_per_move": 100000
+  },
+  "results": [
+    {
+      "left": "schwarz_p_to_diamond_lambda000_c007.json.gz",
+      "right": "schwarz_p_to_diamond_lambda001_c007.json.gz",
+      "old_shared_class": 1,
+      "abstract_isomorphic": true,
+      "status": "unknown",
+      "reason": "no_witness_in_bounded_move_set",
+      "states": 2,
+      "seconds": 0.11876158299855888,
+      "witness": {
+        "rejections": {
+          "selected_edge_not_single_straight_segment": 24
+        },
+        "attempts": 0
+      }
+    },
+    {
+      "left": "schwarz_p_to_diamond_lambda010_c007.json.gz",
+      "right": "schwarz_p_to_diamond_lambda011_c007.json.gz",
+      "old_shared_class": 2,
+      "abstract_isomorphic": true,
+      "status": "equivalent",
+      "reason": "certified_contractions_to_identical_PL_graph",
+      "states": 0,
+      "seconds": 9.029201464727521e-05,
+      "witness": {
+        "left": [],
+        "right": [],
+        "terminal_fingerprint": "(((Fraction(0, 1), Fraction(0, 1), Fraction(0, 1)),), ())"
+      }
+    },
+    {
+      "left": "schwarz_p_to_diamond_lambda019_c007.json.gz",
+      "right": "schwarz_p_to_diamond_lambda020_c007.json.gz",
+      "old_shared_class": 3,
+      "abstract_isomorphic": true,
+      "status": "unknown",
+      "reason": "no_witness_in_bounded_move_set",
+      "states": 2,
+      "seconds": 0.9454501669970341,
+      "witness": {
+        "rejections": {
+          "selected_edge_not_single_straight_segment": 43
+        },
+        "attempts": 10
+      }
+    },
+    {
+      "left": "gyroid_to_schwarz_p_lambda001_c007.json.gz",
+      "right": "gyroid_to_schwarz_p_lambda002_c007.json.gz",
+      "old_shared_class": 2,
+      "abstract_isomorphic": true,
+      "status": "unknown",
+      "reason": "no_witness_in_bounded_move_set",
+      "states": 2,
+      "seconds": 0.14844129100674763,
+      "witness": {
+        "rejections": {
+          "selected_edge_not_single_straight_segment": 42
+        },
+        "attempts": 0
+      }
+    },
+    {
+      "left": "gyroid_to_schwarz_p_lambda012_c007.json.gz",
+      "right": "gyroid_to_schwarz_p_lambda013_c007.json.gz",
+      "old_shared_class": 1,
+      "abstract_isomorphic": true,
+      "status": "unknown",
+      "reason": "no_witness_in_bounded_move_set",
+      "states": 2,
+      "seconds": 0.10227887501241639,
+      "witness": {
+        "rejections": {
+          "selected_edge_not_single_straight_segment": 24
+        },
+        "attempts": 0
+      }
+    },
+    {
+      "left": "gyroid_to_schwarz_p_lambda019_c007.json.gz",
+      "right": "gyroid_to_schwarz_p_lambda020_c007.json.gz",
+      "old_shared_class": 1,
+      "abstract_isomorphic": true,
+      "status": "unknown",
+      "reason": "no_witness_in_bounded_move_set",
+      "states": 2,
+      "seconds": 0.11558070796309039,
+      "witness": {
+        "rejections": {
+          "selected_edge_not_single_straight_segment": 24
+        },
+        "attempts": 0
+      }
+    },
+    {
+      "left": "gyroid_to_diamond_lambda001_c007.json.gz",
+      "right": "gyroid_to_diamond_lambda002_c007.json.gz",
+      "old_shared_class": 3,
+      "abstract_isomorphic": true,
+      "status": "unknown",
+      "reason": "no_witness_in_bounded_move_set",
+      "states": 2,
+      "seconds": 0.4897223340230994,
+      "witness": {
+        "rejections": {
+          "selected_edge_not_single_straight_segment": 59
+        },
+        "attempts": 2
+      }
+    },
+    {
+      "left": "gyroid_to_diamond_lambda011_c007.json.gz",
+      "right": "gyroid_to_diamond_lambda012_c007.json.gz",
+      "old_shared_class": 22,
+      "abstract_isomorphic": true,
+      "status": "unknown",
+      "reason": "no_witness_in_bounded_move_set",
+      "states": 2,
+      "seconds": 0.5568378330208361,
+      "witness": {
+        "rejections": {
+          "selected_edge_not_single_straight_segment": 32
+        },
+        "attempts": 4
+      }
+    },
+    {
+      "left": "gyroid_to_diamond_lambda019_c007.json.gz",
+      "right": "gyroid_to_diamond_lambda020_c007.json.gz",
+      "old_shared_class": 47,
+      "abstract_isomorphic": true,
+      "status": "unknown",
+      "reason": "no_witness_in_bounded_move_set",
+      "states": 2,
+      "seconds": 0.5714326250017621,
+      "witness": {
+        "rejections": {
+          "selected_edge_not_single_straight_segment": 45
+        },
+        "attempts": 6
+      }
+    }
+  ]
+}

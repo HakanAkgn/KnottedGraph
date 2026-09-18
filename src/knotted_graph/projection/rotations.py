@@ -25,8 +25,8 @@ def _validate_rotation_order(order: str) -> str:
 
     if not isinstance(order, str):
         raise TypeError(
-            "rotation_order must be a string such as 'ZYX' (extrinsic) "
-            "or 'xyz' (intrinsic)."
+            "rotation_order must be a string such as 'ZYX' (intrinsic) "
+            "or 'xyz' (extrinsic)."
         )
     if len(order) != 3 or any(axis.lower() not in "xyz" for axis in order):
         raise ValueError(
@@ -36,8 +36,8 @@ def _validate_rotation_order(order: str) -> str:
     if not (order.isupper() or order.islower()):
         raise ValueError(
             "rotation_order must use one case consistently: uppercase for "
-            "extrinsic rotations (for example 'ZYX') or lowercase for "
-            "intrinsic rotations (for example 'xyz')."
+            "intrinsic rotations (for example 'ZYX') or lowercase for "
+            "extrinsic rotations (for example 'xyz')."
         )
     return order
 
@@ -66,8 +66,8 @@ def get_rotation_matrix(
         The three rotation angles (α, β, γ) applied in the specified order.
     order : str, default "xyz"
         Three‑letter string giving the rotation axes.
-        • Lower‑case  → intrinsic (rotations about *body‑fixed* axes)
-        • Upper‑case  → extrinsic (rotations about *world* axes)
+        • Lower‑case  → extrinsic (rotations about *world* axes)
+        • Upper‑case  → intrinsic (rotations about *body‑fixed* axes)
         Accepted letters: x/X, y/Y, z/Z.
     use_radians : bool, default False
         Supply angles in radians if True, else in degrees.
@@ -79,11 +79,11 @@ def get_rotation_matrix(
     
     Examples
     --------
-    1) Classic aerospace yaw‑pitch‑roll (extrinsic Z‑Y‑X)
+    1) Classic aerospace yaw‑pitch‑roll (intrinsic Z‑Y‑X)
     >>> yaw, pitch, roll = 30, 15, 5    # degrees
     >>> R = get_rotation_matrix((yaw, pitch, roll), order="ZYX")
 
-    2) Intrinsic roll‑pitch‑yaw for camera pose (x‑y‑z in body frame)
+    2) Extrinsic roll‑pitch‑yaw for camera pose (x‑y‑z in world frame)
     >>> R_cam = get_rotation_matrix((5, 15, 30), order="xyz")
 
     3) Euler ZXZ (commonly used in molecular crystallography)
@@ -116,8 +116,8 @@ def get_rotation_matrix(
     thetas = [a, b, c]
     R_elems = [_single_axis(ax.lower(), th) for ax, th in zip(order, thetas)]
 
-    # Combine them: intrinsic (lower‑case) multiplies right‑to‑left; 
-    # extrinsic (upper‑case) left‑to‑right
+    # Combine them: intrinsic (upper‑case) postmultiplies;
+    # extrinsic (lower‑case) premultiplies
     R = np.eye(3)
     for ax, Rk in zip(order, R_elems):
         R = R @ Rk if ax.isupper() else Rk @ R
@@ -125,65 +125,67 @@ def get_rotation_matrix(
     return R
 
 
+def _matrix_to_euler(matrix: NDArray, order: str) -> NDArray:
+    """Decompose a rotation using the same convention as get_rotation_matrix.
+
+    Reduce intrinsic sequences to reversed extrinsic sequences.  The usual
+    three-axis and repeated-axis decompositions then avoid a SciPy dependency.
+    """
+    axes = order.lower()[::-1] if order.isupper() else order
+    if axes[0] == axes[1] or axes[1] == axes[2]:
+        raise ValueError("Sampling requires an Euler sequence with distinct adjacent axes.")
+    i = "xyz".index(axes[0])
+    parity = int("xyz".index(axes[1]) != (i + 1) % 3)
+    j = (i + 1 + parity) % 3
+    k = (i + 2 - parity) % 3
+    repeated = axes[0] == axes[2]
+    m = matrix
+    if repeated:
+        s = float(np.hypot(m[i, j], m[i, k]))
+        if s > 16 * np.finfo(float).eps:
+            angles = np.array([np.arctan2(m[i, j], m[i, k]), np.arctan2(s, m[i, i]), np.arctan2(m[j, i], -m[k, i])])
+        else:
+            angles = np.array([np.arctan2(-m[j, k], m[j, j]), np.arctan2(s, m[i, i]), 0.0])
+    else:
+        c = float(np.hypot(m[i, i], m[j, i]))
+        if c > 16 * np.finfo(float).eps:
+            angles = np.array([np.arctan2(m[k, j], m[k, k]), np.arctan2(-m[k, i], c), np.arctan2(m[j, i], m[i, i])])
+        else:
+            angles = np.array([np.arctan2(-m[j, k], m[j, j]), np.arctan2(-m[k, i], c), 0.0])
+    if parity:
+        angles = -angles
+    return angles[::-1] if order.isupper() else angles
+
+
 def generate_isotopy_angles(
     N: int,
     order: str = "ZYX",
     use_radians: bool = False,
 ) -> NDArray:
-    r"""
-    Return *N* Euler‑angle triples that are (approximately) uniformly
-    distributed over SO(3) / ~, where the equivalence ~ removes
-    
-        • the sign of the view direction  (v and −v give isotopic diagrams)  
-        • rotations about the view axis   (in‑plane diagram spin)
+    """Return deterministic views distributed over the upper hemisphere.
 
-    Parameters
-    ----------
-    N : int
-        Number of representative rotations desired.
-    order : str, default "ZYX"
-        Three‑letter Euler sequence, upper‑case = extrinsic, lower‑case = intrinsic.
-        Must match the `rotation_matrix` helper you already have.
-    use_radians : bool, default False
-        If False the function returns angles in **degrees** (handy when driving 
-        Matplotlib, PyVista, etc.); otherwise in radians.
-
-    Returns
-    -------
-    angles : (N, 3) ndarray
-        Each row is *(α, β, γ)* in the requested `order`.
-        γ (roll) is always 0 because in‑plane rotation is isotopic.
+    The last row of each resulting rotation matrix is the intended viewing
+    direction in input coordinates.  In-plane spin is fixed by the camera
+    basis; setting an arbitrary Euler angle to zero does not in general
+    remove that spin.  Uppercase sequences are intrinsic and lowercase
+    sequences extrinsic, as in :func:`get_rotation_matrix`.
     """
     N = _validate_positive_integer(N, name="N")
     order = _validate_rotation_order(order)
-
-    GOLDEN_ANGLE = np.pi * (3 - np.sqrt(5))      # ~2.399963..., offsets points nicely
-    # --- 1. Fibonacci spiral sampling on the upper hemisphere -----------------
     i = np.arange(N)
-    phi = i * GOLDEN_ANGLE                       # azimuth ∈ [0, 2π)
-    z   = (i + 0.5) / N                          # uniform height in (0, 1]
-    r   = np.sqrt(1.0 - z**2)                    # radius in XY‑plane
-    x, y = r * np.cos(phi), r * np.sin(phi)
-
-    # --- 2. Convert each direction to Euler yaw–pitch (roll = 0) --------------
-    # For extrinsic ZYX:
-    #   yaw   = atan2(y, x)
-    #   pitch = atan2(√(x²+y²), z)
-    yaw   = np.arctan2(y, x)
-    pitch = np.arctan2(np.sqrt(x**2 + y**2), z)
-    roll  = np.zeros_like(yaw)
-
-    euler_ZYX = np.vstack((yaw, pitch, roll)).T  # shape (N, 3)
-
-    # --- 3. Re‑order angles if caller wants a different convention ------------
-    idx = {axis.lower(): k for k, axis in enumerate("zyx")}
-    perm = [idx[a.lower()] for a in order]       # where to pick yaw/pitch/roll
-    angles = euler_ZYX[:, perm]
-
-    if not use_radians:
-        angles = np.degrees(angles)
-
-    return angles
+    phi = i * np.pi * (3 - np.sqrt(5))
+    z = (i + 0.5) / N
+    r = np.sqrt(1.0 - z**2)
+    angles = []
+    for azimuth, height, radial in zip(phi, z, r):
+        cp, sp = np.cos(azimuth), np.sin(azimuth)
+        # Orthonormal right/up/view rows, with determinant +1.
+        matrix = np.array([[height * cp, height * sp, -radial],
+                           [-sp, cp, 0.0],
+                           [radial * cp, radial * sp, height]])
+        angles.append(_matrix_to_euler(matrix, order))
+    result = np.asarray(angles)
+    return result if use_radians else np.degrees(result)
 
 
 def cut_line_string(line, distances, *, tol=1e-12):

@@ -1,0 +1,109 @@
+{
+  "source_path": "/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/Knotted_graph_code_paper/KnottedGraph_arxiv_revision/User_guide/benchmarks/results/04_thick_handlebody_timing_distributions_source.csv",
+  "source_sha256": "13dd29bf4a87632115ea858e9437f672601628bd10ebbe494a5c1b15ffda3516",
+  "source_rows": 5000,
+  "paired_engine_rows": 3491,
+  "topoly_status_counts": {
+    "ok": 3491,
+    "timeout": 1241,
+    "skipped_no_selected_pd": 216,
+    "error": 52
+  },
+  "selection": "Panels a-g use all finite positive recorded stage timings. Panels h-i both require Topoly status ok, recorded agreement up to a unit, recorded KG/stored-recovered agreement, and finite positive durations for both engines.",
+  "records_are_historical": true,
+  "current_projection_code_rerun": false,
+  "topoly_completed_above_reported_timeout": 184,
+  "timeout_rows_with_stale_match_flag": 5,
+  "panels": [
+    {
+      "panel": "a",
+      "stage": "skeletonization_seconds",
+      "cohort": "all available historical records",
+      "n": 5000,
+      "mean_seconds": 0.052274445848289136,
+      "p95_seconds": 0.08565950774063821,
+      "minimum_seconds": 0.0194274159730412,
+      "maximum_seconds": 0.240981750015635
+    },
+    {
+      "panel": "b",
+      "stage": "graph_extraction_seconds",
+      "cohort": "all available historical records",
+      "n": 5000,
+      "mean_seconds": 0.008936261935898753,
+      "p95_seconds": 0.013711891658022012,
+      "minimum_seconds": 0.004668791021686,
+      "maximum_seconds": 0.2984011250082403
+    },
+    {
+      "panel": "c",
+      "stage": "contract_short_edges_seconds",
+      "cohort": "all available historical records",
+      "n": 4900,
+      "mean_seconds": 0.024214014986919535,
+      "p95_seconds": 0.039311695823562316,
+      "minimum_seconds": 0.0126969579723663,
+      "maximum_seconds": 0.1836549169966019
+    },
+    {
+      "panel": "d",
+      "stage": "remove_leaf_nodes_seconds",
+      "cohort": "all available historical records",
+      "n": 4900,
+      "mean_seconds": 6.572524712857554e-05,
+      "p95_seconds": 0.00012683718523474001,
+      "minimum_seconds": 2.154201501980424e-05,
+      "maximum_seconds": 0.0030825000139884
+    },
+    {
+      "panel": "e",
+      "stage": "simplify_edges_seconds",
+      "cohort": "all available historical records",
+      "n": 4900,
+      "mean_seconds": 0.01264999040375145,
+      "p95_seconds": 0.02042661807790862,
+      "minimum_seconds": 0.0065715420059859,
+      "maximum_seconds": 0.1256673749885521
+    },
+    {
+      "panel": "f",
+      "stage": "smooth_edges_seconds",
+      "cohort": "all available historical records",
+      "n": 4900,
+      "mean_seconds": 0.01343247544566849,
+      "p95_seconds": 0.021311406505992583,
+      "minimum_seconds": 0.0066686670179478,
+      "maximum_seconds": 0.6374371669953689
+    },
+    {
+      "panel": "g",
+      "stage": "projection_selection_seconds",
+      "cohort": "all available historical records",
+      "n": 5000,
+      "mean_seconds": 0.030997587301412523,
+      "p95_seconds": 0.0630760899006418,
+      "minimum_seconds": 0.0081153329992957,
+      "maximum_seconds": 0.298382249999122
+    },
+    {
+      "panel": "h",
+      "stage": "knottedgraph_yamada_seconds",
+      "cohort": "same completed and matched diagrams",
+      "n": 3491,
+      "mean_seconds": 0.0005715492374603902,
+      "p95_seconds": 0.0014591669987566499,
+      "minimum_seconds": 0.0001301250013057,
+      "maximum_seconds": 0.0137949160016432
+    },
+    {
+      "panel": "i",
+      "stage": "topoly_yamada_seconds",
+      "cohort": "same completed and matched diagrams",
+      "n": 3491,
+      "mean_seconds": 3.6348641902337375,
+      "p95_seconds": 10.794457104000685,
+      "minimum_seconds": 0.0004223749965603,
+      "maximum_seconds": 449.2821096249973
+    }
+  ]
+}

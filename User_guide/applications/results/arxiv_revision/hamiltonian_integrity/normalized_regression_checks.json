@@ -1,0 +1,17 @@
+{
+  "passed": [
+    "empty volume stays unsupported",
+    "boundary contact stays unsupported",
+    "positive b2 rejected",
+    "b2 included in Euler/Betti relation",
+    "graph cycle loss rejected",
+    "projection failure never abstract/point fallback",
+    "high-valence diagram metadata retained",
+    "unavailable cells excluded from phase coloring",
+    "raw labels unchanged with display filter off",
+    "failure cannot trigger terminal vertex row",
+    "no validated terminal preserves full requested energy range"
+  ],
+  "count": 11,
+  "notebook_sha256": "7dc8b7cd2612f668baeba296f47497bc0de3c32930939bcb5eddf9d1a41c5528"
+}

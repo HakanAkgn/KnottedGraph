@@ -52,6 +52,10 @@ class YamadaPhaseRecord:
     yamada: sp.Expr | None
     phase_signature: str
     error: str | None = None
+    evaluation_kind: str = "unrecorded"
+    projection: dict[str, Any] | None = None
+    normalization: str | None = None
+    is_subcubic: bool | None = None
 
 
 @dataclass
@@ -418,11 +422,12 @@ def make_yamada_phase_map(
             graph = nx.MultiGraph()
             yamada = None
             error = None
+            audit: dict[str, Any] = {}
             try:
                 graph = graph_factory(float(lam), float(parameter))
                 if graph_transform is not None:
                     graph = graph_transform(graph)
-                yamada = _compute_yamada(graph, variable, yamada_kwargs)
+                yamada, audit = _compute_yamada_audited(graph, variable, yamada_kwargs)
                 signature = _phase_signature(graph, yamada, None)
             except Exception as exc:
                 if not continue_on_error:
@@ -438,6 +443,10 @@ def make_yamada_phase_map(
                     yamada=yamada,
                     phase_signature=signature,
                     error=error,
+                    evaluation_kind=audit.get("evaluation_kind", "failed"),
+                    projection=audit.get("projection"),
+                    normalization=audit.get("normalization"),
+                    is_subcubic=max(dict(graph.degree()).values(), default=0) <= 3,
                     **_graph_summary(graph),
                 )
             )
@@ -463,6 +472,14 @@ def make_yamada_phase_map(
             "band_index": band_index if resolved_kind == "material" else None,
             "energy_tol": energy_tol if material_mode == "energy" else None,
             "force_genus_zero_vertex": force_genus_zero_vertex,
+            "normalize_yamada": bool(yamada_kwargs.get("normalize", True)),
+            "classification_scope": (
+                "Normalization is recorded per cell. Only normalized subcubic "
+                "values have the stated ambient-isotopy interpretation; raw or "
+                "higher-valence values refer to the recorded diagram. Equal "
+                "signatures do not establish embedding or handlebody equivalence. "
+                "Failed spatial evaluations are never replaced by abstract polynomials."
+            ),
         },
         _graph_factory=graph_factory if keep_factories else None,
         _object_factory=object_factory if keep_factories else None,
@@ -985,7 +1002,8 @@ def boundary_filling_groups(
 
 def _closed_genus_zero_interior(mask: np.ndarray) -> bool:
     topology = volume_topology(mask)
-    return topology.is_compact and topology.handle_rank == 0
+    return (topology.is_compact and topology.connected_components == 1
+            and topology.handle_rank == 0 and topology.enclosed_voids == 0)
 
 
 def _graph_from_skeleton_like(
@@ -1002,27 +1020,15 @@ def _graph_from_skeleton_like(
     try:
         graph = obj.skeleton_graph(**graph_options)
     except (EmbeddingValidationError, ValueError) as exc:
-        message = str(exc)
-        if "collapsed to fewer than two distinct points" in message:
-            retry_options = dict(graph_options)
-            retry_options["smooth_epsilon"] = 0
-            try:
-                graph = obj.skeleton_graph(**retry_options)
-            except (EmbeddingValidationError, ValueError):
-                return _one_vertex_graph()
-            if graph.number_of_edges() == 0:
-                return _one_vertex_graph()
-            return graph
-        if (
-            "graph has no edges" in message
-            or "skeleton image is empty" in message
-            or "does not contain any True voxels" in message
-            or "Skeletonization produced no points" in message
-        ):
-            return _one_vertex_graph()
-        raise
-    if graph.number_of_edges() == 0:
-        return _one_vertex_graph()
+        if "collapsed to fewer than two distinct points" not in str(exc):
+            raise
+        # Retry without geometric simplification, but preserve a second
+        # failure. An extraction failure does not establish a ball topology.
+        retry_options = dict(graph_options)
+        retry_options["smooth_epsilon"] = 0
+        graph = obj.skeleton_graph(**retry_options)
+    if graph.number_of_nodes() == 0:
+        raise ValueError("skeleton reconstruction produced an empty graph")
     return graph
 
 
@@ -1051,19 +1057,55 @@ def _compute_yamada(
     variable: sp.Symbol,
     yamada_options: dict[str, Any],
 ) -> sp.Expr:
-    from knotted_graph.invariants.yamada import compute_graph_yamada_polynomial
+    """Compute the requested spatial quantity, propagating projection failures.
 
+    The crossing-free graph polynomial is not an embedding-sensitive fallback.
+    Callers that continue after an error must record an unevaluated cell.
+    """
+    return _compute_yamada_audited(graph, variable, yamada_options)[0]
+
+
+def _compute_yamada_audited(
+    graph: nx.MultiGraph,
+    variable: sp.Symbol,
+    yamada_options: dict[str, Any],
+) -> tuple[sp.Expr, dict[str, Any]]:
+    """Return a spatial polynomial and its diagram/normalization provenance."""
     if graph.number_of_nodes() == 0:
         raise ValueError("cannot compute Yamada polynomial for an empty graph")
+    options = dict(yamada_options)
+    if options.pop("return_result", False):
+        raise ValueError("phase-map evaluations manage return_result internally")
+    normalized = bool(options.get("normalize", True))
+    subcubic = max(dict(graph.degree()).values(), default=0) <= 3
+    audit: dict[str, Any] = {
+        "evaluation_kind": "spatial-yamada" if subcubic else "diagram-yamada",
+        "normalization": "signed-minimum-degree-zero" if normalized else "raw",
+        "projection": None,
+        "is_subcubic": subcubic,
+    }
     if graph.number_of_edges() == 0:
-        return compute_graph_yamada_polynomial(graph, variable)
+        # Each isolated vertex contributes -1; no projection is needed.
+        return sp.Integer((-1) ** graph.number_of_nodes()), {
+            **audit, "evaluation_kind": "isolated-vertices"
+        }
 
     from knotted_graph.projection import compute_yamada_polynomial
 
-    try:
-        return compute_yamada_polynomial(graph, variable, **yamada_options)
-    except Exception:
-        return compute_graph_yamada_polynomial(graph, variable)
+    result = compute_yamada_polynomial(graph, variable, return_result=True, **options)
+    if hasattr(result, "projection"):
+        projection = result.projection
+        audit["projection"] = {
+            "rotation_angles": projection.rotation_angles,
+            "rotation_order": projection.rotation_order,
+            "num_crossings": projection.num_crossings,
+            "pd_code": projection.pd_code,
+        }
+        return result.polynomial, audit
+    # A custom evaluator/test double can return an expression without a diagram.
+    # Do not fabricate projection metadata in that case.
+    audit["evaluation_kind"] = "custom-yamada-without-projection"
+    return sp.sympify(result), audit
 
 
 def _phase_signature(
@@ -1076,7 +1118,8 @@ def _phase_signature(
             canonical = sp.factor(sp.together(sp.expand(yamada)))
         except Exception:
             canonical = sp.expand(yamada)
-        return "yamada:" + sp.srepr(canonical)
+        prefix = "yamada:" if max(dict(graph.degree()).values(), default=0) <= 3 else "diagram-yamada:"
+        return prefix + sp.srepr(canonical)
     if error is not None:
         return "error:" + error
     return "graph:" + repr(tuple(_graph_summary(graph).values()))

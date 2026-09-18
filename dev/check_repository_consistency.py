@@ -26,6 +26,7 @@ STALE_TEXT = {
 
 GENERATED_PATHS = {
     "doc/_build/",
+    "doc/assets/demos/new_phase_maps/",
     "site_preview/",
 }
 
@@ -135,6 +136,16 @@ def resolve_repo_link(source: Path, target: str) -> Path | None:
         asset_candidate = ROOT / "doc" / "assets" / stripped
         if asset_candidate.exists():
             return asset_candidate
+        # Sphinx generates these four outputs from pinned tracked inputs.
+        # Validate their source files in a fresh checkout without requiring a
+        # documentation build; unknown generated filenames remain failures.
+        parts = Path(stripped).parts
+        if len(parts) == 4 and parts[:2] == ("demos", "new_phase_maps"):
+            demo = runpy.run_path(str(ROOT / "dev/build_phase_map_demos.py"))
+            entry = demo["SOURCES"].get(parts[2])
+            if entry and parts[3] in {"index.html", "preview.png"}:
+                relative = entry[0] if parts[3] == "index.html" else entry[2]
+                return demo["REFERENCE"] / relative
 
     return candidate
 

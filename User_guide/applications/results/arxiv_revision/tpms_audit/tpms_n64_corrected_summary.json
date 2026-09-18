@@ -1,0 +1,2484 @@
+{
+  "records_path": "/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/Knotted_graph_code_paper/KnottedGraph_arxiv_revision/_build/arxiv_revision/tpms_n64/tpms_parameter_phase_map_records.json",
+  "records_sha256": "b4a8dc6c4feb8905f2c17e8b0567f5a9112135e537f85f764e5af45c0bf09eb2",
+  "filter_source_path": "/Users/hakanakgun/Desktop/Projects/ProfLeeProjects/Knotted_graph_code_paper/KnottedGraph_arxiv_revision/src/knotted_graph/applications/phase_map_examples/_tpms.py",
+  "filter_source_sha256": "70138fdad96d100644ddfdac62319654fa1f0b0b3aa5823fb778c70e691d3658",
+  "scope": "Operational raw signatures; equality is not embedding equivalence. Beta matching is necessary, not a spine proof. Filter is a display operation and cannot resolve failures.",
+  "aggregate": {
+    "cells": 1323,
+    "source_counts": {
+      "diagram-yamada": 51,
+      "error": 74,
+      "large-core": 636,
+      "yamada": 562
+    },
+    "scope_counts": {
+      "abstract-graph-summary": 636,
+      "fixed-diagram-polynomial": 51,
+      "subcubic-normalized-yamada": 562,
+      "unresolved-error": 74
+    },
+    "source_unique_signature_counts": {
+      "diagram-yamada": 22,
+      "error": 1,
+      "large-core": 81,
+      "yamada": 3
+    },
+    "raw_signature_count_including_errors": 107,
+    "raw_signature_count_excluding_source_errors": 106,
+    "raw_signature_count_excluding_any_error": 106,
+    "subcubic_normalized_polynomial_cells": 562,
+    "subcubic_normalized_distinct_polynomials": 3,
+    "fixed_diagram_polynomial_cells": 51,
+    "fixed_diagram_distinct_polynomials": 22,
+    "classification_error_cells": 74,
+    "any_error_cells": 74,
+    "error_messages": {
+      "ValueError: volume has enclosed voids; a single graph is not a spine": 74
+    },
+    "cavity_positive_cells": 74,
+    "cavity_positive_total_voids": 145,
+    "cavity_cells": [
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.75,
+        "c": 0.15,
+        "void_components": 10,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.4,
+        "c": 0.18,
+        "void_components": 3,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.21,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.22499999999999998,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.24,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.255,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.27,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.285,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.3,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.105,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.12,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.135,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.15,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.16499999999999998,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.18,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.195,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.21,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.22499999999999998,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.24,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.255,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.27,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.285,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.3,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.015,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.03,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.045,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.06,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.075,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.09,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.105,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.12,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.135,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.15,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.16499999999999998,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.18,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.195,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.21,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.22499999999999998,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.24,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.255,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.27,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.285,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.3,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.09,
+        "void_components": 13,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.105,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.12,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.135,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.15,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.16499999999999998,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.18,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.195,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.21,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.22499999999999998,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.24,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.255,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.27,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.285,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.3,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.16499999999999998,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.18,
+        "void_components": 13,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.195,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.21,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.22499999999999998,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.24,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.255,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.27,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.285,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.3,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.65,
+        "c": 0.24,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.65,
+        "c": 0.255,
+        "void_components": 13,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.65,
+        "c": 0.27,
+        "void_components": 13,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.65,
+        "c": 0.285,
+        "void_components": 13,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.65,
+        "c": 0.3,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.7000000000000001,
+        "c": 0.3,
+        "void_components": 1,
+        "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+      }
+    ],
+    "remaining_nonvoid_classification_errors": [],
+    "b0_mismatches_in_returned_graphs": [
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.75,
+        "c": 0.15,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.4,
+        "c": 0.18,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.21,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.22499999999999998,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.24,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.255,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.27,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.285,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.4,
+        "c": 0.3,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.105,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.12,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.135,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.15,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.16499999999999998,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.18,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.195,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.21,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.22499999999999998,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.24,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.255,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.27,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.285,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.45,
+        "c": 0.3,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.015,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.03,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.045,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.06,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.075,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.09,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.105,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.12,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.135,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.15,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.16499999999999998,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.18,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.195,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.21,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.22499999999999998,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.24,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.255,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.27,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.285,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.5,
+        "c": 0.3,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.09,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.105,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.12,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.135,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.15,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.16499999999999998,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.18,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.195,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.21,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.22499999999999998,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.24,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.255,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.27,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.285,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.55,
+        "c": 0.3,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.16499999999999998,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.18,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.195,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.21,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.22499999999999998,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.24,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.255,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.27,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.285,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.6000000000000001,
+        "c": 0.3,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.65,
+        "c": 0.24,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.65,
+        "c": 0.255,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.65,
+        "c": 0.27,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.65,
+        "c": 0.285,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.65,
+        "c": 0.3,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      },
+      {
+        "family": "schwarz_p_to_diamond",
+        "lambda": 0.7000000000000001,
+        "c": 0.3,
+        "source": "error",
+        "mask": 1,
+        "graph": 0
+      }
+    ],
+    "b1_mismatches_in_returned_graphs": [
+      {
+        "family": "gyroid_to_diamond",
+        "lambda": 0.75,
+        "c": 0.15,
+        "source": "error",
+        "mask": 7,
+        "graph": 0
+      },
+      {
+        "family": "gyroid_to_schwarz_p",
+        "lambda": 0.4,
+        "c": 0.18,
+        "source": "error",
+        "mask": 5,
+        "graph": 0
+      }
+    ],
+    "successful_cells_b0_mismatch_count": 0,
+    "successful_cells_b1_mismatch_count": 0,
+    "component_validation_unreached_cells": 74,
+    "classification_computed_flag_false_cells": 0,
+    "closed_surface_cells": 1323,
+    "open_surface_cells": 0,
+    "box_boundary_touch_cells": 0,
+    "evaluation_kind_counts": {
+      "diagram-yamada": 51,
+      "failed": 74,
+      "not-evaluated": 636,
+      "spatial-yamada": 562
+    },
+    "exact_yamada_attempted_cells": 613,
+    "zero_polynomial_cells": []
+  },
+  "families": {
+    "gyroid_to_diamond": {
+      "cells": 441,
+      "source_counts": {
+        "diagram-yamada": 44,
+        "error": 1,
+        "large-core": 274,
+        "yamada": 122
+      },
+      "scope_counts": {
+        "abstract-graph-summary": 274,
+        "fixed-diagram-polynomial": 44,
+        "subcubic-normalized-yamada": 122,
+        "unresolved-error": 1
+      },
+      "source_unique_signature_counts": {
+        "diagram-yamada": 19,
+        "error": 1,
+        "large-core": 55,
+        "yamada": 3
+      },
+      "raw_signature_count_including_errors": 78,
+      "raw_signature_count_excluding_source_errors": 77,
+      "raw_signature_count_excluding_any_error": 77,
+      "subcubic_normalized_polynomial_cells": 122,
+      "subcubic_normalized_distinct_polynomials": 3,
+      "fixed_diagram_polynomial_cells": 44,
+      "fixed_diagram_distinct_polynomials": 19,
+      "classification_error_cells": 1,
+      "any_error_cells": 1,
+      "error_messages": {
+        "ValueError: volume has enclosed voids; a single graph is not a spine": 1
+      },
+      "cavity_positive_cells": 1,
+      "cavity_positive_total_voids": 10,
+      "cavity_cells": [
+        {
+          "family": "gyroid_to_diamond",
+          "lambda": 0.75,
+          "c": 0.15,
+          "void_components": 10,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        }
+      ],
+      "remaining_nonvoid_classification_errors": [],
+      "b0_mismatches_in_returned_graphs": [
+        {
+          "family": "gyroid_to_diamond",
+          "lambda": 0.75,
+          "c": 0.15,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        }
+      ],
+      "b1_mismatches_in_returned_graphs": [
+        {
+          "family": "gyroid_to_diamond",
+          "lambda": 0.75,
+          "c": 0.15,
+          "source": "error",
+          "mask": 7,
+          "graph": 0
+        }
+      ],
+      "successful_cells_b0_mismatch_count": 0,
+      "successful_cells_b1_mismatch_count": 0,
+      "component_validation_unreached_cells": 1,
+      "classification_computed_flag_false_cells": 0,
+      "closed_surface_cells": 441,
+      "open_surface_cells": 0,
+      "box_boundary_touch_cells": 0,
+      "evaluation_kind_counts": {
+        "diagram-yamada": 44,
+        "failed": 1,
+        "not-evaluated": 274,
+        "spatial-yamada": 122
+      },
+      "exact_yamada_attempted_cells": 166,
+      "zero_polynomial_cells": []
+    },
+    "gyroid_to_schwarz_p": {
+      "cells": 441,
+      "source_counts": {
+        "diagram-yamada": 7,
+        "error": 1,
+        "large-core": 183,
+        "yamada": 250
+      },
+      "scope_counts": {
+        "abstract-graph-summary": 183,
+        "fixed-diagram-polynomial": 7,
+        "subcubic-normalized-yamada": 250,
+        "unresolved-error": 1
+      },
+      "source_unique_signature_counts": {
+        "diagram-yamada": 3,
+        "error": 1,
+        "large-core": 22,
+        "yamada": 2
+      },
+      "raw_signature_count_including_errors": 28,
+      "raw_signature_count_excluding_source_errors": 27,
+      "raw_signature_count_excluding_any_error": 27,
+      "subcubic_normalized_polynomial_cells": 250,
+      "subcubic_normalized_distinct_polynomials": 2,
+      "fixed_diagram_polynomial_cells": 7,
+      "fixed_diagram_distinct_polynomials": 3,
+      "classification_error_cells": 1,
+      "any_error_cells": 1,
+      "error_messages": {
+        "ValueError: volume has enclosed voids; a single graph is not a spine": 1
+      },
+      "cavity_positive_cells": 1,
+      "cavity_positive_total_voids": 3,
+      "cavity_cells": [
+        {
+          "family": "gyroid_to_schwarz_p",
+          "lambda": 0.4,
+          "c": 0.18,
+          "void_components": 3,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        }
+      ],
+      "remaining_nonvoid_classification_errors": [],
+      "b0_mismatches_in_returned_graphs": [
+        {
+          "family": "gyroid_to_schwarz_p",
+          "lambda": 0.4,
+          "c": 0.18,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        }
+      ],
+      "b1_mismatches_in_returned_graphs": [
+        {
+          "family": "gyroid_to_schwarz_p",
+          "lambda": 0.4,
+          "c": 0.18,
+          "source": "error",
+          "mask": 5,
+          "graph": 0
+        }
+      ],
+      "successful_cells_b0_mismatch_count": 0,
+      "successful_cells_b1_mismatch_count": 0,
+      "component_validation_unreached_cells": 1,
+      "classification_computed_flag_false_cells": 0,
+      "closed_surface_cells": 441,
+      "open_surface_cells": 0,
+      "box_boundary_touch_cells": 0,
+      "evaluation_kind_counts": {
+        "diagram-yamada": 7,
+        "failed": 1,
+        "not-evaluated": 183,
+        "spatial-yamada": 250
+      },
+      "exact_yamada_attempted_cells": 257,
+      "zero_polynomial_cells": []
+    },
+    "schwarz_p_to_diamond": {
+      "cells": 441,
+      "source_counts": {
+        "error": 72,
+        "large-core": 179,
+        "yamada": 190
+      },
+      "scope_counts": {
+        "abstract-graph-summary": 179,
+        "subcubic-normalized-yamada": 190,
+        "unresolved-error": 72
+      },
+      "source_unique_signature_counts": {
+        "error": 1,
+        "large-core": 13,
+        "yamada": 1
+      },
+      "raw_signature_count_including_errors": 15,
+      "raw_signature_count_excluding_source_errors": 14,
+      "raw_signature_count_excluding_any_error": 14,
+      "subcubic_normalized_polynomial_cells": 190,
+      "subcubic_normalized_distinct_polynomials": 1,
+      "fixed_diagram_polynomial_cells": 0,
+      "fixed_diagram_distinct_polynomials": 0,
+      "classification_error_cells": 72,
+      "any_error_cells": 72,
+      "error_messages": {
+        "ValueError: volume has enclosed voids; a single graph is not a spine": 72
+      },
+      "cavity_positive_cells": 72,
+      "cavity_positive_total_voids": 132,
+      "cavity_cells": [
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.21,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.22499999999999998,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.24,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.255,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.27,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.285,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.3,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.105,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.12,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.135,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.15,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.16499999999999998,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.18,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.195,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.21,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.22499999999999998,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.24,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.255,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.27,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.285,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.3,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.015,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.03,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.045,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.06,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.075,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.09,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.105,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.12,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.135,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.15,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.16499999999999998,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.18,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.195,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.21,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.22499999999999998,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.24,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.255,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.27,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.285,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.3,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.09,
+          "void_components": 13,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.105,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.12,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.135,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.15,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.16499999999999998,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.18,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.195,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.21,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.22499999999999998,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.24,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.255,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.27,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.285,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.3,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.16499999999999998,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.18,
+          "void_components": 13,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.195,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.21,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.22499999999999998,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.24,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.255,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.27,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.285,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.3,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.65,
+          "c": 0.24,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.65,
+          "c": 0.255,
+          "void_components": 13,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.65,
+          "c": 0.27,
+          "void_components": 13,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.65,
+          "c": 0.285,
+          "void_components": 13,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.65,
+          "c": 0.3,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.7000000000000001,
+          "c": 0.3,
+          "void_components": 1,
+          "error": "ValueError: volume has enclosed voids; a single graph is not a spine"
+        }
+      ],
+      "remaining_nonvoid_classification_errors": [],
+      "b0_mismatches_in_returned_graphs": [
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.21,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.22499999999999998,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.24,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.255,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.27,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.285,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.4,
+          "c": 0.3,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.105,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.12,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.135,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.15,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.16499999999999998,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.18,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.195,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.21,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.22499999999999998,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.24,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.255,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.27,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.285,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.45,
+          "c": 0.3,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.015,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.03,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.045,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.06,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.075,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.09,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.105,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.12,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.135,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.15,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.16499999999999998,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.18,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.195,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.21,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.22499999999999998,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.24,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.255,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.27,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.285,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.5,
+          "c": 0.3,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.09,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.105,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.12,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.135,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.15,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.16499999999999998,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.18,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.195,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.21,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.22499999999999998,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.24,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.255,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.27,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.285,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.55,
+          "c": 0.3,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.16499999999999998,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.18,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.195,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.21,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.22499999999999998,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.24,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.255,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.27,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.285,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.6000000000000001,
+          "c": 0.3,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.65,
+          "c": 0.24,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.65,
+          "c": 0.255,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.65,
+          "c": 0.27,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.65,
+          "c": 0.285,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.65,
+          "c": 0.3,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        },
+        {
+          "family": "schwarz_p_to_diamond",
+          "lambda": 0.7000000000000001,
+          "c": 0.3,
+          "source": "error",
+          "mask": 1,
+          "graph": 0
+        }
+      ],
+      "b1_mismatches_in_returned_graphs": [],
+      "successful_cells_b0_mismatch_count": 0,
+      "successful_cells_b1_mismatch_count": 0,
+      "component_validation_unreached_cells": 72,
+      "classification_computed_flag_false_cells": 0,
+      "closed_surface_cells": 441,
+      "open_surface_cells": 0,
+      "box_boundary_touch_cells": 0,
+      "evaluation_kind_counts": {
+        "failed": 72,
+        "not-evaluated": 179,
+        "spatial-yamada": 190
+      },
+      "exact_yamada_attempted_cells": 190,
+      "zero_polynomial_cells": []
+    }
+  }
+}

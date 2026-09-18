@@ -36,7 +36,7 @@ from collections import Counter, deque
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Iterable
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -52,9 +52,10 @@ from ._runtime import package_location
 
 from knotted_graph.applications.phase_maps import (  # noqa: E402
     _closed_genus_zero_interior,
-    _compute_yamada,
+    _compute_yamada_audited,
     _graph_summary,
     _one_vertex_graph,
+    volume_topology,
 )
 from knotted_graph.core import (  # noqa: E402
     is_trivalent,
@@ -235,6 +236,13 @@ class PhaseCell:
     surface_seconds: float
     total_seconds: float
     error: str | None = None
+    evaluation_kind: str = "unrecorded"
+    normalization: str | None = None
+    projection: dict[str, Any] | None = None
+    is_subcubic: bool | None = None
+    classification_computed: bool = True
+    component_count_matches: bool | None = None
+    void_components: int = 0
 
 
 class ImplicitSolidRegion:
@@ -318,7 +326,14 @@ class ImplicitSolidRegion:
             return self.skeleton_graph_cache
 
         if skeleton_image is None:
-            graph = skeleton_image_to_graph(self._skeleton_image)
+            topology = volume_topology(self._interior_mask)
+            if topology.enclosed_voids:
+                raise ValueError("volume has enclosed voids; a single graph is not a spine")
+            graph = skeleton_image_to_graph(
+                self._skeleton_image,
+                expected_cycle_rank=topology.handle_rank,
+                expected_components=topology.connected_components,
+            )
         elif isinstance(skeleton_image, (nx.Graph, nx.MultiGraph)):
             graph = (
                 skeleton_image
@@ -330,7 +345,8 @@ class ImplicitSolidRegion:
 
         if simplify:
             graph = remove_leaf_nodes(graph)
-            graph = simplify_edges(graph)
+            if graph.number_of_edges():
+                graph = simplify_edges(graph)
 
         if force_small_edge_contraction and small_edge_limit > 0:
             from knotted_graph.core import contract_short_edges
@@ -341,7 +357,8 @@ class ImplicitSolidRegion:
                 copy=False,
             )
 
-        graph = smooth_edges(graph, epsilon=float(smooth_epsilon), copy=False)
+        if graph.number_of_edges():
+            graph = smooth_edges(graph, epsilon=float(smooth_epsilon), copy=False)
         graph.graph["is_trivalent"] = is_trivalent(graph)
         self.skeleton_graph_cache = graph
         self.skeleton_graph_cache_args = args
@@ -574,6 +591,7 @@ def interior_summary(mask: np.ndarray) -> dict[str, Any]:
     mask = np.asarray(mask, dtype=bool)
     if not mask.any():
         return {
+            "void_components": 0,
             "interior_voxels": 0,
             "interior_fraction": 0.0,
             "interior_components": 0,
@@ -584,9 +602,11 @@ def interior_summary(mask: np.ndarray) -> dict[str, Any]:
         }
     _, component_count = label_volume(mask, connectivity=3, return_num=True)
     euler = int(euler_number(mask, connectivity=3))
-    handle_rank = max(0, int(component_count) - euler)
+    topology = volume_topology(mask)
+    handle_rank = topology.handle_rank
     faces = boundary_faces(mask)
     return {
+        "void_components": int(topology.enclosed_voids),
         "interior_voxels": int(mask.sum()),
         "interior_fraction": float(mask.mean()),
         "interior_components": int(component_count),
@@ -641,9 +661,11 @@ def graph_signature(
 
 def short_signature_label(signature: str, source: str, polynomial: str) -> str:
     if source == "vertex":
-        return "one-vertex Y=-1"
+        return f"isolated vertices; Yamada {polynomial}"
     if source == "yamada":
         return f"Yamada {polynomial}"
+    if source == "diagram-yamada":
+        return f"fixed-diagram Yamada {polynomial}"
     if source == "large-core":
         chunks = dict(
             part.split("=", 1)
@@ -741,7 +763,7 @@ def graph_geometry(
         nodes.append(
             {
                 "id": str(node),
-                "index_pos": pos.round(6).tolist(),
+                "index_pos": pos.tolist(),
                 "coord": region.idx_to_world(pos).round(6).tolist(),
             }
         )
@@ -758,7 +780,8 @@ def graph_geometry(
                 "u": str(u),
                 "v": str(v),
                 "key": str(key),
-                "points_index": downsample_polyline(pts, max_edge_points),
+                "points_index": pts.tolist(),
+                "display_downsampled": bool(len(pts) > max_edge_points),
                 "points_coord": downsample_polyline(
                     region.idx_to_world(pts),
                     max_edge_points,
@@ -768,6 +791,7 @@ def graph_geometry(
         )
 
     return {
+        "geometry_role": "full-index-polylines-with-display-world-coordinates",
         "nodes": nodes,
         "edges": edges,
         "node_count": int(graph.number_of_nodes()),
@@ -892,86 +916,72 @@ def evaluate_cell(
     attempted = False
     error = None
 
+    audit: dict[str, Any] = {}
+    skeleton_voxels = 0
+    component_count_matches = None
     try:
         t0 = time.perf_counter()
         if _closed_genus_zero_interior(mask):
             graph = _one_vertex_graph()
-            skeleton_voxels = 0
+            graph.nodes[0]["pos"] = np.argwhere(mask).mean(axis=0)
             skeleton_seconds = time.perf_counter() - t0
-            summary = _graph_summary(graph)
-            polynomial = "-1"
-            signature = "yamada:-1"
-            source = "vertex"
-            attempted = True
         else:
             _ = region._skeleton_image
             skeleton_voxels = int(np.sum(region._skeleton_image))
             skeleton_seconds = time.perf_counter() - t0
-
             t0 = time.perf_counter()
-            graph = region.skeleton_graph(
-                smooth_epsilon=0,
-                simplify=True,
-            )
+            graph = region.skeleton_graph(smooth_epsilon=0, simplify=True)
             graph_seconds = time.perf_counter() - t0
-            summary = _graph_summary(graph)
-
-            if graph.number_of_edges() == 0:
-                graph = _one_vertex_graph()
-                summary = _graph_summary(graph)
-                polynomial = "-1"
-                signature = "yamada:-1"
-                source = "vertex"
-                attempted = True
-            elif graph.number_of_edges() <= max_exact_yamada_edges:
-                attempted = True
-                t0 = time.perf_counter()
-                polynomial_expr = _compute_yamada(graph, Y, {"normalize": True})
-                polynomial, signature = canonical_yamada_string(polynomial_expr)
-                yamada_seconds = time.perf_counter() - t0
-                source = "yamada"
+        summary = _graph_summary(graph)
+        component_count_matches = summary["components"] == interior["interior_components"]
+        if not component_count_matches:
+            raise ValueError(
+                "reconstruction component mismatch: "
+                f"volume={interior['interior_components']}, graph={summary['components']}"
+            )
+        if graph.number_of_nodes() == 0:
+            raise ValueError("reconstruction produced an empty graph")
+        if interior["void_components"]:
+            raise ValueError("volume has enclosed voids; a single graph is not a spine")
+        if summary["cycle_rank"] != interior["handle_rank"]:
+            raise ValueError(
+                "reconstruction cycle-rank mismatch: "
+                f"volume={interior['handle_rank']}, graph={summary['cycle_rank']}"
+            )
+        if graph.number_of_edges() <= max_exact_yamada_edges:
+            attempted = True
+            t0 = time.perf_counter()
+            polynomial_expr, audit = _compute_yamada_audited(graph, Y, {"normalize": True})
+            polynomial, signature = canonical_yamada_string(polynomial_expr)
+            yamada_seconds = time.perf_counter() - t0
+            if not audit["is_subcubic"]:
+                signature = signature.replace("yamada:", "diagram-yamada:", 1)
+                source = "diagram-yamada"
             else:
-                signature = graph_signature(summary, interior, graph)
-                source = "large-core"
+                source = "vertex" if graph.number_of_edges() == 0 else "yamada"
+        else:
+            signature = graph_signature(summary, interior, graph)
+            source = "large-core"
+    except Exception as exc:
+        # Preserve the actual graph and failure, never invent a genus-zero
+        # vertex or substitute a crossing-free polynomial after an error.
+        summary = _graph_summary(graph)
+        polynomial = ""
+        signature = "error:" + type(exc).__name__ + ":" + str(exc)[:120]
+        source = "error"
+        error = type(exc).__name__ + ": " + str(exc)[:240]
 
-        t0 = time.perf_counter()
+    t0 = time.perf_counter()
+    try:
         surface_stats, surface_sample = surface_stats_and_sample(
-            compact_values,
-            0.0,
+            compact_values, 0.0,
             spacing=region.spacing * region.axis_scale,
             origin=region.origin,
             max_sample_points=max_surface_sample_points,
         )
-        surface_seconds = time.perf_counter() - t0
-
     except Exception as exc:
-        message = str(exc)
-        graph = _one_vertex_graph()
-        summary = _graph_summary(graph)
-        skeleton_voxels = (
-            int(np.sum(region.__dict__.get("_skeleton_image", np.zeros(1))))
-            if "_skeleton_image" in region.__dict__
-            else 0
-        )
-        if any(
-            text in message
-            for text in (
-                "graph has no edges",
-                "skeleton image is empty",
-                "does not contain any True voxels",
-                "Skeletonization produced no points",
-                "collapsed to fewer than two distinct points",
-            )
-        ):
-            polynomial = "-1"
-            signature = "yamada:-1"
-            source = "vertex"
-            attempted = True
-        else:
-            polynomial = ""
-            signature = "error:" + type(exc).__name__ + ":" + message[:120]
-            source = "error"
-            error = type(exc).__name__ + ": " + message[:240]
+        error = error or "surface:" + type(exc).__name__ + ": " + str(exc)[:200]
+    surface_seconds = time.perf_counter() - t0
 
     geometry_path = (
         output_dir
@@ -1043,6 +1053,12 @@ def evaluate_cell(
         surface_seconds=float(surface_seconds),
         total_seconds=float(total_seconds),
         error=error,
+        evaluation_kind=audit.get("evaluation_kind", "failed" if source == "error" else "not-evaluated"),
+        normalization=audit.get("normalization"),
+        projection=audit.get("projection"),
+        is_subcubic=max(dict(graph.degree()).values(), default=0) <= 3,
+        classification_computed=True,
+        component_count_matches=component_count_matches,
         **interior,
     )
 
@@ -1125,35 +1141,55 @@ def stable_labels(
     labels: np.ndarray,
     *,
     min_cells: int,
+    protected_labels: Iterable[int] = (),
 ) -> tuple[np.ndarray, int]:
-    if min_cells <= 1:
-        return labels.copy(), 0
+    """Optional display-only filtering; never evidence of topological equivalence.
+
+    In each of at most three synchronous passes, a four-connected component
+    smaller than ``min_cells`` can join an adjacent component already at least
+    that size. Boundary contacts supply votes; a tied maximum leaves the small
+    component unchanged. Protected labels are neither changed nor recipients.
+    This rule is invariant under renaming label IDs. Return distinct changed
+    cells relative to the input, not the number of intermediate assignments.
+    """
     stable = labels.copy()
-    changed_cells = 0
+    if min_cells <= 1:
+        return stable, 0
+    protected = {int(value) for value in protected_labels}
     for _ in range(3):
-        changed = False
+        large = np.zeros(stable.shape, dtype=bool)
+        components = []
         for phase_id in sorted(set(int(v) for v in stable.ravel())):
+            if phase_id in protected:
+                continue
             for component in connected_components_for_label(stable, phase_id):
                 if len(component) >= min_cells:
-                    continue
-                neighbor_counts: Counter[int] = Counter()
-                for i, j in component:
-                    for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                        ni, nj = i + di, j + dj
-                        if 0 <= ni < stable.shape[0] and 0 <= nj < stable.shape[1]:
-                            neighbor = int(stable[ni, nj])
-                            if neighbor != phase_id:
-                                neighbor_counts[neighbor] += 1
-                if not neighbor_counts:
-                    continue
-                replacement = neighbor_counts.most_common(1)[0][0]
-                for i, j in component:
-                    stable[i, j] = replacement
-                    changed_cells += 1
-                changed = True
-        if not changed:
+                    for i, j in component:
+                        large[i, j] = True
+                else:
+                    components.append((phase_id, component))
+        updated = stable.copy()
+        for phase_id, component in components:
+            neighbor_counts: Counter[int] = Counter()
+            for i, j in component:
+                for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    ni, nj = i + di, j + dj
+                    if 0 <= ni < stable.shape[0] and 0 <= nj < stable.shape[1]:
+                        neighbor = int(stable[ni, nj])
+                        if large[ni, nj] and neighbor != phase_id:
+                            neighbor_counts[neighbor] += 1
+            if not neighbor_counts:
+                continue
+            maximum = max(neighbor_counts.values())
+            winners = [k for k, count in neighbor_counts.items() if count == maximum]
+            if len(winners) != 1:
+                continue
+            for i, j in component:
+                updated[i, j] = winners[0]
+        if np.array_equal(updated, stable):
             break
-    return stable, changed_cells
+        stable = updated
+    return stable, int(np.count_nonzero(stable != labels))
 
 
 def phase_grid(
@@ -1806,6 +1842,15 @@ def build_source_data(
             "convention": family.convention,
             "raw_grid": raw_by_family[family.key].astype(int).tolist(),
             "stable_grid": stable_by_family[family.key].astype(int).tolist(),
+            "display_reassigned_mask": (
+                stable_by_family[family.key] != raw_by_family[family.key]
+            ).tolist(),
+            "display_filter_role": "visualization only; raw_grid is the classification record",
+            "display_filter_rule": (
+                "at most 3 synchronous passes; four-connected components; "
+                "unique boundary-contact plurality among adjacent large components; "
+                "ties unchanged; errors protected"
+            ),
             "phase_labels": {
                 str(key): value for key, value in labels_by_family[family.key].items()
             },
@@ -1919,6 +1964,8 @@ def main(argv: list[str] | None = None) -> None:
         stable_grid, changed_cells = stable_labels(
             raw_grid,
             min_cells=int(args.min_stable_cells),
+            protected_labels={signature_to_id[r.phase_signature]
+                              for r in records if r.source == "error"},
         )
         records_by_family[family.key] = records
         raw_by_family[family.key] = raw_grid

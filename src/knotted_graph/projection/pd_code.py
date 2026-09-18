@@ -440,37 +440,35 @@ class PDCode:
             self.arcs[arc.id] = arc
             self._update_incidences(arc)
 
+    @staticmethod
+    def _endpoint_angle(arc: Arc, *, start: bool) -> float:
+        """Find a local projected direction, ignoring roundoff duplicate points.
+
+        ``substring`` can insert an interpolated endpoint immediately next to
+        the same original polyline sample.  Their difference then measures
+        floating-point noise, not the incident half-edge direction.  Use the
+        arc endpoint itself and the first numerically distinct sample; using
+        the shared crossing point would introduce another subtraction error.
+        """
+        coords = np.asarray(arc.line.coords, dtype=float)[:, :2]
+        if not start:
+            coords = coords[::-1]
+        roundoff = 64.0 * np.finfo(float).eps * max(1.0, float(np.abs(coords).max()))
+        for other in coords[1:]:
+            delta = other - coords[0]
+            if float(np.linalg.norm(delta)) > roundoff:
+                return float(np.arctan2(delta[1], delta[0]))
+        raise ValueError("Nongeneric projection: arc has no resolved endpoint direction.")
+
     def _update_incidences(self, arc: Arc) -> None:
-        def angle_from(base_point, other_coords):
-            dx = other_coords[0] - base_point.x
-            dy = other_coords[1] - base_point.y
-            return float(np.arctan2(dy, dx))
-
-        if arc.start_type == "v":
-            vertex_pt = self.vertices[arc.start_id].point
-            self.vertices[arc.start_id].add_incident_arc(
-                arc.id,
-                angle_from(vertex_pt, arc.line.coords[1]),
-            )
-        else:
-            crossing_pt = self.crossings[arc.start_id].point
-            self.crossings[arc.start_id].add_incident_arc(
-                arc.id,
-                angle_from(crossing_pt, arc.line.coords[1]),
-            )
-
-        if arc.end_type == "v":
-            vertex_pt = self.vertices[arc.end_id].point
-            self.vertices[arc.end_id].add_incident_arc(
-                arc.id,
-                angle_from(vertex_pt, arc.line.coords[-2]),
-            )
-        else:
-            crossing_pt = self.crossings[arc.end_id].point
-            self.crossings[arc.end_id].add_incident_arc(
-                arc.id,
-                angle_from(crossing_pt, arc.line.coords[-2]),
-            )
+        start = self.vertices if arc.start_type == "v" else self.crossings
+        end = self.vertices if arc.end_type == "v" else self.crossings
+        start[arc.start_id].add_incident_arc(
+            arc.id, self._endpoint_angle(arc, start=True),
+        )
+        end[arc.end_id].add_incident_arc(
+            arc.id, self._endpoint_angle(arc, start=False),
+        )
 
     @staticmethod
     def _angular_distance(a: float, b: float) -> float:
@@ -483,27 +481,16 @@ class PDCode:
         incidence_angle: float,
     ) -> float:
         """Return z for a specific half-edge incidence at a crossing."""
-        crossing_pt = self.crossings[xid].point
         candidates: list[tuple[float, float]] = []
 
         if arc.start_type == "x" and arc.start_id == xid:
             coords = arc.line.coords
-            angle = float(
-                np.arctan2(
-                    coords[1][1] - crossing_pt.y,
-                    coords[1][0] - crossing_pt.x,
-                )
-            )
+            angle = self._endpoint_angle(arc, start=True)
             candidates.append((angle, float(coords[0][2])))
 
         if arc.end_type == "x" and arc.end_id == xid:
             coords = arc.line.coords
-            angle = float(
-                np.arctan2(
-                    coords[-2][1] - crossing_pt.y,
-                    coords[-2][0] - crossing_pt.x,
-                )
-            )
+            angle = self._endpoint_angle(arc, start=False)
             candidates.append((angle, float(coords[-1][2])))
 
         if not candidates:
@@ -760,8 +747,8 @@ def compute_yamada_polynomial(
         Three Euler angles in degrees. If ``None``, sample
         ``num_rotation_samples`` viewing directions.
     rotation_order
-        Three-character Euler-axis sequence. Use uppercase for extrinsic
-        rotations (for example ``"ZYX"``) or lowercase for intrinsic rotations
+        Three-character Euler-axis sequence. Use uppercase for intrinsic
+        rotations (for example ``"ZYX"``) or lowercase for extrinsic rotations
         (for example ``"xyz"``).
     num_rotation_samples
         Positive integer number of candidate projections considered when

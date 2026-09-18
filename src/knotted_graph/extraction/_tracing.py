@@ -88,6 +88,33 @@ def trace_component(
     if len(coords) == 0:
         return nx.MultiGraph()
 
+    # A connected acyclic skeleton needs no junction-zone contraction. Trace
+    # only its degree-2 chains, retaining all polyline samples and every
+    # component (including one- and two-voxel satellites).
+    if sum(map(len, adjacency)) == 2 * (len(coords) - 1):
+        graph = nx.MultiGraph()
+        terminals = {i for i, row in enumerate(adjacency) if len(row) != 2}
+        for i in sorted(terminals):
+            graph.add_node(i, pos=coords[i].astype(float, copy=True))
+        visited = set()
+        for start in sorted(terminals):
+            for neighbour in adjacency[start]:
+                first = tuple(sorted((start, neighbour)))
+                if first in visited:
+                    continue
+                path = [start, neighbour]
+                visited.add(first)
+                previous, current = start, neighbour
+                while current not in terminals:
+                    nxt = next(j for j in adjacency[current] if j != previous)
+                    visited.add(tuple(sorted((current, nxt))))
+                    path.append(nxt)
+                    previous, current = current, nxt
+                points = coords[path].astype(float, copy=True)
+                graph.add_edge(start, current, pts=points,
+                               weight=float(np.linalg.norm(np.diff(points, axis=0), axis=1).sum()))
+        return nx.convert_node_labels_to_integers(graph)
+
     degree = np.fromiter((len(row) for row in adjacency), dtype=np.int16)
     special = set(np.flatnonzero(degree != 2).tolist())
     if not special:

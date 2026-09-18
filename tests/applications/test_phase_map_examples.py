@@ -292,7 +292,13 @@ def test_quick_scan_round_trip_on_optional_stack(tmp_path, kind, stem):
     main(["scan", kind, "--output-dir", str(output)])
     data = load_phase_map(output / (stem + "_records.csv"))
     assert data.summary()["records"] == 9
-    assert data.summary()["error_records"] == 0
+    # Coarse scans can be unresolved. Failed geometry/projection must remain
+    # explicit instead of being replaced by a ball or an abstract polynomial.
+    for record in data.records:
+        if record.get("error"):
+            assert record["source"] == "error"
+            assert not record.get("polynomial")
+            assert "error" in record["phase_signature"]
     assert data.summary()["missing_grid_cells"] == 0
     assert data.summary()["adaptive_fill_records"] == 0
     assert json.loads((output / "run_plan.json").read_text())["workers"] == 1
