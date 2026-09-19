@@ -1,0 +1,42 @@
+name: Full-map kernel validation
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths:
+      - 'dev/full_map_collapse.cpp'
+      - 'dev/full_map_kernel.py'
+      - 'tests/extraction/test_full_map_kernel.py'
+      - '.github/workflows/full-map-kernel-validation.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install frozen environment
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+      - name: Differential and complete repository checks
+        run: |
+          mkdir -p kernel-results
+          uv run --no-sync pytest -q --junitxml=kernel-results/tests.xml
+          uv run --no-sync ruff check dev/full_map_kernel.py tests/extraction/test_full_map_kernel.py
+          uv run --no-sync python dev/check_repository_consistency.py
+          git ls-files '*.tex' '*.bib' '*.zip' '*Phase*pdf' '*phase*pdf' '*tpms*py' > kernel-results/source-inventory.txt
+          git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: full-map-kernel-validation
+          path: kernel-results
+          retention-days: 30
