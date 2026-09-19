@@ -1,0 +1,83 @@
+name: Complete original-resolution maps
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['.github/workflows/full-resolution-maps.yml']
+permissions:
+  contents: read
+jobs:
+  maps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MPLBACKEND: Agg
+      PYVISTA_OFF_SCREEN: 'true'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install immutable environment and validate kernel
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+          g++ -O3 -std=c++17 dev/full_map_collapse.cpp -o /tmp/kg-collapse
+          uv run --no-sync pytest -q tests/extraction/test_full_map_kernel.py tests/extraction/test_full_map_plan.py
+      - name: Execute original Hamiltonian grid shard
+        run: uv run --no-sync python dev/run_full_resolution_maps.py --mode hamiltonian --dimension 120 --kernel /tmp/kg-collapse --out full-results/hamiltonian --shard ${{ matrix.shard }} --shards 20 --case-seconds 90
+      - name: Execute full TPMS grid shard at matching spatial resolution
+        run: uv run --no-sync python dev/run_full_resolution_maps.py --mode tpms --dimension 120 --kernel /tmp/kg-collapse --out full-results/tpms --shard ${{ matrix.shard }} --shards 20 --case-seconds 90
+      - name: Check no tracked scientific source was modified
+        run: git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: full-map-shard-${{ matrix.shard }}
+          path: full-results
+          compression-level: 1
+          retention-days: 30
+  collect:
+    needs: maps
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install frozen collector environment
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: full-map-shard-*
+          path: collected
+      - name: Verify complete exact grids and archive hashes
+        run: |
+          uv run --no-sync python dev/collect_full_resolution_maps.py --root collected --out full-map-summary --shards 20
+          uv run --no-sync ruff check dev/collect_full_resolution_maps.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: complete-full-map-summary
+          path: full-map-summary
+          retention-days: 30
