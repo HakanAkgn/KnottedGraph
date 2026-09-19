@@ -1,0 +1,58 @@
+name: Complete numerical grid review
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['.github/workflows/numerical-full-grid-review.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install and validate numerical collectors
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+          uv run --no-sync pytest -q
+          uv run --no-sync ruff check dev/audit_refined_tpms_records.py dev/summarize_executed_maps.py
+      - name: Require successful completion of both fixed source runs
+        run: |
+          gh run watch 35411673566 --interval 30 --exit-status > /tmp/full-grid-dependency.log 2>&1
+          gh run watch 35411858561 --interval 30 --exit-status > /tmp/continuation-dependency.log 2>&1
+      - uses: actions/download-artifact@v4
+        with:
+          name: complete-full-map-summary
+          run-id: 35411673566
+          github-token: ${{ github.token }}
+          path: map-input
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: refined-tpms-shard-*
+          run-id: 35411858561
+          github-token: ${{ github.token }}
+          path: continuation-input
+      - name: Audit exact adaptive coverage and summarize every original map cell
+        run: |
+          uv run --no-sync python dev/audit_refined_tpms_records.py --root continuation-input --out numerical-review/adaptive --shards 20
+          uv run --no-sync python dev/summarize_executed_maps.py --maps map-input --adaptive numerical-review/adaptive --out numerical-review/full-maps
+          git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: complete-numerical-review
+          path: numerical-review
+          retention-days: 30
