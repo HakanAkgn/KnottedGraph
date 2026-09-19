@@ -1,0 +1,82 @@
+name: Build restored figures and complete results package
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['.github/workflows/build-completion-results.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: read
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MPLBACKEND: Agg
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install frozen environment and document compiler
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libboost-dev latexmk texlive-latex-extra texlive-fonts-recommended lmodern
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+      - name: Test entire repository and figure-data contracts
+        run: |
+          mkdir -p build-verification
+          uv run --no-sync pytest -q --junitxml=build-verification/tests.xml
+          uv run --no-sync ruff check dev/render_completion_results.py dev/check_completion_package.py dev/publish_completion_package.py tests/applications/test_completion_figures.py
+          uv run --no-sync python dev/check_repository_consistency.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: final-completion-evidence
+          run-id: 35419823987
+          github-token: ${{ github.token }}
+          path: completed-data
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: full-map-shard-*
+          run-id: 35411673566
+          github-token: ${{ github.token }}
+          path: retained-geometry
+      - name: Render original layouts with complete source-linked arrays and geometry
+        run: uv run --no-sync python dev/render_completion_results.py --data completed-data --artifacts retained-geometry --out results-package
+      - name: Compile the results report without shell escape
+        working-directory: results-package
+        run: latexmk -pdf -no-shell-escape -interaction=nonstopmode -halt-on-error -file-line-error Results_Report.tex
+      - name: Validate PDFs, render every report page and archive all result inputs
+        run: |
+          cp build-verification/tests.xml results-package/tests.xml
+          uv run --no-sync python dev/check_completion_package.py --directory results-package
+          git diff --exit-code
+      - name: Publish only the generated report and figures to the research branch
+        run: uv run --no-sync python dev/publish_completion_package.py --directory results-package --receipt build-verification/publication.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: KnottedGraph-results-and-figures
+          path: |
+            KnottedGraph_results_and_figures.zip
+            results-package/Results_Report.pdf
+            results-package/Figures/*.pdf
+            results-package/RESULTS_SUMMARY.md
+            build-verification
+          compression-level: 1
+          retention-days: 30
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: KnottedGraph-results-layout-previews
+          path: results-package/QA
+          retention-days: 30
