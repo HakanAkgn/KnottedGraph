@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from fractions import Fraction
+from functools import lru_cache
 import gzip
 from hashlib import sha256
 from itertools import combinations
@@ -31,6 +32,7 @@ from knotted_graph.core.field_isotopy import tpms_problem, verify
 from knotted_graph.core.field_isotopy_rational import verify_rational
 
 
+@lru_cache(maxsize=4096)
 def terms(value):
     variable = sp.Symbol('A')
     expression = sp.expand(sp.sympify(value, locals={'A': variable}))
@@ -147,9 +149,9 @@ def collect_events(previous, additional):
         areas = {'regular':Fraction(0),'event':Fraction(0),'unknown':Fraction(0)}
         counts = Counter()
         for leaf in selected:
-            l,r = map(Fraction,leaf['lambda_bounds'])
-            b,t = map(Fraction,leaf['c_bounds'])
-            area = (r-l)*(t-b)
+            left,right = map(Fraction,leaf['lambda_bounds'])
+            bottom,top = map(Fraction,leaf['c_bounds'])
+            area = (right-left)*(top-bottom)
             total_area += area
             state = 'regular' if leaf['status']=='certified' else (
                 'unknown' if merged[leaf['id']]['status']=='unknown' else 'event')

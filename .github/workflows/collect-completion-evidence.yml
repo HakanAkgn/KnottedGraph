@@ -2,7 +2,7 @@ name: Collect completion evidence and exact voxel-link audit
 on:
   push:
     branches: [research/solid-spine-maps-41dc87c]
-    paths: ['.github/workflows/collect-completion-evidence.yml']
+    paths: ['.github/workflows/collect-completion-evidence.yml', 'dev/collect_completion_evidence.py']
 permissions:
   contents: read
   actions: read
