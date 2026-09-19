@@ -1,0 +1,364 @@
+
+\section{Geometric preconditioning of difficult embeddings}
+\label{supp:repulsive_layout}
+An embedding can be difficult to project even when its incidence and intended topology are fixed. Noisy coordinates, clustered vertices, long detours and near contacts can create avoidable crossings or unresolved views. The optional preconditioning module changes coordinates while retaining graph identity and returns the result to the common embedded-graph interface (\Figpanelref{fig:functionality_overview}{f}). The nonlocal objective belongs to the tangent-point energy family, with an early formulation by Buck and Orloff \cite{kg_buck1995energy}, and follows the computational framework of Yu, Schumacher and Crane \cite{kg_yu2021repulsive}.
+
+The native solver can use Henrik Schumacher's \texttt{Repulsor}. The third-party notice in the immutable software reference listed in Code availability specifies revision \texttt{adc56b61f65f5958b59cbd7e1539f44ed0c5e993}; the upstream source is \url{https://github.com/HenrikSchumacher/Repulsor}. This pin identifies the documented reproducibility dependency, not independently recovered execution metadata for every historical figure. Geometry-to-curve mappings, pinned junctions and optional swept-step checks connect the optimizer to the graph representation without treating repulsion alone as a topology certificate.
+
+\subsection{Simplifying graphs with repulsive curves}
+\label{supp:repulsive_objective}
+The graph is converted to a curve network while retaining mappings from curve samples to graph vertices and edges. Vertices can be pinned, with optional collar points on incident edges. Resampling or optional guarded decimation controls the number of samples. The inverse mapping preserves node labels, edge keys and non-geometric attributes when the final curve is returned to a \texttt{MultiGraph}.
+
+Let $\mathcal X=\{\mathbf x_i\}\subset\mathbb R^3$ be the curve samples, $\mathcal S$ its segments and $\mathcal P\subset\mathcal S\times\mathcal S$ the pairs included in the nonlocal sum. For $s=[\mathbf x_i,\mathbf x_j]$, denote its length by $\ell_s$, midpoint by $\mathbf c_s$, unit tangent by $\boldsymbol\tau_s$ and normal projector by $\Pi_s^\perp=I-\boldsymbol\tau_s\boldsymbol\tau_s^T$. The discrete energy is
+\begin{equation}
+E_{\mathrm{tp}}^{p,q}(\mathcal X)=\sum_{(s,t)\in\mathcal P}\ell_s\ell_t\frac{\|\Pi_s^\perp(\mathbf c_t-\mathbf c_s)\|^q+\|\Pi_t^\perp(\mathbf c_s-\mathbf c_t)\|^q}{\|\mathbf c_t-\mathbf c_s\|^p}.
+\label{suppeq:tangent_point_energy}
+\end{equation}
+The displayed examples use $p=8$ and $q=4$. Optional local terms include
+\begin{equation}
+E_{\mathrm{len}}=\sum_{s\in\mathcal S}\ell_s^2
+\end{equation}
+and
+\begin{equation}
+E_{\mathrm{bend}}=\sum_i\|\mathbf x_{i-1}-2\mathbf x_i+\mathbf x_{i+1}\|^2,
+\end{equation}
+together with an optional clearance penalty for non-adjacent strands. Their weights are user-controlled; neither a common degree of compaction nor a particular geometric interpretation is imposed on every scientific input.
+
+\subsection{Relaxation and topology checks}
+\label{supp:repulsive_topology}
+A repulsive objective is not by itself a guarantee of ambient isotopy. Proposed updates use a maximum-safe-step estimate, a user-controlled safety fraction and backtracking. The public graph route pins vertices by default unless they are explicitly released. When the intermediate motion states needed for independent verification are retained, the verifier can replay the trajectory and test swept segments. A failed verification is not reported as successful topology preservation.
+
+Static clearance statistics for the initial, relaxed and decimated configurations are separate geometric diagnostics. They do not rule out strand intersections during the intervening motion. Likewise, a geometric shortcut requires its own check: the guarded decimation route tests the swept triangle against non-adjacent segments. Any claim of preservation applies to the operations actually checked, their numerical tolerances and the recorded trajectory; it is not inferred from an unchanged abstract graph. Solver parameters, step history, clearance statistics, scale, length and graph--curve mappings are retained when available.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\linewidth]{GeneralVersion/Figures/Repulsive_curves.pdf}
+\caption{\textbf{Optional geometric preconditioning before projection.}
+Each row retains a protein-derived example from the RCSB Protein Data Bank \cite{kg_burley2019rcsb}, through unfolding, compaction, smoothing, projection and PD/polynomial evaluation. The tangent-point term in \Eqref{suppeq:tangent_point_energy} uses $p=8$, $q=4$ for these examples \cite{kg_yu2021repulsive}. The unchanged artwork illustrates coordinate processing and return to the common graph interface. Incidence retention, static strand separation and verified swept-motion preservation are distinct properties; the images alone do not certify an unarchived intermediate trajectory.}
+\label{suppfig:repulsive_curves_pipeline}
+\end{figure}
+
+\subsection{Return to the common graph and projection pipeline}
+\label{supp:repulsive_return}
+In the displayed examples, nonlocal repulsion first opens close contacts, length control removes detours while repulsion remains active, and local terms regularize the final curves. This staging is a figure-generation choice rather than a required sequence in every public call. Updated node positions and polylines are mapped onto a copy of the original graph, retaining labels, edge keys and non-geometric attributes. Optional final simplification is a separate operation whose admissibility must be checked rather than assumed from the preceding relaxation. The returned graph uses the same projection and invariant interfaces as an unrelaxed input. Preconditioning is a numerical aid, not a replacement for independent diagram or invariant checks.
+\FloatBarrier
+
+\section{\texttt{KnottedGraph} supports evaluator-guided mathematical discovery}
+\label{supp:transfer_derivation}
+The exact evaluator also provides a data layer for investigating parameterized spatial-graph families. This problem has substantial prior mathematical structure. Dobrynin and Vesnin derive an all-$n$ formula for a family of knotted two-vertex cubic graphs \cite{kg_dobrynin1996yamada}. Li, Lei, Li and Vesnin derive edge-replacement formulas \cite{kg_li2018yamada}; associated work analyzes families whose polynomial roots are dense in the complex plane \cite{kg_li2019density}. Lundstr\"om develops transfer-matrix calculations for repeated symmetric graph layers \cite{kg_lundstrom2022transfer}. Relations to other invariants include Huh's comparison with Jones polynomials of links associated with theta curves \cite{kg_huh2024theta} and relations among spatial-$K_4$, theta and knot/link invariants \cite{kg_vesnin2025complete}. Thus neither family formulas nor transfer matrices for Yamada polynomials are introduced for the first time here.
+
+The present computational direction connects exact graph-family data to candidate discovery and verification. It is complementary to evaluator-guided AI-assisted mathematics such as FunSearch \cite{kg_funsearch2024}, AlphaEvolve \cite{kg_alphaevolve2025} and related mathematical exploration \cite{kg_georgiev2025mathematical}. Machine-verifiable proof systems supply a different verification target, exemplified by AlphaProof \cite{kg_alphaproof2026}. Our exact polynomial comparisons do not constitute formal proofs in such a system.
+
+The intended procedure is
+\begin{equation}
+\boxed{\begin{aligned}
+\text{define a graph family}&\longrightarrow\text{generate exact }\overline{\Upsilon}(G;Y)\text{ data}\\
+&\longrightarrow\text{infer a candidate}\longrightarrow\text{freeze the candidate}\longrightarrow\text{test additional members}.
+\end{aligned}}
+\label{suppeq:yamada_discovery_direction}
+\end{equation}
+The following sections retain the family expressions and matrix constructions, but distinguish three statements: a proposed correspondence between a transfer expression and a graph-family invariant; exact algebraic consequences of the supplied matrices; and direct finite comparisons with the graph evaluator. Only the second follows from matrix algebra alone. An all-family identity additionally requires a construction-specific proof of the first statement.
+
+\Figref{fig:three_theta_yamada_families} organizes the examples. The three homogeneous families occupy panels \textbf{(b--j)}, their commuting mixed extension is in \textbf{(k)}, and the fixed-graph order-sensitive construction is in \textbf{(l)}. The displayed closed forms are retained as candidate family laws, not relabeled as proved by the figure. Their admissible parameter range and the actual retained test records are specified below.
+
+\subsection{LLM assistance, candidate construction and retained verification evidence}
+\label{supp:llm_discovery_protocol}
+The investigation used LLM assistance to formulate candidate relations from graph-family definitions and exact polynomial data. The diagram in \Figpanelref{fig:three_theta_yamada_families}{a} states a protocol in which discovery data $D$ are separated from a test set $T$ before evaluation. The retained materials do not, however, contain the original model conversations or independently timestamped snapshots establishing that historical order of events. Accordingly, this version does not identify an undocumented model version, access date or quoted prompt as reproducible evidence of the actual discovery process. The words ``blind'' and ``held out'' in the unchanged protocol artwork describe the intended design, not an experimentally verified historical chronology.
+
+The executable notebook retains family constructors, proposed expressions and deterministic test plans. The subsequent audit recomputes exact polynomials, reconstructs the finite matrices and tests their algebraic identities. These are retrospective checks against an available candidate. A later Boolean flag or timestamp cannot establish what an earlier model saw, and a prescribed but unfinished test plan is not a completed evaluation. Deterministic symbolic reconstruction and human mathematical interpretation are therefore distinguished from LLM-generated proposals.
+
+The retained evidence includes $324$ distinct short pure-braid words, all $459$ mixed-family comparisons, complete finite Hankel/transfer matrices and two exact length-$101$ pure-braid comparisons. Original discovery/freezing transcripts are not claimed to be available or promised as if already archived. The record paths and exact audit commands are given in \SuppSubsecref{supp:reproducibility_resources}. These finite checks support the tested candidate relations without establishing their universal family correspondence.
+
+\subsection{Commuting transfer ansatz for homogeneous and mixed theta-derived families}
+\label{supp:transfer_commuting}
+\label{supp:transfer_common_notation}
+The homogeneous expressions in \Figpanelref{fig:three_theta_yamada_families}{d,g,j} and the mixed expression in panel \textbf{(k)} use a common three-channel ansatz. Define
+\begin{equation}
+\begin{aligned}
+a(Y)&=Y^2+1,\qquad b(Y)=Y^2-Y+1,\qquad c(Y)=Y^4+Y^2+1,\\
+\phi(Y)&=Y^4+Y^3+Y^2+Y+1,\qquad d(Y)=2Y^2-Y+2,
+\end{aligned}
+\label{supp:deriv:eq:factors}
+\end{equation}
+and abbreviate these as $a,b,c,\phi,d$ when no ambiguity arises. These polynomial abbreviations, in particular $c(Y)$, are not the TPMS threshold. The boundary vectors are
+\begin{equation}
+\bm\omega=\begin{pmatrix}a\\-c\\-Y^2\phi\end{pmatrix},\qquad
+\bm 1=\begin{pmatrix}1\\1\\1\end{pmatrix},
+\label{supp:deriv:eq:omega}
+\end{equation}
+and the local matrices are
+\begin{equation}
+\begin{aligned}
+T_\Lambda&=\operatorname{diag}(a^2,Y^2b^2,Y^8),\\
+T_\downarrow&=\operatorname{diag}(a,Y^2b,-Y^7),\\
+T_\updownarrow&=\operatorname{diag}(ab,-Y^2(Y-1)d,Y^5(Y+1)b).
+\end{aligned}
+\label{supp:deriv:eq:transfers}
+\end{equation}
+Identification of these matrices with the complete graph families is the proposed transfer law. The subsequent expansions and commutation statements are exact algebraic consequences of \Eqsref{supp:deriv:eq:omega}{supp:deriv:eq:transfers}, conditional on that identification. The normalized family expressions below are used for nonempty constructions, $m\geq1$. At $m=0$, the common contraction is $-Y^2(1+Y+2Y^2+Y^3+Y^4)$, whose normalized value is $-(1+Y+2Y^2+Y^3+Y^4)$. The unshifted matrix contraction at the empty construction is therefore not called normalized. This boundary qualification also applies to the unchanged expressions in the artwork.
+
+\paragraph{Cross-linked family $\Lambda_m$}
+\label{supp:transfer_crosslinked}
+Panels \textbf{(b,c)} show $m=1,2$, and panel \textbf{(d)} displays the general construction. The proposed relation has the algebraic expansion
+\begin{equation}
+\begin{aligned}
+\overline{\Upsilon}(\Lambda_m;Y)&=\bm\omega^TT_\Lambda^m\bm1,\\
+T_\Lambda^m&=\operatorname{diag}(a^{2m},Y^{2m}b^{2m},Y^{8m}),\\
+\bm\omega^TT_\Lambda^m\bm1
+&=a\,a^{2m}-c\,Y^{2m}b^{2m}-Y^2\phi\,Y^{8m}\\
+&=\boxed{a^{2m+1}-Y^{2m}c\,b^{2m}-Y^{8m+2}\phi}.
+\end{aligned}
+\label{supp:deriv:eq:lambda_family}
+\end{equation}
+The three terms are the three diagonal channels propagated through the repeated cells. The first equality is the graph-family ansatz; the following matrix expansion is an identity.
+
+\paragraph{Lower-paired family $\Lambda_m^{\downarrow}$}
+\label{supp:transfer_lower_paired}
+Panels \textbf{(e,f,g)} similarly describe the lower-paired family. Its candidate expression is
+\begin{equation}
+\begin{aligned}
+\overline{\Upsilon}(\Lambda_m^{\downarrow};Y)&=\bm\omega^TT_\downarrow^m\bm1,\\
+T_\downarrow^m&=\operatorname{diag}(a^m,Y^{2m}b^m,(-1)^mY^{7m}),\\
+\bm\omega^TT_\downarrow^m\bm1
+&=a\,a^m-c\,Y^{2m}b^m-Y^2\phi\,(-1)^mY^{7m}\\
+&=\boxed{a^{m+1}-Y^{2m}c\,b^m+(-1)^{m+1}Y^{7m+2}\phi}.
+\end{aligned}
+\label{supp:deriv:eq:down_family}
+\end{equation}
+The alternating sign comes from the channel $-Y^7$.
+
+\paragraph{Two-sided family $\Lambda_m^{\updownarrow}$}
+\label{supp:transfer_two_sided}
+Panels \textbf{(h,i,j)} show the two-sided paired family. The corresponding expansion is
+\begin{equation}
+\begin{aligned}
+\overline{\Upsilon}(\Lambda_m^{\updownarrow};Y)&=\bm\omega^TT_\updownarrow^m\bm1,\\
+T_\updownarrow^m&=\operatorname{diag}\!\left(a^mb^m,\,(-1)^mY^{2m}(Y-1)^md^m,\,Y^{5m}(Y+1)^mb^m\right),\\
+\bm\omega^TT_\updownarrow^m\bm1
+&=a^{m+1}b^m-c(-1)^mY^{2m}(Y-1)^md^m-Y^{5m+2}\phi(Y+1)^mb^m\\
+&=\boxed{a^{m+1}b^m+(-1)^{m+1}Y^{2m}c(Y-1)^md^m-Y^{5m+2}\phi(Y+1)^mb^m}.
+\end{aligned}
+\label{supp:deriv:eq:updown_family}
+\end{equation}
+The three candidate families share a finite algebraic representation with different diagonal operators. A common representation fitted or inferred from data remains distinct from a proof that the local operations implement these channels for every graph construction.
+
+\paragraph{Commuting mixed family $\mathcal A_{\mathbf n}$}
+\label{supp:transfer_abelian_mixed}
+Let $G_w$ be the graph constructed from an ordered motif word,
+\begin{equation}
+\begin{aligned}
+w&=w_1\cdots w_m,\quad w_j\in\{\Lambda,\downarrow,\updownarrow\},\\
+\mathbf n&=(n_\Lambda,n_\downarrow,n_\updownarrow),\quad m=n_\Lambda+n_\downarrow+n_\updownarrow.
+\end{aligned}
+\label{supp:deriv:eq:mixed_word_counts}
+\end{equation}
+The proposed law and its matrix-level commutation are
+\begin{equation}
+\begin{aligned}
+\overline{\Upsilon}(G_w;Y)&=\bm\omega^T\!\left(\prod_{j=1}^mT_{w_j}\right)\!\bm1,\\
+[T_\Lambda,T_\downarrow]&=[T_\Lambda,T_\updownarrow]=[T_\downarrow,T_\updownarrow]=0,\\
+\prod_{j=1}^mT_{w_j}&=T_\Lambda^{n_\Lambda}T_\downarrow^{n_\downarrow}T_\updownarrow^{n_\updownarrow}.
+\end{aligned}
+\label{supp:deriv:eq:mixed_commuting_transfer}
+\end{equation}
+The first line is conditional on the family correspondence. The other lines follow from diagonality and imply that this candidate expression depends only on counts. Its channels are
+\begin{equation}
+\begin{aligned}
+C_1&=a\,(a^2)^{n_\Lambda}a^{n_\downarrow}(ab)^{n_\updownarrow}
+=a^{m+n_\Lambda+1}b^{n_\updownarrow},\\
+C_2&=-c\,(Y^2b^2)^{n_\Lambda}(Y^2b)^{n_\downarrow}[-Y^2(Y-1)d]^{n_\updownarrow}\\
+&=(-1)^{n_\updownarrow+1}Y^{2m}c\,b^{2n_\Lambda+n_\downarrow}(Y-1)^{n_\updownarrow}d^{n_\updownarrow},\\
+C_3&=-Y^2\phi\,(Y^8)^{n_\Lambda}(-Y^7)^{n_\downarrow}[Y^5(Y+1)b]^{n_\updownarrow}\\
+&=(-1)^{n_\downarrow+1}Y^{8n_\Lambda+7n_\downarrow+5n_\updownarrow+2}\phi\,(Y+1)^{n_\updownarrow}b^{n_\updownarrow}.
+\end{aligned}
+\label{supp:deriv:eq:mixed_channels}
+\end{equation}
+Summing gives the displayed mixed-family candidate,
+\begin{equation}
+\boxed{\begin{aligned}
+\overline{\Upsilon}(\mathcal A_{\mathbf n};Y)=C_1+C_2+C_3
+={}&a^{m+n_\Lambda+1}b^{n_\updownarrow}\\
+&+(-1)^{n_\updownarrow+1}Y^{2m}c\,b^{2n_\Lambda+n_\downarrow}(Y-1)^{n_\updownarrow}d^{n_\updownarrow}\\
+&+(-1)^{n_\downarrow+1}Y^{8n_\Lambda+7n_\downarrow+5n_\updownarrow+2}\phi\,(Y+1)^{n_\updownarrow}b^{n_\updownarrow}.
+\end{aligned}}
+\label{supp:deriv:eq:abelian_final}
+\end{equation}
+Under the same proposed identification, equal count vectors imply equal predicted Yamada values. The deterministic audited plan contains $363$ nonempty words of lengths one through five and $96$ additional words of lengths six and seven, totaling $459$. All $459$ retrospective exact comparisons pass. The earlier claim of $500$ tested words is not supported by the retained plan, and the separate twenty-case mixed-family long-word plan is not reported as completed. These qualifications change the reported evidence, not the expressions in \Eqsref{supp:deriv:eq:lambda_family}{supp:deriv:eq:abelian_final}.
+
+\subsection{Order-sensitive reconstruction through noncommuting matrices}
+\label{supp:transfer_nonabelian_hankel}
+The family in \Figpanelref{fig:three_theta_yamada_families}{l} fixes an $8$-vertex, $12$-edge cubic multigraph and inserts a pure three-braid in three distinguished strands:
+\begin{equation}
+w=w_1\cdots w_m,\quad w_j\in\{A,B\},\qquad A=\sigma_1^2,\quad B=\sigma_2^2.
+\label{supp:deriv:eq:pure_braid_word}
+\end{equation}
+Here $\sigma_1$ exchanges strands one and two and $\sigma_2$ exchanges strands two and three. Squaring restores their endpoint permutations, so changing the word changes the embedding of that region without changing the surrounding graph incidence.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.62\linewidth]{GeneralVersion/Figures/MathematicalGraphPatterns/NonAbelianWorkedExample.pdf}
+\caption{\textbf{A worked word outside the coordinate basis, but not outside the reconstruction data.}
+The same cubic multigraph carries $w=AAABA=A^3BA$, read left to right, with pure-braid blocks $A=\sigma_1^2$ and $B=\sigma_2^2$. The candidate transfer product is $T_A^3T_BT_A$. Although $AAABA$ is not one of the fifteen coordinate words, its value occurs in the Hankel input as $H_{AA,ABA}$, so this example illustrates algebraic reconstruction rather than an independent held-out test.}
+\label{suppfig:nonabelian_worked_example}
+\end{figure}
+
+The length-three examples $AAB$, $ABA$ and $BAA$ have the same count vector $(2,1)$, but the direct values satisfy \Eqref{eq:main_nonabelian_example}. Thus order affects some closed-graph invariants in this family. In the finite set of all $255$ binary words of length at most seven, including the empty word, raw equality under reversal is observed:
+\begin{equation}
+\Upsilon(\mathcal N_w;Y)=\Upsilon(\mathcal N_{w^{\mathrm{rev}}};Y),\qquad w^{\mathrm{rev}}=w_m\cdots w_1.
+\label{supp:deriv:eq:observed_reversal}
+\end{equation}
+Within the tested fixed-count classes, reversal accounts for the observed equalities between distinct words. This is a finite observation for the stated closure. It is consistent with reversing the longitudinal reading of the scaffold, but a universal geometric symmetry claim requires the corresponding family-level argument rather than the word data alone.
+
+\paragraph{A finite rank-15 Hankel block}
+\label{supp:transfer_hankel_intuition}
+Choose the word indices
+\begin{equation}
+\begin{aligned}
+\mathcal B=\{&\varepsilon,A,B,AA,AB,BA,BB,AAB,ABA,ABB,BAA,BAB,\\
+&AABA,ABAA,ABAB\}.
+\end{aligned}
+\label{supp:deriv:eq:hankel_basis}
+\end{equation}
+Define the finite matrix
+\begin{equation}
+H_{\xi,\eta}=\Upsilon(\mathcal N_{\xi\eta};Y),\qquad\xi,\eta\in\mathcal B.
+\label{supp:deriv:eq:H_definition}
+\end{equation}
+For example, $H_{A,B}=\Upsilon(\mathcal N_{AB};Y)$ and $H_{AA,ABA}=\Upsilon(\mathcal N_{AAABA};Y)$. The latter is the graph in \SuppFigref{suppfig:nonabelian_worked_example}.
+
+The exact audit records a nonzero determinant of the specialized finite matrix $H(2)$, which proves that this rational-function block is nonsingular. Hence
+\begin{equation}
+\boxed{\operatorname{rank}_{\mathbb Q(Y)}H=15.}
+\label{supp:deriv:eq:hankel_rank_15}
+\end{equation}
+This is a rank statement about the displayed finite matrix. Chbili's three-strand Yamada algebra supplies relevant finite-dimensional skein structure \cite{kg_chbili2016}, and finite-rank realization theory explains the relationship to linear representations \cite{kg_carlyle1971realizations,kg_balle2012spectral}. To infer an all-word upper bound of fifteen or minimality of a universal graph-family representation, one must additionally construct the applicable skein-state and closure map for this particular family. Nonsingularity of one finite block and a reference to an abstract algebra do not supply that missing correspondence.
+
+\paragraph{Reconstructing the candidate $A$ and $B$ actions}
+\label{supp:transfer_hankel_reconstruction}
+The shifted matrices are
+\begin{equation}
+(H_A)_{\xi,\eta}=\Upsilon(\mathcal N_{\xi A\eta};Y),\qquad
+(H_B)_{\xi,\eta}=\Upsilon(\mathcal N_{\xi B\eta};Y).
+\label{supp:deriv:eq:hankel_matrices}
+\end{equation}
+For example,
+\begin{equation}
+\begin{aligned}
+H_{A,B}&=\Upsilon(\mathcal N_{AB};Y),\\
+(H_A)_{A,B}&=\Upsilon(\mathcal N_{AAB};Y),\qquad
+(H_B)_{A,B}=\Upsilon(\mathcal N_{ABB};Y).
+\end{aligned}
+\label{supp:deriv:eq:hankel_examples}
+\end{equation}
+All input words have length at most nine. The unique matrices satisfying the finite equations are
+\begin{equation}
+HT_A=H_A,\qquad HT_B=H_B,
+\qquad\boxed{T_A=H^{-1}H_A,\quad T_B=H^{-1}H_B.}
+\label{supp:deriv:eq:TA_TB}
+\end{equation}
+Let $R$ select the empty-word state and $L^T$ be the empty-word row of $H$. The reconstructed candidate for an arbitrary word is
+\begin{equation}
+\boxed{\Upsilon(\mathcal N_w;Y)=L^TT_{w_1}\cdots T_{w_m}R.}
+\label{supp:deriv:eq:raw_word_transfer}
+\end{equation}
+The all-word graph identity in this display is the conjectural extension being tested. In contrast, the definitions of $T_A,T_B$ and the identities $HT_X=H_X$ are exact finite linear algebra. The latter do not by themselves prove the former.
+
+For the example $AAABA$, the candidate states are built from right to left:
+\begin{equation}
+\varepsilon\xrightarrow{T_A}A\xrightarrow{T_B}BA\xrightarrow{T_A}ABA\xrightarrow{T_A}AABA\xrightarrow{T_A}AAABA.
+\label{supp:deriv:eq:AAABA_state_path}
+\end{equation}
+The first four nonempty words are coordinate indices in $\mathcal B$, whereas $AAABA$ is represented by a linear combination of the fifteen states. This illustrates finite reconstruction and does not create a new independent validation point when that word already occurs in $H$.
+
+\paragraph{Three channels for repeated blocks}
+\label{supp:transfer_cubic}
+The exact reconstructed matrices satisfy
+\begin{equation}
+\boxed{(T_X-Y^2I)(T_X-Y^{-2}I)(T_X-Y^{-4}I)=0,\qquad X\in\{A,B\}.}
+\label{supp:deriv:eq:cubic}
+\end{equation}
+Over $\mathbb Q(Y)$, define
+\begin{equation}
+P_X^{(\alpha)}=\prod_{\substack{\beta\in\{2,-2,-4\}\\\beta\neq\alpha}}\frac{T_X-Y^\beta I}{Y^\alpha-Y^\beta},\qquad\alpha\in\{2,-2,-4\}.
+\label{supp:deriv:eq:projector_general}
+\end{equation}
+Then, as a matrix identity,
+\begin{equation}
+T_X^n=Y^{2n}P_X^{(2)}+Y^{-2n}P_X^{(-2)}+Y^{-4n}P_X^{(-4)}.
+\label{supp:deriv:eq:run_power}
+\end{equation}
+These rational projectors are written for the formal variable; at special numerical values where their denominators vanish, the original matrix expression or an appropriate limiting calculation must be used. A long run such as $A^{100}$ therefore uses the same three formal projectors while changing only scalar powers. This is an exact property of the reconstructed matrices, irrespective of the unproved all-word graph identification.
+
+\paragraph{Arbitrary ordered words}
+\label{supp:transfer_ordered_words}
+Write the word in maximal runs,
+\begin{equation}
+w=X_1^{n_1}\cdots X_r^{n_r},\qquad X_j\in\{A,B\},\quad X_j\neq X_{j+1}.
+\label{supp:deriv:eq:run_decomp}
+\end{equation}
+For example, $AAABA=A^3B^1A^1$ and $AAB=A^2B^1$. Substitution of the matrix power identity into the proposed word evaluation gives
+\begin{equation}
+\boxed{\Upsilon(\mathcal N_w;Y)=L^T\prod_{j=1}^r\left[Y^{2n_j}P_{X_j}^{(2)}+Y^{-2n_j}P_{X_j}^{(-2)}+Y^{-4n_j}P_{X_j}^{(-4)}\right]R.}
+\label{supp:deriv:eq:raw_nonabelian_final}
+\end{equation}
+Run lengths enter scalar factors while the sequence of projectors remains ordered. Thus the candidate is not generally a function of motif counts alone. Its normalization is
+\begin{equation}
+\overline{\Upsilon}(\mathcal N_w;Y)=(-1)^{-\mu(w)}Y^{-\mu(w)}\Upsilon(\mathcal N_w;Y),\qquad
+\mu(w)=\min\deg_Y\Upsilon(\mathcal N_w;Y),
+\label{supp:deriv:eq:normalization}
+\end{equation}
+for a nonzero raw value; a zero raw value is normalized to zero without defining $\mu(w)$.
+
+\paragraph{Worked reconstruction outside the coordinate basis}
+\label{supp:nonabelian_worked_example}
+For $w=AAABA=A^3BA$, the run expression becomes
+\begin{equation}
+\begin{aligned}
+\Upsilon(\mathcal N_{AAABA};Y)={}&L^T\left[Y^6P_A^{(2)}+Y^{-6}P_A^{(-2)}+Y^{-12}P_A^{(-4)}\right]\\
+&\times\left[Y^2P_B^{(2)}+Y^{-2}P_B^{(-2)}+Y^{-4}P_B^{(-4)}\right]\\
+&\times\left[Y^2P_A^{(2)}+Y^{-2}P_A^{(-2)}+Y^{-4}P_A^{(-4)}\right]R\\
+={}&L^TT_A^3T_BT_AR.
+\end{aligned}
+\label{supp:deriv:eq:AAABA_projector_prediction}
+\end{equation}
+The coordinate steps are $R\xrightarrow{T_A}e_A\xrightarrow{T_B}e_{BA}\xrightarrow{T_A}e_{ABA}\xrightarrow{T_A}e_{AABA}$, followed by a nonbasis state. Expanding the verified cubic identity gives
+\begin{equation}
+T_A^3=(Y^2+Y^{-2}+Y^{-4})T_A^2-(1+Y^{-2}+Y^{-6})T_A+Y^{-4}I.
+\label{supp:deriv:eq:TA3_reduction}
+\end{equation}
+Consequently,
+\begin{equation}
+\begin{aligned}
+\Upsilon(\mathcal N_{AAABA};Y)={}&(Y^2+Y^{-2}+Y^{-4})L^TT_A^2T_BT_AR\\
+&-(1+Y^{-2}+Y^{-6})L^TT_AT_BT_AR+Y^{-4}L^TT_BT_AR.
+\end{aligned}
+\label{supp:deriv:eq:AAABA_reduced}
+\end{equation}
+The required basis contractions are
+\begin{equation}
+\begin{aligned}
+L^TT_A^2T_BT_AR&=\Upsilon(\mathcal N_{AABA};Y),\\
+L^TT_AT_BT_AR&=\Upsilon(\mathcal N_{ABA};Y),\\
+L^TT_BT_AR&=\Upsilon(\mathcal N_{BA};Y),
+\end{aligned}
+\label{supp:deriv:eq:AAABA_basis_contractions}
+\end{equation}
+so the retained worked relation is
+\begin{equation}
+\boxed{\begin{aligned}
+\Upsilon(\mathcal N_{AAABA};Y)={}&(Y^2+Y^{-2}+Y^{-4})\Upsilon(\mathcal N_{AABA};Y)\\
+&-(1+Y^{-2}+Y^{-6})\Upsilon(\mathcal N_{ABA};Y)+Y^{-4}\Upsilon(\mathcal N_{BA};Y).
+\end{aligned}}
+\label{supp:deriv:eq:AAABA_prediction}
+\end{equation}
+The relation illustrates how the reconstructed representation combines short-word data. Since $AAABA$ is itself part of the Hankel input, it is not evidence of a blind prediction outside those data.
+
+\paragraph{Retrospective exact comparisons and proof status}
+\label{supp:transfer_nonabelian_verification}
+The complete finite-data audit covers $324$ distinct raw graph-polynomial evaluations. The union of the words used in $H,H_A,H_B$ has $255$ members with maximum length nine. All $255$ binary words of lengths zero through seven form a different set; $69$ are additional, giving the $324$-word union. Exact checks verify the rank witness, $HH^{-1}=I$, $HT_A=H_A$, $HT_B=H_B$, the two cubic identities, noncommutation and agreement of $L^TT_wR$ with all $324$ directly evaluated words. The distinction between these two sets of $255$ words avoids conflating a reconstruction data set with an exhaustive short-word test set.
+
+A subsequent bounded audit completed two full exact length-$101$ comparisons, $A^{51}B^{50}$ and $(AB)^{50}A$. In each, directly evaluated raw Laurent coefficients equal the transfer prediction; normalization then follows from the stated convention. The remaining $18$ cases in the twenty-word plan, spanning lengths $101$, $125$, $150$ and $200$, were not completed in that audit. No success for all twenty or extrapolation verification through length $200$ is claimed here. These retrospective checks do not establish historical candidate freezing or data withholding.
+
+The resulting evidence supports the candidate's agreement on the explicitly listed graphs and establishes the algebraic identities of its finite matrices. A family-specific skein/state-space and closure proof is still needed to promote \Eqref{supp:deriv:eq:raw_word_transfer} to an all-word theorem. This proof-status distinction applies equally in the main text, captions and the present formula displays.
+
+The same infrastructure can be used to investigate further braid, tangle, satellite or recursive families when suitable exact invariant backends are available. Such extensions are prospective. The contribution demonstrated here is a computational environment in which candidate structure and direct exact comparisons are kept distinct and reproducible, rather than a claim that finitely many values uniquely determine every possible all-family law.

@@ -1,0 +1,109 @@
+
+\section{Validation across reconstruction, projection and invariant evaluation}
+\label{supp:validation}
+Reconstruction is tested against finite-thickness inputs generated from known graphs, projection through multi-view consistency and planar references, and the algebraic evaluator against graph identities and published formulas. These are separate tests of separate mathematical objects. Agreement at one stage does not certify the preceding correspondences.
+
+\subsection{Algebraic and projection checks}
+\label{supp:sanity_validation}
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\linewidth,keepaspectratio]{GeneralVersion/Figures/HandleBody_YamadaFramework_Stresstest.pdf}
+\caption{\textbf{Representative reconstructions from graph-generated finite-thickness inputs.}
+\textbf{(a--t)} Twenty retained examples from the recovery chain in \Eqref{suppeq:ground_truth_recovery}, with their historical graph-polynomial annotations. The stated benchmark construction uses a $200^3$ grid, tube radii of at least four voxels and thickness/safety factors of $0.90$. Its crossing-rich component was designed to comprise approximately $60\%$ of the ensemble, with at least two prescribed projected crossings and separation exceeding $2.4$ tube radii at those crossings. The input acceptance condition in \Eqref{suppeq:handlebody_betti} is a Betti-number consistency check, not a proof that every input is a handlebody. These selected panels do not establish a $100\%$ success rate for the full nominal $5{,}000$-construction ensemble; batch provenance and incomplete comparisons are discussed below.}
+\label{suppfig:handlebody_stress}
+\end{figure}
+
+The tests separate four kinds of reference calculation.
+\begin{enumerate}[leftmargin=*,label=\textbf{(\arabic*)}]
+\item \textbf{Graph-level algebra.} Tested trees $T_1,\ldots,T_6$, cycles $C_1,\ldots,C_7$, bouquets $B_1,\ldots,B_6$ and theta graphs $\Theta_1,\ldots,\Theta_8$ are checked with the isthmus, one-point-union and edge-replacement identities \cite{kg_yamada1989,kg_li2018yamada}. Planar $K_4$ and further cubic values are compared with Dobrynin and Vesnin \cite{kg_dobrynin1996yamada}. The Negami backend is independently compared with the defining edge-subset polynomial \cite{kg_negami1987}, and its Yamada specialization with the direct graph evaluator.
+
+\item \textbf{Published closed-form families.} For the $\Theta(n)$ family in \Figpanelref{fig:knottedgraph_topoly_scaling}{a,d,g}, Theorem~2 of Ref.~\cite{kg_dobrynin1996yamada} gives
+\begin{equation}
+\begin{aligned}
+\Upsilon(\Theta(n);Y)={}&\left(Y^2+Y+1+Y^{-1}+Y^{-2}\right)Y^n
+-\left(Y+Y^{-1}\right)Y^{-2n}
+-\left(Y^2+1+Y^{-2}\right)(-1)^nY^{-n}.
+\end{aligned}
+\label{suppeq:dv_theta_oracle}
+\end{equation}
+For the edge-replaced families in \Figpanelref{fig:knottedgraph_topoly_scaling}{b,e,h}, let $\sigma(Y)=Y+1+Y^{-1}$. Theorem~5.1, Corollary~5.2 and Example~5.4 of Ref.~\cite{kg_li2018yamada} give
+\begin{equation}
+\Upsilon\!\left(C_n(\infty_+);Y\right)=\left[-Y^{-2}\sigma(Y)\right]^n+\sigma(Y)\left(Y^{-2}+1\right)^n,
+\label{suppeq:li_cycle_oracle}
+\end{equation}
+and for the corresponding theta construction,
+\begin{equation}
+\Upsilon\!\left(\Theta_s(\infty_+);Y\right)=\frac{[-\sigma(Y)]^s+\sigma(Y)\left[(\sigma(Y)+1)Y^{-2}+1\right]^s}{1+\sigma(Y)}.
+\label{suppeq:li_theta_oracle}
+\end{equation}
+The stored tested examples agree with these references, including structured diagrams with $500$ crossings. This is a demonstrated input scale for the particular families, not a claim that all diagrams of that size have comparable cost. Topoly~1.1.0 \cite{kg_topoly2021} is compared only where both programs satisfy the same reference polynomial. The representative $25\times$, $136\times$ and $567\times$ ratios refer to these matched reference-passing cases, not to absent or skipped comparator results.
+
+\item \textbf{Crossings and mirroring.} Planar theta, crossed-theta and mirror examples test crossing-sensitive behavior. The one-crossing factor $(-Y)^{\pm1}$ is compared with the convention used in Ref.~\cite{kg_peddada2023}.
+
+\item \textbf{Projection consistency.} Each accepted view of a fixed subcubic embedding is independently processed through crossing detection, height assignment and PD construction. Normalized outputs must agree even if the diagrams have different crossing counts. Planar references also admit a crossing-free calculation. The tested catalogue includes theta, $K_4$, triangular-prism, $K_{3,3}$ and cube-type examples. Equal outputs are consistency checks, not a complete equivalence decision for arbitrary independently supplied graphs.
+\end{enumerate}
+
+\paragraph{Available scaling-benchmark protocol}
+The retained benchmark implementation makes one timed invariant call per requested graph/framework pair in a fresh spawned worker. It has no explicit warmup or repeated-measurement distribution. The worker clock starts immediately before framework evaluation and stops after conversion to the comparison coefficient dictionary. Geometry construction, projection, worker startup and result serialization lie outside this worker timer. The recorded \texttt{KnottedGraph} route uses the raw invariant with \texttt{normalize=False}, \texttt{n\_jobs=1} and \texttt{method="negami"}. The comparator clears its process-global Yamada memo table inside its timed function. Projection preprocessing can be reused from a geometry/PD cache, and retained Topoly ledger results can be reused rather than freshly timed.
+
+The currently documented requested limits are $600\,\mathrm{s}$ for \texttt{KnottedGraph} and $100{,}000\,\mathrm{s}$ for Topoly; these controls do not establish that every missing historical point consumed that budget. Some later family points are explicitly skipped after a comparator non-pass. The 112-row comparison ledger does not supply a historical CPU/RAM specification, operating system, complete dependency versions, compiler flags, measured thread-environment values or per-row source commit. These missing fields are not filled with the machine information of a later audit. The quoted historical timings are therefore limited to their retained protocol and samples; no repeated-run error bar, memory bound or hardware-independent scaling conclusion is inferred. The relevant audit and script identifiers are listed in \SuppSubsecref{supp:reproducibility_resources}.
+
+\subsection{Handlebody--spatial-graph reconstruction tests}
+\label{supp:handlebody_validation}
+The inverse test begins with a known embedded graph and a geometrically generated thickening:
+\begin{equation}
+G_i\longrightarrow\Omega_i=N(G_i)\longrightarrow\Omega_i^{\mathrm{voxel}}\longrightarrow G_i^{\mathrm{rec}}.
+\label{suppeq:ground_truth_recovery}
+\end{equation}
+Connected components and lattice Euler characteristics are computed using SciPy and \texttt{scikit-image} \cite{kg_virtanen2020scipy,kg_vanderwalt2014skimage}, with the chosen digital Euler convention \cite{kg_ohser2002euler}. \SuppFigref{suppfig:handlebody_stress} retains twenty illustrative outputs. Their presentation does not identify a complete, uniformly successful $5{,}000$-row invariant ledger.
+
+\begin{center}
+\fbox{\begin{minipage}{0.92\linewidth}
+\textbf{Inverse reconstruction protocol and distinct checks}
+\begin{enumerate}[leftmargin=*,label=\textbf{\arabic*.},itemsep=3pt,topsep=4pt]
+\item \textbf{Generate a graph.} Construct a connected bridge-free subcubic embedded graph $G_i$. For the crossing-rich generators, check the prescribed crossings in the standard $xy$ view and require centerline separation $d_{\min}>2.4\,r_{\mathrm{tube}}$ at those crossings.
+\item \textbf{Thicken and voxelize.} Estimate non-contact separation by dense edge resampling, excluding shared-junction neighborhoods for incident edges, and choose a tube radius $r_i$. The intended geometric neighborhood is
+\begin{equation*}
+\Omega_i=N_{r_i}(G_i)=\{\mathbf x\in\mathbb R^3:\operatorname{dist}(\mathbf x,G_i)\leq r_i\}.
+\end{equation*}
+Place a $200^3$ grid around the embedding with an additional margin $2.25r_i$. For a segment $[\mathbf a,\mathbf b]$, the nearest point to a voxel center is
+\begin{equation*}
+\mathbf c=\mathbf a+\operatorname{clip}_{[0,1]}\!\left[\frac{(\mathbf x-\mathbf a)\cdot(\mathbf b-\mathbf a)}{\|\mathbf b-\mathbf a\|^2}\right](\mathbf b-\mathbf a).
+\end{equation*}
+The voxel is occupied if $\|\mathbf x-\mathbf c\|\leq r_i$ for at least one segment. A sampled clearance estimate is not an exact regular-neighborhood certificate.
+\item \textbf{Check digital topology and thickness.} Accept the benchmark input when
+\begin{equation}
+\bigl(\beta_0(\Omega_i^{\mathrm{voxel}}),\beta_1(\Omega_i^{\mathrm{voxel}}),\beta_2(\Omega_i^{\mathrm{voxel}})\bigr)=\bigl(1,\beta_1(G_i),0\bigr)
+\label{suppeq:handlebody_betti}
+\end{equation}
+and the tube radius is at least four voxels. This is a necessary consistency check for the intended topology. It does not prove manifoldness, handlebody structure or ambient-isotopic source correspondence.
+\item \textbf{Reconstruct.} Apply the stated extraction and cleanup sequence to obtain $G_i^{\mathrm{rec}}$, retaining its incidence and polylines.
+\item \textbf{Check graph summaries.} Record connectedness, subcubic valence and $\beta_1(G_i^{\mathrm{rec}})=\beta_1(G_i)$. Record abstract multigraph isomorphism separately rather than conflating it with equal cycle rank.
+\item \textbf{Compare embedding-sensitive values.} When both computations complete in the admissible convention, compare
+\begin{equation*}
+\overline{\Upsilon}_{\mathrm{seed}}=\overline{\Upsilon}(G_i;Y),\qquad
+\overline{\Upsilon}_{\mathrm{rec}}=\overline{\Upsilon}(G_i^{\mathrm{rec}};Y).
+\end{equation*}
+Equality is an invariant-consistency result, not a sufficient proof of ambient isotopy. Missing computations are not matches, and a mismatch is retained.
+\item \textbf{Report outcomes separately.} Distinguish attempted inputs, accepted digital masks, graph-summary passes, polynomial attempts, completed comparisons, matches, mismatches and unverified records. An overall Boolean flag must not replace these counts.
+\end{enumerate}
+\end{minipage}}
+\end{center}
+
+\paragraph{Historical batch evidence and its limits}
+The available neighboring preservation CSV inspected in the 18 September audit has $5{,}000$ passing input-summary checks and $5{,}000$ passing primary graph-summary checks. Its invariant column contains $4{,}472$ matches, one mismatch and $527$ blank comparisons; the overall flag has $4{,}999$ passes and one failure. Abstract isomorphism is true in $680$ rows and false in $4{,}320$. The mismatch is associated with \texttt{random\_4920}: the seed and reconstruction have different vertex/edge counts but equal cycle rank. These outcomes demonstrate why the graph-summary condition cannot stand in for invariant or embedding recovery.
+
+The inspected CSV was not conclusively matched to the manuscript's historical timing artwork. Its counts are therefore reported as the audited available batch, not substituted as a newly established success rate for every retained figure panel. Blank comparisons are unverified, not assumed failures or matches. Later replay records can only be associated with the historical ensemble after input identities and source metadata are matched; such a replay is not automatically a fresh reconstruction. This version withdraws the earlier statement that every case recovered its spatial topology whenever evaluated. Individual benchmark manifests, completed checks and unresolved associations must be read with their own provenance.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\linewidth,keepaspectratio]{./GeneralVersion/Figures/Time_distributions.pdf}
+\caption{\textbf{Retained historical per-stage timing distributions.}
+\textbf{(a)} Voxel skeletonization; \textbf{(b)} graph extraction; \textbf{(c)} short-edge contraction; \textbf{(d)} leaf removal; \textbf{(e)} degree-two simplification; \textbf{(f)} Ramer--Douglas--Peucker smoothing; \textbf{(g)} projection selection; \textbf{(h)} \texttt{KnottedGraph} invariant evaluation; and \textbf{(i)} completed external Topoly evaluations. Solid and dashed lines display the original means and 95th percentiles. The figure is retained unchanged as descriptive historical output. A common matched sample set and complete original-run provenance for all panels have not been established; in particular, the invariant panels must not be interpreted as a paired speedup estimate. The annotations are not fresh measurements of the corrected release or a $5{,}000$-case invariant-success certificate.}
+\label{suppfig:handlebody_timing_distributions}
+\end{figure*}
+
+The histograms in \SuppFigref{suppfig:handlebody_timing_distributions} visualize the different operations in \SuppFigref{suppfig:skeletonization_steps}. Their retained annotations include means near $0.052\,\mathrm{s}$ for skeletonization, $0.031\,\mathrm{s}$ for projection selection, $0.024\,\mathrm{s}$ for contraction, $0.013\,\mathrm{s}$ for simplification and smoothing, and $6.6\times10^{-5}\,\mathrm{s}$ for leaf removal. These are descriptions of the unchanged plotted summaries, not independently reproduced estimates with newly established cohorts.
+
+The two invariant panels show means near $1.1\times10^{-3}\,\mathrm{s}$ and $3.63\,\mathrm{s}$ among their respective recorded outcomes. Their ratio is not used as a measured paired acceleration: completion policies and cohort correspondence must first be matched, and failed, skipped and resource-limited calls must be separated. The reference-gated structured-family comparisons in \Figref{fig:knottedgraph_topoly_scaling} supply the narrower performance evidence used in the main text. Missing historical hardware, per-panel sample membership, timing boundaries and timeout metadata remain explicit limitations rather than being inferred from the visual separation of these distributions.
+\FloatBarrier

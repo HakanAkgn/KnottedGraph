@@ -1,0 +1,192 @@
+% Text-only revision of the source supplied on 19 September 2026.
+% Figure files and the inline TikZ drawing are not altered.
+% Compile from the project root containing GeneralVersion/.
+\documentclass[10pt,twocolumn]{article}
+\usepackage[a4paper,margin=0.75in,columnsep=0.25in]{geometry}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{placeins}
+\IfFileExists{GeneralVersion/macros.tex}
+  {\input{GeneralVersion/macros}}
+  {\input{macros}}
+\setcounter{MaxMatrixCols}{20}
+\setcounter{dbltopnumber}{1}
+\renewcommand{\dbltopfraction}{0.92}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\dblfloatpagefraction}{0.75}
+\providecommand{\SuppSubsecref}[1]{\hyperref[#1]{Supplementary Note~\ref*{#1}}}
+\providecommand{\SuppSubsecsref}[2]{\hyperref[#1]{Supplementary Notes~\ref*{#1}} and~\hyperref[#2]{\ref*{#2}}}
+
+% Author-controlled metadata: not inferred from the audit or the repository.
+\newcommand{\ManuscriptTitle}{KnottedGraph: Scalable spatial-graph topology for scientific analysis and mathematical discovery}
+\newcommand{\ManuscriptAuthors}{\placeholder{FINAL AUTHOR LIST WITH AUTHOR MARKERS}}
+\newcommand{\ManuscriptAffiliations}{\placeholder{FINAL AFFILIATIONS}}
+\newcommand{\ManuscriptCorrespondence}{\placeholder{CORRESPONDING AUTHOR NAME AND EMAIL}}
+\newcommand{\SupplementaryVersionDate}{\placeholder{SUPPLEMENTARY INFORMATION VERSION DATE}}
+\title{\ManuscriptTitle}
+\author{\ManuscriptAuthors}
+\date{}
+\hypersetup{pdftitle={KnottedGraph: Scalable spatial-graph topology for scientific analysis and mathematical discovery}}
+
+\begin{document}
+\twocolumn[
+\begin{@twocolumnfalse}
+\MakeManuscriptTitle{\ManuscriptTitle}{\ManuscriptAuthors}{\ManuscriptAffiliations}
+\begin{abstract}
+Three-dimensional scientific data arrive as coordinates, networks, surfaces, volumes and fields, making embedding-sensitive comparison dependent on several representation-specific steps. We introduce \texttt{KnottedGraph}, a modular framework built around embedded spatial graphs that retain connectivity and three-dimensional edge geometry. Direct graph and curve inputs share interfaces with application-specific finite-thickness reconstruction, generic projection, graph-level analysis and exact Yamada-polynomial evaluation. On structured published graph families, the evaluator reproduces reference formulas for diagrams with up to $500$ crossings. Reconstruction, projection and algebra are tested against separate reference targets, with the scope of each check stated explicitly. Exact invariant datasets also support LLM-assisted conjecture generation and deterministic reconstruction of commuting and order-sensitive transfer representations. Retrospective exact comparisons test these candidate family laws without substituting finite agreement for an all-family proof or for a documented blind-discovery chronology. Supplementary Hamiltonian and TPMS-derived examples illustrate parameter-dependent numerical signatures and their reconstruction limitations. The framework provides a reusable computational basis for scientific spatial-graph analysis and evaluator-guided mathematical discovery, while distinguishing invariants of selected graphs from claims about their continuous source geometries.
+\end{abstract}
+\vspace{1em}
+\end{@twocolumnfalse}
+]
+
+\section{Introduction}
+\begin{figure*}[t!]
+\centering
+\includegraphics[width=\linewidth,keepaspectratio]{GeneralVersion/Figures/InputFormatsOverview_Pipeline.pdf}
+\caption{\textbf{Heterogeneous scientific inputs converge to a common embedded spatial-graph representation.}
+\textbf{(a)} Biomolecular backbones; \textbf{(b)} neuronal and vascular morphologies; \textbf{(c)} polymer configurations; \textbf{(d)} engineered node--edge networks; \textbf{(e)} Hamiltonian-derived level-set or occupied-region geometry; \textbf{(f)} a finite-thickness object and a candidate embedded graph spine; \textbf{(g)} oriented field curves; and \textbf{(h)} mathematical spatial graphs. Curves and explicit graphs can enter directly. Surface and volume inputs require an application-specific reconstruction and a separate assessment of source-to-graph correspondence. Format names in the artwork identify source representations; they do not imply that every format has a native adapter. In particular, the GraphML examples use external conversion, as described in \SuppSubsecref{supp:input_examples}.}
+\label{fig:input_formats_overview}
+\end{figure*}
+
+Many systems in biology, materials science and physics are governed in part by how paths and branches are connected and embedded in space. Examples include biomolecular backbones \cite{kg_burley2019rcsb,kg_yeates2007protein_topology}, vascular \cite{kg_aylward2005spatial_vascular} and neuronal networks \cite{kg_cuntz2010neuronal_graphs}, polymers \cite{kg_deguchi2017topological_polymers}, engineered spatial networks \cite{kg_peddada2023}, and Hamiltonian-derived geometries \cite{kg_fang2016nodal_line,akgun_yan_2026topologicalclassificationknottedgraphs}. These systems arise from different data, yet share a computational problem: organizing and comparing information that depends on both connectivity and three-dimensional embedding.
+
+Spatial graphs retain graph incidence together with an embedding in three dimensions \cite{kg_kauffman1989spatial,kg_flapan2017spatial,kg_mellor2018spatial}. Following our companion work \cite{akgun_yan_2026topologicalclassificationknottedgraphs}, we use \emph{knotted graph} when emphasizing this embedding-sensitive topology. The term includes topologically trivial as well as nontrivially knotted or linked embeddings; \emph{spatial graph} is the formal term used in definitions, invariants and equivalence statements. This language accommodates branching as well as knotting and linking.
+
+The practical difficulty is to connect native scientific representations to a shared graph object and then to a reliable diagrammatic calculation. Biomolecular coordinates, branching networks, polymers, engineered structures and momentum-space geometry begin from different data structures. An explicit graph can be analyzed without reconstructing it from a volume, whereas the graph-like organization of a finite-thickness input is implicit. The latter requires a numerical reduction whose interpretation depends on the source geometry and its discretization.
+
+We develop \texttt{KnottedGraph} as a common computational framework for these representation boundaries. In the handlebody setting, regular neighborhoods of embedded graphs supply the mathematical model for finite-thickness reconstruction \cite{kg_ishii2008handlebody,kg_ishii2012handlebody}. The software attempts to recover a useful embedded graph while retaining junctions and the spatial paths of its edges. Once a graph is specified, projection must distinguish genuine graph vertices from apparent crossings, recover over/under information and reject unresolved geometric degeneracies. The resulting interfaces support graph-level measurements, orientation-aware analysis, geometric preconditioning and exact diagrammatic invariant calculations, including the Yamada polynomial \cite{kg_yamada1989,kg_mellor2018spatial}.
+
+The admissibility of these stages is distinct. A normalized Yamada polynomial of an admissible subcubic spatial graph is an invariant of that graph's embedding, but it is not a complete invariant. A numerical graph extracted from a sampled solid is not automatically a certified spine of the continuous source. Even valid alternative spines of an equivalent handlebody need not have equal ordinary Yamada polynomials, because handlebody equivalence permits spatial contractions in addition to graph ambient isotopy \cite{kg_ishii2012handlebody}. We retain these distinctions when interpreting applications; detailed limitations follow the software architecture in \SuppNoteref{supp:limitations}.
+
+A principal computational result is exact Yamada evaluation on structured published families with diagrams containing up to $500$ crossings. This permits repeated calculations on explicitly generated graph families rather than only isolated examples. Parameterized Hamiltonian and TPMS-derived geometries provide supplementary applications of the same interfaces (\SuppNoteref{supp:knot_fields}). Their unchanged historical maps are retained as exploratory, postprocessed displays with explicitly restricted interpretation, not as validated continuum phase classifications. They are not used to establish the evaluator's correctness or performance.
+
+The same exact evaluator supplies mathematical data for conjecture generation. Existing Yamada-family studies derive recurrences, closed forms or transfer descriptions from the structure of a chosen family \cite{kg_dobrynin1996yamada,kg_li2018yamada,kg_lundstrom2022transfer}. Here we also study the reverse route: exact family data suggest candidate transfer structures that are checked by deterministic algebra and direct invariant evaluation. This connects the spatial-graph engine to evaluator-guided AI-assisted mathematics \cite{kg_funsearch2024,kg_alphaevolve2025,kg_georgiev2025mathematical}. We distinguish a proposed generate--infer--freeze--test protocol from the retrospective computational evidence actually retained, and distinguish exact matrix identities from the additional proof needed to identify a transfer expression with every member of a graph family.
+
+\section{Results}
+\begin{figure*}[t!]
+\centering
+\includegraphics[width=\linewidth]{GeneralVersion/Figures/Provided_Functionalities.pdf}
+\caption{\textbf{\texttt{KnottedGraph} separates reconstruction, projection and invariant evaluation while reusing an embedded graph.}
+\textbf{(a)} Finite-thickness reconstruction produces a candidate graph representation; \textbf{(b)} the graph is converted to a generic planar diagram and PD representation; \textbf{(c)} the diagram's Yamada polynomial is evaluated; \textbf{(d)} orientation and graph-level observables remain attached to the graph; \textbf{(e)} repeated calculations organize parameter-dependent numerical signatures; and \textbf{(f)} optional geometric preconditioning can regularize difficult embeddings before projection \cite{kg_yu2021repulsive}. The label ``Phase Space Analysis'' in the unchanged artwork denotes a scanning interface, not a certificate that the displayed colors are phases of the continuous source. Preserving incidence during geometric processing is distinct from verifying preservation of the spatial embedding.}
+\label{fig:functionality_overview}
+\end{figure*}
+
+\subsection{A common embedded-graph representation connects heterogeneous scientific geometry}
+\label{sec:unified_representation}
+\texttt{KnottedGraph} brings different inputs to the same embedded spatial-graph interface (\Figref{fig:input_formats_overview}). Ordered coordinate curves and explicit node--edge networks already possess a one-dimensional organization and enter directly. Surface and volumetric inputs use reconstruction when a graph spine is the intended representation. An embedded graph can bypass upstream geometry processing, while valid planar-diagram or PD data can enter at the diagrammatic stage. The source-specific normalization rules and entry points are detailed in \SuppNoteref{supp:representation}.
+
+The common object retains graph incidence and the three-dimensional path of every edge. Incidence determines the abstract graph, while the stored geometry supports analyses that depend on the embedding. The same graph can therefore support connectivity and geometric measurements, visualization, orientation-aware analysis and embedding-sensitive invariant evaluation without discarding its source attributes between stages.
+
+For finite-thickness inputs intended to represent handlebodies or handlebody-links, the computational route is
+\begin{equation}
+\Omega\longrightarrow G_{\mathrm{spine}}\longrightarrow\operatorname{PD}(G_{\mathrm{spine}})\longrightarrow\overline{\Upsilon}(G_{\mathrm{spine}};Y),
+\label{eq:main_pipeline}
+\end{equation}
+where $\Omega$ is the region, $G_{\mathrm{spine}}$ denotes the reconstructed candidate spine, $\operatorname{PD}$ is its crossing-aware planar representation and $\overline{\Upsilon}$ is the normalized Yamada polynomial in the admissible graph setting. The subscript identifies the intended role of the graph; the first arrow does not by itself assert a proved deformation retraction or ambient-isotopic regular-neighborhood correspondence. The handlebody model and extraction are described in \SuppSubsecsref{supp:handlebody_basis}{supp:extraction}, projection in \SuppNoteref{supp:projection}, and exact evaluation in \SuppNoteref{supp:yamada_engine}.
+
+The modules in \Figref{fig:functionality_overview} act on these shared representations. Reconstruction, projection, invariant evaluation, orientation-aware measurements, parameter scans and optional geometric preconditioning can be combined according to the input and scientific question. Their separation also permits errors and limitations to be attributed to a particular interface instead of being hidden in a final signature.
+
+\begin{figure*}[t!]
+\centering
+\includegraphics[width=\linewidth]{GeneralVersion/Figures/KnottedGraphVsTopoly.pdf}
+\caption{\textbf{Reference-checked Yamada evaluation reaches $500$ crossings on structured published families.}
+Columns show the Dobrynin--Vesnin $\Theta(n)$ family \cite{kg_dobrynin1996yamada}, the Li--Lei--Li--Vesnin $\infty_{+}$ edge-replaced cycle family and the corresponding edge-replaced theta family \cite{kg_li2018yamada}. \textbf{(a--c)} Representative embeddings; \textbf{(d--f)} diagrams and PD data; \textbf{(g--i)} historical invariant-evaluation timings. Displayed timings are retained for their original benchmark protocol, and direct comparisons with Topoly~1.1.0 \cite{kg_topoly2021} are restricted to cases satisfying the same published reference polynomial. Missing or skipped comparator points are not measured timeouts or measured speedups. The $500$-crossing result is family-specific, not a bound for arbitrary diagrams; timing provenance and scope are stated in \SuppSubsecref{supp:sanity_validation} and \SuppSubsecref{supp:limitations_performance}.}
+\label{fig:knottedgraph_topoly_scaling}
+\end{figure*}
+
+\subsection{Separate reference checks assess reconstruction, projection and algebra}
+\label{sec:validation_main}
+The stages of \Eqref{eq:main_pipeline} are tested separately, because agreement of a final invariant cannot identify errors introduced earlier. In an inverse reconstruction benchmark, known embedded graphs are thickened and voxelized, reconstructed and compared with their seeds. Connectedness, cycle rank, valence, abstract isomorphism and completed normalized-polynomial comparisons are recorded as different checks. The reported $5{,}000$-construction ensemble is an empirical test set, not a certificate that every sampled object is a handlebody or that every reconstruction preserves its source embedding. The retained batch counts and provenance qualifications are given in \SuppSubsecref{supp:handlebody_validation}; no universal $5{,}000$-case embedding-recovery claim is made.
+
+Projection is tested through multiple accepted generic views of fixed subcubic embeddings. Crossing numbers and PD strings can differ between views while the normalized polynomial must agree. Planar references are also compared with crossing-free graph-polynomial calculations. Algebraic tests use graph identities, crossing relations and published closed-form families (\SuppNoteref{supp:validation}). These checks support the tested interfaces and examples; they do not certify every finite-thickness reduction used by an application.
+
+\subsection{Scalable exact Yamada evaluation enables dataset-scale spatial-graph analysis}
+\label{sec:performance}
+The three published families in \Figref{fig:knottedgraph_topoly_scaling} supply independent formulas for checking the evaluator \cite{kg_dobrynin1996yamada,kg_li2018yamada}. Stored examples reproduce these formulas exactly on structured diagrams with up to $500$ crossings. The historical records support approximate evaluation times of $0.32\,\mathrm{s}$, $9.31\,\mathrm{s}$ and $15.17\,\mathrm{s}$ at the largest tested parameters of the Dobrynin--Vesnin, edge-replaced cycle and edge-replaced theta families, respectively (\Figpanelref{fig:knottedgraph_topoly_scaling}{g--i}). These values are retained observations, not fresh timings of every later software revision.
+
+On reference-passing cases, the recorded comparisons give approximately $25\times$ speedup for the $n=3$ edge-replaced cycle, $136\times$ for the $n=7$ edge-replaced cycle and $567\times$ for the $s=7$ edge-replaced theta. Larger \texttt{KnottedGraph} points still satisfy their literature formulas when no common validated Topoly result is retained. We do not assign speedups to those missing comparisons. The available timing boundaries, single-measurement protocol and missing historical environment information are stated in \SuppSubsecref{supp:sanity_validation}.
+
+Crossing number alone does not determine the computational cost. The local Yamada relation has three terms per crossing, giving a direct resolution space of size $3^c$ for $c$ crossings. The evaluator combines intermediate histories once they have the same remaining connectivity data and exact polynomial contribution structure (\SuppNoteref{supp:yamada_engine}). Repeated local structure can therefore make a large-crossing diagram tractable by reducing the number of distinct intermediate states. This observation is not a claim of polynomial-time evaluation for arbitrary spatial graphs.
+
+The geometric and diagrammatic interfaces are independent of the particular invariant backend. Additional exact knot, link or spatial-graph invariants can be incorporated without redesigning the earlier representations. The next example uses the Yamada evaluator to generate structured mathematical data. Exploratory finite-thickness scans, including the unchanged TPMS display, are confined to \SuppNoteref{supp:knot_fields}.
+
+\begin{figure*}[t!]
+\centering
+\includegraphics[width=\linewidth]{GeneralVersion/Figures/MathematicalGraphPatterns/LLMBasedFormulaDiscovery_Yamada.pdf}
+\caption[Evaluator-guided investigation of candidate Yamada-family laws.]{\textbf{Exact invariant data support candidate family-level algebraic descriptions.}
+\textbf{(a)} The diagram specifies a generate--infer--freeze--test protocol with discovery set $D$ and test set $T$. The words ``blind'' in the unchanged artwork describe this protocol; the archived evidence does not establish a complete historical withholding and freezing chronology. \textbf{(b--d)} Cross-linked family $\Lambda_m$; \textbf{(e--g)} lower-paired family $\Lambda_m^{\downarrow}$; \textbf{(h--j)} two-sided family $\Lambda_m^{\updownarrow}$. Their displayed normalized formulas are considered for nonempty constructions. \textbf{(k)} The proposed mixed-family transfer expression depends only on motif counts because its matrices commute. \textbf{(l)} A fixed $8$-vertex, $12$-edge cubic multigraph carrying $A=\sigma_1^2$ and $B=\sigma_2^2$ exhibits order-sensitive polynomial values. Formula-to-family identification, retrospective exact checks and proof status are distinguished in \SuppNoteref{supp:transfer_derivation}. The formulas in the artwork are not asserted to be universally proved by a finite data fit.}
+\label{fig:three_theta_yamada_families}
+\end{figure*}
+
+\subsection{Exact topological-invariant datasets support evaluator-guided mathematical discovery}
+\label{sec:mathematical_discovery}
+Exact invariant values can serve as mathematical data for conjecture generation. The evaluator and the conjecture-generating procedure have different roles: a model can propose algebraic structure, while a direct graph calculation tests particular predictions. Existing family-specific derivations supply an important precedent \cite{kg_dobrynin1996yamada,kg_li2018yamada,kg_lundstrom2022transfer}. Our contribution is the integration of graph-family generation, exact data and deterministic transfer reconstruction in a reusable computational workflow, rather than the invention of transfer-matrix methods for Yamada polynomials.
+
+\Figpanelref{fig:three_theta_yamada_families}{a} specifies a protocol in which a candidate is fixed before a test set is evaluated. The present evidence supports LLM-assisted candidate formulation followed by retrospective exact computational checks; it does not independently establish every step of the original blind-discovery chronology. In particular, deterministic Hankel reconstruction and algebraic verification are not attributed to an LLM merely because language-model assistance was used in the broader investigation. This distinction places the work within the evaluator-guided direction of Refs.~\cite{kg_funsearch2024,kg_alphaevolve2025,kg_georgiev2025mathematical} without treating the generative model as the source of mathematical verification.
+
+The homogeneous constructions in \Figpanelref{fig:three_theta_yamada_families}{b--j} motivate a common three-channel diagonal transfer ansatz. Its mixed extension in \Figpanelref{fig:three_theta_yamada_families}{k} uses commuting operators. Under the proposed identification of this expression with the graph-family invariant, an ordered motif word $w$ with count vector $\mathbf n=(n_\Lambda,n_\downarrow,n_\updownarrow)$ factors through
+\begin{equation}
+w\longmapsto\mathbf n\longmapsto\overline{\Upsilon}(\mathcal A_{\mathbf n};Y).
+\label{eq:main_abelianization}
+\end{equation}
+The reconstructed expression agrees with all $459$ comparisons in the completed retrospective mixed-family audit. This count comprises the stated deterministic word plan, not the $500$-word claim in an earlier draft. The all-word family identity remains distinct from these finite comparisons; its displayed algebraic consequences are developed conditionally in \SuppSubsecref{supp:transfer_commuting}.
+
+The pure-braid family in \Figpanelref{fig:three_theta_yamada_families}{l} shows a complementary effect. The underlying cubic multigraph is fixed, but three distinguished strands carry a word in $A=\sigma_1^2$ and $B=\sigma_2^2$. The recorded length-three examples satisfy
+\begin{equation}
+\overline{\Upsilon}(\mathcal N_{AAB};Y)
+=\overline{\Upsilon}(\mathcal N_{BAA};Y)
+\neq\overline{\Upsilon}(\mathcal N_{ABA};Y),
+\label{eq:main_nonabelian_example}
+\end{equation}
+so the invariant can retain order information beyond motif counts within this fixed graph family.
+
+A symbolic reconstruction from short-word data yields a $15$-state candidate representation with noncommuting matrices. The exact finite Hankel block has rank $15$, and the retained matrix identities and cubic relations pass exact arithmetic checks. Direct raw-polynomial evaluation agrees with the representation for $324$ distinct short words and for two subsequently audited words of length $101$ (\SuppSubsecref{supp:transfer_nonabelian_verification}). These are retrospective extrapolation checks against an already available candidate. The other $18$ members of the planned long-word test set are not reported as completed. Identifying the candidate with every closure in the graph family, and consequently establishing all-word minimality, still requires the family-specific state-space and closure argument.
+
+The demonstrated role of \texttt{KnottedGraph} is therefore to generate exact spatial-graph data and to test candidate mathematical structure independently of how that structure was proposed. Recurrences, closed forms, transfer representations and algebraic symmetries can be investigated in the same environment, with finite verification and theorem-level proof kept separate. Other exactly computable invariants can support analogous studies as their backends are added.
+
+\section{Discussion}
+\label{sec:discussion}
+\texttt{KnottedGraph} addresses interoperability between representations used in three-dimensional scientific topology. Coordinates, networks, surfaces, volumes and fields can enter at different stages, while a common embedded-graph object retains incidence, geometry and scientific attributes. Reconstruction, projection, graph-level analysis, parameter scanning and exact invariant evaluation become reusable components rather than isolated application scripts.
+
+The strongest quantitative performance evidence comes from explicit published graph families. The evaluator reproduces their formulas on structured diagrams with up to $500$ crossings, and the historical reference-passing comparisons yield representative speedups of approximately $25\times$--$567\times$ over Topoly. These observations are specific to the tested inputs and timing protocol. They demonstrate useful computational scale without implying a general crossing-number complexity bound or a hardware-independent performance guarantee.
+
+The mathematical examples use this scale to investigate candidate transfer laws. The proposed mixed-family operators commute and consequently produce count-only expressions, whereas the pure-braid candidate retains word order. Exact retrospective data support the tested predictions and matrix identities. They do not reconstruct unarchived model conversations, establish historical blindness, or replace an all-family proof. The distinction is useful beyond the present examples: a generative procedure proposes a relation, a reproducible evaluator tests it, and a mathematical argument determines its universal scope.
+
+Finite-thickness applications require an additional correspondence that explicit spatial-graph inputs do not. A successful graph calculation describes its supplied embedding; interpreting it as a statement about an analytic source requires a justified discretization and source-to-spine map. Betti agreement, stable abstract graph structure across nearby extraction scales and equality of an incomplete invariant are valuable diagnostics, but not interchangeable with that correspondence. The supplementary TPMS and Hamiltonian displays are accordingly presented as historical numerical explorations with documented postprocessing, not as independent demonstrations of continuum phase boundaries.
+
+The graph-spine setting also has representation limits for objects with distinguished inner or nested boundaries. The boundary-resolved direction discussed in \SuppSubsecref{supp:handlebody_basis} remains separate from the ordinary graph-only reconstruction used here. Likewise, higher-valence evaluations retain their diagram data rather than inheriting the subcubic projection-independent interpretation. The detailed limitations, retained-data scope and prospective improvements are collected after the software architecture in \SuppNoteref{supp:limitations}.
+
+The modular structure permits additional invariants, improved reconstruction certificates and application-specific boundary representations to be developed without changing every layer. It also permits scientific response calculations to be coupled to verified geometric quantities. Such mechanical, transport or thermal calculations are future applications, not results inferred from the unchanged exploratory phase-map artwork. The present framework supports scientific graph analysis and exact-data-driven mathematical investigation within these stated boundaries.
+
+\BackMatterHeading{Acknowledgements}
+\label{sec:acknowledgements}
+We thank Henrik Schumacher and Keenan Crane for helpful guidance regarding the repulsive-curve framework and the associated \url{https://github.com/HenrikSchumacher/Repulsor} repository. \placeholder{FUNDING AGENCIES, GRANT NUMBERS, INSTITUTIONAL SUPPORT, COMPUTE CREDITS, AND ANY ADDITIONAL ACKNOWLEDGEMENTS}
+
+\BackMatterHeading{Data availability}
+\label{sec:data_availability}
+The \texttt{KnottedGraph} repositories contain the executable application workflows and retained result records. Retrospective audit records used to qualify this version are available at the immutable revision
+\url{https://github.com/HakanAkgn/KnottedGraph/tree/1488ea366085d641040e3c7e48f2763a127894ad}, particularly under \texttt{doc/reproducibility/} and \texttt{User\_guide/applications/results/arxiv\_revision/}. These records are distinct from the historical artwork retained in this manuscript; they are not asserted to reproduce every unchanged figure from one common original run. The available original-figure provenance and remaining gaps are stated in \SuppSubsecref{supp:reproducibility_resources} and \SuppNoteref{supp:limitations}. Original LLM transcripts and independently timestamped historical discovery/freezing records are not included.
+
+\BackMatterHeading{Code availability}
+\label{sec:code_availability}
+The source code, documentation and executable notebooks are available at \url{https://github.com/sarinstein-yan/KnottedGraph} and the independently audited revision \url{https://github.com/HakanAkgn/KnottedGraph/tree/1488ea366085d641040e3c7e48f2763a127894ad}. The latter contains an environment lockfile and reproduction scripts. It is a software/audit reference, not an invented identifier for the unversioned historical manuscript or every original figure-generation environment. No permanent archival DOI is claimed in this version. Methods and reproducibility resources are specified in \SuppSubsecref{supp:reproducibility_resources}.
+
+\FloatBarrier
+\bibliographystyle{apsrev4-2}
+\bibliography{GeneralVersion/references,text_only_references}
+
+\setcounter{dbltopnumber}{2}
+\renewcommand{\dbltopfraction}{0.70}
+\renewcommand{\textfraction}{0.20}
+\renewcommand{\dblfloatpagefraction}{0.50}
+\BeginSupplementaryInformation{\ManuscriptTitle}{\ManuscriptAuthors}{\ManuscriptAffiliations}{Correspondence: \ManuscriptCorrespondence}{\SupplementaryVersionDate}
+\setcounter{secnumdepth}{2}
+\renewcommand{\thesubsection}{\thesection.\Alph{subsection}}
+\ifcsname theHsection\endcsname
+\renewcommand*{\theHsection}{supp.\arabic{section}}
+\fi
+\ifcsname theHsubsection\endcsname
+\renewcommand*{\theHsubsection}{supp.\arabic{section}.\Alph{subsection}}
+\fi
+\titleformat{\subsection}[block]{\normalfont\sffamily\bfseries\fontsize{10.8}{12.8}\selectfont\KGHeadingNoBreak}{Supplementary Note~\thesubsection\enspace\textbar\enspace}{0pt}{}
+\titlespacing*{\subsection}{0pt}{2.0ex plus 0.5ex minus 0.2ex}{0.55ex}

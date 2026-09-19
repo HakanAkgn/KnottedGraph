@@ -1,0 +1,80 @@
+
+\section{Software architecture and reproducibility}
+\label{supp:software_architecture}
+The package is organized around the representation boundaries used throughout this work (\SuppFigref{suppfig:library_architecture}). \texttt{knotted\_graph.inputs} contains parsers and constructors; \texttt{knotted\_graph.core} contains the shared graph data model and graph-level utilities; \texttt{knotted\_graph.extraction} processes surfaces, masks and skeletons; \texttt{knotted\_graph.projection} produces crossing-aware diagrams and PD records; and \texttt{knotted\_graph.invariants} contains the exact backends. \texttt{knotted\_graph.layout} and \texttt{knotted\_graph.visualization} supply optional geometric and rendering operations, while \texttt{knotted\_graph.applications} composes those interfaces for particular domains. These boundaries follow the intermediate object rather than imposing a separate complete implementation for every scientific example.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\linewidth]{GeneralVersion/Figures/Architecture.pdf}
+\caption{\textbf{Modular organization of \texttt{KnottedGraph}.} Input adapters and application constructors feed shared representations. Extraction, projection and invariant modules implement distinct stages, while layout and visualization operate on the same intermediate objects. An input can begin at a later stage if it already satisfies the required contract. The organization makes the stages reusable; it does not supply a topology-preservation theorem for every source conversion.}
+\label{suppfig:library_architecture}
+\end{figure}
+
+The embedded \texttt{networkx.MultiGraph}-compatible object retains node positions and ordered edge paths. Projection, visualization, layout and graph measurements can consume the same object. \texttt{ProjectionResult} retains a selected view and diagram data, and \texttt{YamadaComputationResult} associates an evaluated polynomial with its projection. These records permit a result to be traced to the representation actually evaluated. A graph-only workflow can begin at the core interface, while a valid PD-only workflow can bypass three-dimensional processing.
+
+Application modules, including \texttt{materials.py}, \texttt{mathematical.py}, \texttt{knot\_deformation.py}, \texttt{nodal/} and \texttt{phase\_maps.py}, organize inputs and invoke the shared lower layers. They do not remove the need to state each application's mathematical object and boundary convention. In particular, a parameter-map interface can organize outputs of different scopes, but the output record must distinguish spatial invariants, selected-diagram values, abstract summaries and failures rather than treating them as one classification.
+
+Workflow-specific dependencies are separated from the graph and invariant interfaces. Optional groups cover knot-field, nodal, surface, visualization, repulsion, notebook and benchmark functionality; development, testing and documentation dependencies are maintained separately. Installation groups describe software dependencies, not independent scientific validation of every application. Native layout dependencies and the external Repulsor checkout are documented in the pinned third-party notice.
+
+\subsection{Methods and reproducibility resources}
+\label{supp:reproducibility_resources}
+The immutable software/audit reference for the textual qualifications in this version is
+\begin{center}
+\url{https://github.com/HakanAkgn/KnottedGraph/tree/1488ea366085d641040e3c7e48f2763a127894ad}.
+\end{center}
+It contains \texttt{uv.lock}, the package configuration, source code, tests and the historical/audit distinction in \texttt{doc/reproducibility/}. This identifier is not claimed to be the original commit that generated every retained figure. The software reference and the manuscript's unchanged historical artwork are different provenance objects.
+
+The principal retained resources are as follows. \texttt{doc/reproducibility/arxiv\_revision.md} describes the corrected extraction and explicit evaluation-status behavior. \texttt{doc/reproducibility/discovery\_and\_protocols.md} records the retrospective family checks, available benchmark timing protocol and recovered Hamiltonian sampling. The directories under \texttt{User\_guide/applications/results/arxiv\_revision/} contain the short-word, mixed-family and completed long-word audit records, exact matrices, coefficient dictionaries and source/environment information. The continuation and later full-grid work in \texttt{doc/reproducibility/} is additional validation material, not the source of the historical maps retained here.
+
+A fresh software environment can be installed from the pinned checkout with \texttt{uv sync --all-extras --group dev --group docs --frozen}. The standard checks are \texttt{uv run pytest -q} and \texttt{uv run python dev/check\_repository\_consistency.py}. The exact family audit scripts include \texttt{dev/audit\_discovery\_artifacts.py}, \texttt{dev/audit\_mixed\_family.py} and \texttt{dev/audit\_discovery\_long\_words.py}; their documented commands write to new output directories so a rerun need not overwrite retained evidence. The bounded long-word command need not complete a fixed number of cases on another machine, and completed versus uncompleted records must remain explicit.
+
+The full finite Hankel and transfer payload includes $H,H_A,H_B,H^{-1},T_A,T_B,L^T,R$, coefficient records, the specialized rank witness, cubic checks and a nonzero commutator witness. These artifacts permit the stated finite matrix assertions to be checked without accepting an unprovided family-level proof. The recorded retrospective formula-payload hash is \texttt{72ac75fe0ca14632e888207d7c39ec71b05dac0c7e5a44eafb37a27c246e63a3}. It identifies that audited payload, not a historical LLM freezing event.
+
+The unchanged TPMS display has a documented correspondence to its historical generator and recorded filtering, which permits the explicit account in \SuppSubsecref{supp:tpms_phase_maps}. By contrast, not every original timing image and benchmark batch has a verified common provenance match. A general repository address, an executable notebook or a later successful software test does not establish such a match. No complete, uniform original-environment manifest or permanent archival DOI is asserted for the retained figure set. Figure-specific limitations are stated beside the relevant image and consolidated below.
+
+Original model conversations, historical prompts, independently timestamped discovery/freezing snapshots and a historical $500$-word mixed-family ledger are not included in the reproducibility claim. The manuscript identifies these as unavailable rather than inferring them from a notebook's prospective order of operations. Author, affiliation, correspondence, funding and supplementary-date fields remain author-controlled metadata and must be finalized before submission.
+
+\FloatBarrier
+\section{Limitations and scope of interpretation}
+\label{supp:limitations}
+The software architecture separates objects that can be confused when only a final colored map or polynomial is inspected. This note states the associated limitations together, while the captions and relevant sections retain the local qualifications needed to read the figures correctly.
+
+\subsection{The continuous source, its digital realization and its selected graph}
+\label{supp:limitations_correspondence}
+An analytic solid, a voxel mask, an embedded graph and a planar diagram are distinct representations. The mathematical existence of a spine for a handlebody does not guarantee that a numerical extraction returns such a spine, nor that the sampled mask is a manifold or a correct regular neighborhood of the intended graph. Matching $\beta_0,\beta_1,\beta_2$, preserving component count, repeated incidence under nearby cleanup scales and agreement of an incomplete graph invariant provide different necessary or empirical checks. None alone proves the complete source-to-spine correspondence.
+
+This is not only a theoretical possibility. The audited historical TPMS records contain component-count inconsistencies, and later source/digital comparisons identify cases where voxel homology or selected graph signatures vary within a regular analytic continuation region. Those later records are independent checks; they do not update the unchanged plotted labels. Digital-adjacency conventions, sampling resolution, boundary clipping and lost small components must all be distinguished when diagnosing a particular failure. An apparent map boundary can therefore originate from the representation pipeline rather than from the continuous geometry.
+
+A graph-only description also does not encode every multi-boundary geometry. Distinguished inner boundaries and their attachments require the separate boundary-resolved treatment discussed in \SuppSubsecref{supp:handlebody_basis}. The present text does not replace or claim completion of that treatment, and it does not use an artificial isolated vertex as a substitute for an unsupported volume. The empty graph, an isolated vertex and a missing reconstruction remain different outcomes.
+
+\subsection{Graph isotopy, change of spine and numerical preprocessing}
+\label{supp:limitations_equivalence}
+Ordinary Yamada invariance applies to the admissible spatial-graph equivalence being tested. Equivalent handlebody neighborhoods permit changes of spine through spatial contractions as well as ambient isotopies \cite{kg_ishii2012handlebody}. Consequently, even a correctly computed normalized polynomial of a valid chosen spine is not automatically independent of all other valid spine choices. Abstract isomorphism after contraction discards the very embedding information that a spatial invariant detects. Exhausting a finite contraction search means that equivalence was not established by that search, not that inequivalence was proved.
+
+Numerical endpoint movement, polyline simplification and graph pruning must also be interpreted at their actual level. Retaining incidence does not prevent an edge from passing through a nonincident strand. Ramer--Douglas--Peucker simplification is a geometric approximation method \cite{kg_ramer1972,kg_douglas1973}, not an unconditional ambient-isotopy-preserving operation. A topology-preservation claim requires appropriate motion or separation checks for the actual transformation. Optional safe-step layout verification is not retroactively supplied by a before/after picture or a positive static clearance value.
+
+\subsection{Parameter maps and retained historical artwork}
+\label{supp:limitations_maps}
+The TPMS and Hamiltonian map artwork is preserved in this version. Its colors and internal labels must be read with the revised captions: the maps are historical, postprocessed numerical illustrations and are not used to establish a complete continuum phase classification. The TPMS filter changed $171$ distinct parameter cells after bounded abstract-contraction grouping, and the mixed source labels and normalization inconsistencies prevent interpreting every remaining color as the normalized spatial invariant defined here. The five TPMS interval labels are not five proved topological regimes.
+
+Similarly, the Hamiltonian display includes legacy label filtering and mixed spatial/abstract calculation paths. Its recovered sampling and finite-domain conventions are stated explicitly, but a black line in the unchanged image is not a located Lifshitz transition. Genuine critical-set analysis must account for both interior and constrained boundary events. A cell containing a stationary event need not consist entirely of singular parameters, and stationary-point existence alone need not establish the global topology change on either side. Equal colors, different colors and unknown computations are not interchangeable equivalence claims.
+
+A text-only revision cannot turn these historical pixels into newly computed or unfiltered data. Retaining them is therefore accompanied by withdrawal of the unsupported phase-count, optimization-corridor and response-prediction interpretations, rather than by a claim that disclosure validates the old classification. The exact numerical correction or a new validated phase map would require separate computational and figure revisions.
+
+The inline drawing accompanying the Reidemeister-II discussion is another retained-artwork limitation. Its second overpass makes the illustrated cancellation invalid. The adjacent correction explicitly rejects that arrow as a valid move for the drawn tangle and states the correct same-overpassing-strand condition. The drawing has not been silently repaired, and its erroneous overpass is not used as evidence for the implemented simplification.
+
+\subsection{Benchmark coverage and performance claims}
+\label{supp:limitations_performance}
+The inverse reconstruction checks apply to specified generated inputs and cannot establish a universal recovery guarantee. The available $5{,}000$-row audit has missing invariant comparisons and a mismatch, and its identity is not conclusively tied to every unchanged benchmark image. This version does not claim $100\%$ spatial recovery. Equal normalized polynomials, even when obtained for both inputs, are an embedding-sensitive consistency check rather than a complete proof of equivalence.
+
+The retained timing distributions also do not have an established common matched cohort and full original environment for all panels. Ratios of their displayed means are not used as paired speedup estimates. The main-text acceleration claims are limited to the published-family reference-passing comparisons and their retained timing protocol. A $500$-crossing structured example is not evidence for a uniform time or memory bound on all diagrams. Missing hardware and compiler settings, unrecovered thread environments, absent repeated timings and skipped comparator points cannot be reconstructed from the appearance of a plot.
+
+\subsection{Exact finite tests, all-family identities and AI provenance}
+\label{supp:limitations_discovery}
+The family expressions are retained, with their graph-family identification stated as a candidate where a universal derivation is absent. Matrix commutation, cubic identities and the rank of the finite Hankel block are algebraic statements distinct from the assertion that a fixed closure factors through those matrices for every word. Finite data agreement does not supply the missing state/action/closure proof or an all-word minimality theorem. The formal projector expressions are evaluated in a rational-function field, with singular numerical specializations treated through the underlying matrices rather than undefined denominators.
+
+The completed retrospective records comprise the stated $459$ mixed-family comparisons, $324$ short pure-braid comparisons and two length-$101$ extrapolation cases. An unfinished twenty-word plan is not described as twenty successes. The displayed $AAABA$ example is outside the coordinate basis but lies inside the Hankel input data; it is not a blind test. Finally, later exact audits and timestamps cannot recover historical model prompts or prove original withholding of a test set. The proposed generate--infer--freeze--test protocol is therefore separated from the historical provenance that is actually available.
+
+These qualifications preserve the useful software and exact-computation contributions while delimiting their interpretation. Additional reconstruction certificates, complete original-run manifests, independently witnessed spatial equivalences and family-specific proofs would strengthen particular claims. They are not represented as already supplied by the unchanged figures or by this textual revision.
+
+\end{document}

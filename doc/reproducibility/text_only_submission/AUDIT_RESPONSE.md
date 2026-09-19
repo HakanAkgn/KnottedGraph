@@ -1,0 +1,30 @@
+# Text changes and remaining non-text work
+
+Basis: the complete 19 September LaTeX upload, its 40-page PDF, the attached 18 September Codex audit, and the already-discussed retained audit records at immutable code revision `1488ea366085d641040e3c7e48f2763a127894ad`. New numerical runs and new figure data are not part of this revision.
+
+## Main paper
+
+The abstract is shortened and centered on the shared spatial-graph representation, exact evaluator and finite-data mathematical investigation. The absolute claim that no common representation exists is removed. Main-text TPMS class counts, five-regime claims and mechanical/transport/optimization conclusions are removed. The unchanged TPMS figure moves to the supplementary application note. An early paragraph distinguishes graph invariants, source geometry and alternative spines. The detailed limitations are placed **after Software architecture and reproducibility**, as requested.
+
+## Audit findings addressed through text
+
+1. **TPMS filtering.** The caption and application note disclose the fewer-than-four-cell, up-to-three-pass filter; tabulate pre/post operational labels and regions; distinguish 171 unique changed cells from reassignment counts; and withdraw phase-count claims. The image is explicitly historical and filtered, not corrected or unfiltered.
+2. **Abstract versus spatial grouping.** The text states that the historical contraction comparison discarded embedding coordinates. Its finite state/depth/edge limits are listed. Search exhaustion is not called inequivalence. A selected-spine polynomial is not promoted to an arbitrary-spine-invariant handlebody classifier.
+3. **TPMS normalization, valence and components.** Historical source-label coverage, nonzero minimum degrees, high-valence records and component mismatch are explicitly reported. The retained artwork is not retrospectively described using later corrected records.
+4. **Fallback and projection errors.** Spatial-to-abstract fallback is identified as a historical limitation with no invented fallback count. An unresolved nonincident crossing invalidates a view rather than being silently dropped. Explicit graph, diagram and unavailable-result scopes are separated.
+5. **5,000-case claim.** Universal success is withdrawn. The available neighboring CSV's 4,472 matches, one mismatch and 527 blank comparisons are reported with the audit's batch-provenance qualification. They are not substituted as a proved source ledger for the unchanged timing image.
+6. **Certificates and geometry processing.** Betti/thickness/isomorphism checks are described as limited consistency evidence. RDP, endpoint movement and pruning do not acquire an ambient-isotopy guarantee merely through fixed incidence. The distinction from independently checked swept geometry is explicit.
+7. **RII.** The inline TikZ is retained verbatim. Adjacent prose explicitly says its alternating overpass is not a valid RII example, rejects the drawn arrow for that tangle and states the correct same-overpassing-strand/parity condition. This is a textual correction, not a repaired drawing.
+8. **Family laws and AI records.** All mathematical family expressions are preserved. Their universal graph correspondence is stated as proposed/conditional where proof is absent. Finite H-rank and matrix identities are not called an all-word minimality proof. Actual retrospective counts are 459 mixed, 324 short pure-braid and two length-101 comparisons; unfinished plans are not counted as successes. The m=0 normalization exception and zero-polynomial convention are explicit. AAABA is not called an independent holdout. The diagram's blind protocol is separated from the unavailable historical chronology. No model name/access date/transcript is invented.
+9. **Protocols.** Structured-family timing scope and known worker boundaries are stated, with missing historical hardware and repetition metadata left unknown. Histogram means are not treated as paired speedups. Hamiltonian arrays are corrected to lambda j/59 and energy .30+(99/980)k, with endpoint constants, auxiliary non-Hermitian construction, finite box, lack of face identification and historical display filtering disclosed. No black line in an unchanged map is labeled a verified Lifshitz transition.
+10. **Availability.** A real immutable software/audit identifier, lockfile, record paths, commands and an actual Methods and reproducibility resources subsection replace nonexistent-resource assertions. The identifier is not falsely described as the original version of every retained figure. The original author/funding placeholders remain for the authors. Repulsor's documented pin is cited with its original-run scope distinguished.
+
+## Boundaries of this delivery
+
+No scientific implementation, formula coefficients or figure PDFs are changed. No new benchmark, polynomial, source-isotopy or continuum-convergence result is asserted. The unchanged images still contain known limitations; the revised text removes their unsupported scientific interpretation rather than claiming that a disclaimer mathematically validates them.
+
+The original macros, bibliography and separate figure assets were not attached, and local filesystem/execution tools were unavailable. The assembled source is therefore checked statically; no new complete-manuscript PDF or arXiv-generated preview is claimed. Some bibliography metadata and author-specific fields still require access to the original project or author confirmation. These are not hidden behind an unconditional claim of arXiv readiness.
+
+## Preservation map
+
+All 17 original `includegraphics` paths and width settings are retained, including the original .88-width TPMS graphic and .62-width worked-braid graphic. The inline RII drawing is retained exactly. TPMS is moved to Supplementary Note 5, not removed. The expanded limitations are Supplementary Note 9. Captions are prose and were revised wherever necessary to prevent a misleading interpretation of unchanged internal labels.

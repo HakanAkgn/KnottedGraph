@@ -1,0 +1,40 @@
+name: Assemble text-only manuscript revision
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths:
+      - 'doc/reproducibility/text_only_submission/parts/**'
+      - 'doc/reproducibility/text_only_submission/*.py'
+      - 'doc/reproducibility/text_only_submission/*.md'
+      - 'doc/reproducibility/text_only_submission/*.bib'
+      - '.github/workflows/text-only-manuscript-revision.yml'
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install the isolated text assembly runner
+        run: python -m pip install uv==0.12.16
+      - name: Assemble full source and validate figure preservation and cross-references
+        run: |
+          uv run --no-project --python 3.13 python doc/reproducibility/text_only_submission/assemble_text_revision.py --out text-revision-output
+          git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: KnottedGraph-text-only-arxiv-revision
+          path: |
+            KnottedGraph_text_only_revision.zip
+            text-revision-output/Third_draft.tex
+            text-revision-output/arxiv_abstract.txt
+            text-revision-output/TEXT_REVISION_QA.json
+            text-revision-output/AUDIT_RESPONSE.md
+            text-revision-output/README.md
+          retention-days: 30

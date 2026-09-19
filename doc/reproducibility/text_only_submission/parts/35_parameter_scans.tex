@@ -1,0 +1,182 @@
+
+\section{Exploratory parameter scans of finite-thickness geometries}
+\label{supp:knot_fields}
+The shared interfaces can be applied repeatedly to a family of regions $\Omega_{\boldsymbol\theta}$:
+\begin{equation}
+\boldsymbol\theta\longmapsto\Omega_{\boldsymbol\theta}\longmapsto G_{\boldsymbol\theta}\longmapsto\mathcal S(G_{\boldsymbol\theta}).
+\label{suppeq:generic_phase_map}
+\end{equation}
+Here $G_{\boldsymbol\theta}$ is a numerical graph representation and $\mathcal S$ is the explicitly stated graph, diagram or audit signature. Equal signatures do not establish equivalence of the continuous regions, and changes between neighboring signatures are not automatically topology-changing boundaries of the source. This distinction applies even before display filtering, because extraction can change the represented graph and a selected spine's ordinary Yamada polynomial is not invariant under every admissible change of spine.
+
+The figures in this note are retained from the historical exploratory scans without changing their artwork. Their plotted labels include postprocessing and are not presented as corrected, unfiltered invariant maps. The source definitions and filtering rules below explain what the retained images display and which previous interpretations are withdrawn. Later audit calculations referenced in \SuppSubsecref{supp:reproducibility_resources} are separate records; they are not silently substituted as the numerical source of these images.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\linewidth]{GeneralVersion/Figures/PhaseDIagrams.pdf}
+\caption{\textbf{Historical, postprocessed Hamiltonian scan displays.}
+The five panels correspond to \textbf{(a)} Hopf link $\rightarrow$ trefoil, \textbf{(b)} Hopf link $\rightarrow$ Solomon link, \textbf{(c)} unknot $\rightarrow$ trefoil, \textbf{(d)} unknot $\rightarrow$ Solomon link and \textbf{(e)} trefoil $\rightarrow$ cinquefoil. The original grid contains $7{,}140$ parameter points. Its $60$ inclusive interpolation samples have spacing $1/59$, and the retained energy array has spacing $99/980\simeq0.1010204$, not exactly $0.1$. The unchanged color bar labeled $\Upsilon$ and the black boundaries encode the legacy grouping and display procedure, which mixed evaluation scopes and relabeled small regions. They must not be read as uniformly normalized spatial Yamada values, a certified source-solid phase classification or located Lifshitz transitions. The finite-domain and historical postprocessing conventions are stated in \SuppSubsecref{supp:hamiltonian_phase_maps}.}
+\label{suppfig:additional_phase_diagrams}
+\end{figure}
+
+\subsection{Hamiltonian-derived finite-thickness momentum-space regions}
+\label{supp:hamiltonian_phase_maps}
+Finite-energy Fermi volumes motivate parameter-dependent geometric analysis. Lifshitz transitions concern changes in Fermi-surface topology \cite{kg_lifshitz1960,kg_varlamov2021lifshitz}; strain and pressure can tune such transitions \cite{kg_sunko2019lifshitz,kg_xiang2015lifshitz}. Composition is another way to tune a Hamiltonian and its band topology \cite{kg_dziawa2012topological}, but a composition-driven topological crystalline transition is not identified with a Fermi-surface Lifshitz transition merely by that citation. The companion work addresses a Fermi-volume spatial-graph construction \cite{akgun_yan_2026topologicalclassificationknottedgraphs}. The retained scans here illustrate use of the software on analytic benchmark inputs, not an independent validation of all continuum phase boundaries.
+
+The constructor family uses
+\begin{equation}
+\begin{aligned}
+z(\mathbf k)&=\cos(2k_z)+c_0+i\!\left(\cos k_x+\cos k_y+\cos k_z-m\right),\\
+w(\mathbf k)&=\sin k_x+i\sin k_y,\\
+f_{p,q}(\mathbf k)&=z(\mathbf k)^p-w(\mathbf k)^q,
+\end{aligned}
+\label{suppeq:nodal_pq_field}
+\end{equation}
+with the Hermitian reference Hamiltonian
+\begin{equation}
+H_{p,q}(\mathbf k)=\operatorname{Re}f_{p,q}(\mathbf k)\,\sigma_x+\operatorname{Im}f_{p,q}(\mathbf k)\,\sigma_z.
+\label{suppeq:nodal_pq_hamiltonian}
+\end{equation}
+The complex nodal construction follows Refs.~\cite{kg_bi2017nodalknot,kg_lee2020nodalknots}. The constructor labels unknot, Hopf link, trefoil, Solomon link and cinquefoil refer to $(p,q)=(1,1),(2,2),(2,3),(2,4),(2,5)$. These names do not by themselves certify every sampled finite-window nodal embedding.
+
+The recovered implementation uses $m=2$. Most endpoints use $c_0=0.5$, whereas the Solomon endpoint uses the numerical constant $c_0=0.333$, not the exact rational $1/3$. Thus interpolation to Solomon combines endpoint Hamiltonians with different coordinate-map constants. The parameter $c_0$ is distinct from the TPMS threshold $c$ below.
+
+The Hermitian positive band is $\varepsilon_{p,q}(\mathbf k)=|f_{p,q}(\mathbf k)|$. With all sets in this subsection restricted to the finite sampled domain specified below, write
+\begin{equation}
+\Omega_{\lambda,E}=\{\mathbf k:\varepsilon_\lambda(\mathbf k)\leq E\},
+\label{suppeq:fermi_volume_phase_map}
+\end{equation}
+where $\varepsilon_\lambda$ is the positive band of
+\begin{equation}
+H_\lambda(\mathbf k)=(1-\lambda)H_0(\mathbf k)+\lambda H_1(\mathbf k),\qquad 0\leq\lambda\leq1.
+\label{suppeq:phase_map_interpolation}
+\end{equation}
+The numerical route actually uses an auxiliary non-Hermitian model with an additional $i\Gamma\sigma_y$ term. For real coefficients $d_1,d_3$ of the other Pauli matrices and $\Gamma>0$, its exceptional-volume condition corresponds in exact arithmetic to $d_1^2+d_3^2\leq\Gamma^2$. This is the same geometric sublevel condition as the Hermitian positive-band region at $E=\Gamma$. The equivalence concerns the selected geometry, not a claim that the computational Hamiltonian itself is Hermitian. The historical mask implements a zero-real-spectrum condition; numerical extraction and boundary treatment still require separate checks.
+
+The sampled box is $W=[-\pi,\pi]\times[-\pi,\pi]\times[0,\pi]$, at $120^3$ resolution, with displayed coordinate scaling $(1,1,2)$. No periodic face-identification operation was established for this route. In particular, the simultaneous appearance of $\cos k_z$ and $\cos 2k_z$ does not make $[0,\pi]$ a periodic fundamental interval for the complete field. Boundary-touching masks are finite-window objects, not silently closed by identifying opposite faces.
+
+The recovered candidate arrays are
+\begin{equation}
+\lambda_j=\frac{j}{59},\quad j=0,\ldots,59,
+\qquad E_k=0.30+\frac{99}{980}k,\quad k=0,\ldots,49.
+\label{suppeq:hamiltonian_sampling}
+\end{equation}
+Panels \textbf{(a,c)} retain $16$ energy values, \textbf{(b,d)} retain $24$, and \textbf{(e)} retains $39$. The largest retained energies are approximately $1.8153061$, $2.6234694$ and $4.1387755$, respectively, and the total is $60(16+24+16+24+39)=7140$. The historical terminal-row rule stopped or cropped at the first energy row classified as a one-vertex result for every interpolation sample. This was an algorithmic criterion, not a demonstrated physical transition.
+
+\paragraph{Historical grouping and display postprocessing}
+The retained scan route mixed spatial and abstract graph-polynomial calculations through a fallback that could replace a failed projected evaluation with an abstract result. Its original per-cell outputs do not establish which calls used that fallback. Consequently, the unchanged figure is not assigned the uniform interpretation $\mathcal S=\overline{\Upsilon}$ in the ambient-isotopy sense.
+
+The historical parameter-space filter additionally selected four-connected components smaller than $\max(5,\lceil0.01N_{\mathrm{panel}}\rceil)$ and iteratively reassigned them to neighboring large-component labels. Votes used eight neighboring pixels, with total label area and then label index as tie breakers. Small area alone does not demonstrate numerical noise. Abstract-contraction grouping and the filter can both merge labels without establishing equality of spatial embeddings. Neither a black boundary in the retained image nor a constant-color region is therefore used as a certified continuum transition or topology-preserving corridor.
+
+For an independently validated source family, actual Fermi-surface topology changes can affect density of states \cite{kg_galeski2022lifshitz,kg_ichinokura2022lifshitz}, transport \cite{kg_galeski2022lifshitz}, thermodynamics \cite{kg_slizovskiy2015lifshitz} and superconducting behavior \cite{kg_shi2017lifshitz}. These references motivate the application; they do not identify the boundaries of the historical figure as such transitions. Extension to multiband material Hamiltonians similarly requires an explicit band or gap condition, boundary convention and validated source-to-graph correspondence. No result for a particular material is inferred solely from this exploratory benchmark display.
+
+\subsection{TPMS-derived solids: graph grouping and reconstruction limits}
+\label{supp:tpms_phase_maps}
+\label{sec:tpms_design_maps}
+
+\begin{figure*}[t!]
+\centering
+\includegraphics[width=0.88\linewidth]{GeneralVersion/Figures/PorousMaterialPhaseMap.pdf}
+\caption{\textbf{Historical filtered grouping of numerically reconstructed TPMS-derived graphs.}
+\textbf{(a)} Schwarz-P $\rightarrow$ Diamond, \textbf{(b)} Gyroid $\rightarrow$ Schwarz-P and \textbf{(c)} Gyroid $\rightarrow$ Diamond. Colors follow a bounded abstract-contraction grouping and a subsequent small-region display filter, not a demonstrated equivalence of spatial embeddings. The filter changes $18$, $67$ and $86$ distinct cells, respectively ($171$ of $1{,}323$). The stored scan also mixes polynomial and graph/audit outputs, with normalization and valence limitations detailed in the text. Black boundaries separate final display labels rather than certified source-topology phases. \textbf{(d)} The five retained geometries and interval labels at $c=0.105$ illustrate that filtered display; they are not five proved topological regimes. Transparent surfaces, black graph curves and red vertices are unchanged historical renderings. This figure is retained for illustration of the numerical workflow, not as evidence for the withdrawn $3/11/14$ topological-class interpretation.}
+\label{fig:tpms_phase_maps}
+\end{figure*}
+
+TPMS-derived geometries are used as templates for lightweight structures \cite{kg_maskery2018tpms}, tissue scaffolds \cite{kg_castro2019tpms_permeability,kg_liu2022tpms_topological_design} and thermal-management devices \cite{kg_gado2024tpms}. Architecture can influence permeability and mechanical response at comparable occupied fraction. These studies motivate examining network structure as well as density; they do not validate the grouping or filtered boundaries in the present retained illustration.
+
+The numerical scan has the form
+\begin{equation}
+(\lambda,c)\longmapsto\Omega_{\lambda,c}\longmapsto G_{\lambda,c}\longmapsto\mathcal S(G_{\lambda,c}),
+\label{suppeq:tpms_phase_map}
+\end{equation}
+where $\mathcal S$ denotes the historical operational record, not a complete spatial-graph or handlebody invariant. A graph-only reduction is appropriate only when its required source correspondence is established. It is not inferred from surface closure or the absence of contact with the outer computational box.
+
+The three fields are
+\begin{equation}
+\begin{aligned}
+F_{\mathrm G}(x,y,z)&=\sin x\cos y+\sin y\cos z+\sin z\cos x,\\
+F_{\mathrm P}(x,y,z)&=\cos x+\cos y+\cos z,\\
+F_{\mathrm D}(x,y,z)&=\cos x\cos y\cos z-\sin x\sin y\sin z.
+\end{aligned}
+\label{suppeq:tpms_fields}
+\end{equation}
+They are nodal approximations used in Gyroid, Schwarz-P and Diamond design \cite{kg_gado2024tpms}, not a claim that every blend or nonzero level is an exact minimal surface. For selected endpoints,
+\begin{equation}
+F_\lambda=(1-\lambda)F_A+\lambda F_B,\qquad0\leq\lambda\leq1.
+\label{suppeq:tpms_interpolation}
+\end{equation}
+The isosurface $F_\lambda=c$ and sublevel set $F_\lambda\leq c$ define the geometric template and the selected occupied region. Related combinations of canonical fields occur in hybrid-architecture design \cite{kg_mele2025hybrid_tpms}. The interpolation parameter and threshold describe geometric control variables, not predefined topological class labels.
+
+The periodic fields are restricted to a finite spherical domain. The implementation uses $R=0.72(2.25\pi)\simeq5.08938$ within $[-2.25\pi,2.25\pi]^3$, with its numerical value stored at machine precision. The finite solid is
+\begin{equation}
+\Omega_{\lambda,c}=\{\mathbf r:F_\lambda(\mathbf r)\leq c,\ \|\mathbf r\|\leq R\}.
+\label{suppeq:tpms_compact_solid}
+\end{equation}
+It can also be described by
+\begin{equation}
+\Psi_{\lambda,c}(\mathbf r)=\max\!\left[F_\lambda(\mathbf r)-c,\frac{\|\mathbf r\|}{R}-1\right],
+\qquad\Omega_{\lambda,c}=\{\mathbf r:\Psi_{\lambda,c}(\mathbf r)\leq0\}.
+\end{equation}
+The max expression records the intersection; it is not a globally smooth function to which an unconstrained Morse argument can be applied at the joining boundary. Interior and spherical-wall events must instead be treated separately.
+
+The historical figure uses the three paths $F_{\mathrm P}\to F_{\mathrm D}$, $F_{\mathrm G}\to F_{\mathrm P}$ and $F_{\mathrm G}\to F_{\mathrm D}$, with $21$ inclusive values each of $\lambda\in[0,1]$ and $c\in[0,0.3]$. The spacings are $0.05$ and $0.015$. At $64^3$ spatial resolution this gives $1323$ sampled compact volumes. The recorded surfaces are closed and do not touch the computational-box boundary, but the spherical cutoff is itself part of the object's boundary and can contribute constrained events.
+
+\paragraph{What the retained color map actually groups}
+The comparison converted stored geometry to \texttt{networkx.MultiGraph} incidence data and tested abstract isomorphism after non-loop contractions. Spatial coordinates were not part of that comparison. The bounded search used up to $1000$ states, depth three and a 24-edge limit per test. Its labels are thus operational groups of extracted abstract graphs; they do not establish equivalence of knotted embeddings or their regular neighborhoods. A failed bounded comparison establishes only that the search did not find the requested relation within those limits. The spatial-contraction theorem in \SuppSubsecref{supp:handlebody_basis} does not justify replacing its spatial moves by this abstract procedure.
+
+The stored $1323$ records contain $614$ entries labeled \texttt{yamada}, $636$ labeled \texttt{large-core} and $73$ labeled \texttt{vertex}. These source labels are bookkeeping rather than interchangeable invariants. In the audited historical batch, all $614$ polynomials have nonzero minimum degree: $513$ have degree $-5$ and $101$ degree $-7$. They are therefore not normalized as in \Eqref{suppeq:yamada_normalization}. Of the polynomial-labeled records, $37$ involve degree-greater-than-three vertices, so their interpretation also requires retaining the diagram/vertex structure. In $17$ records, the stated volume and graph component counts differ. Such a discrepancy is incompatible with a retraction of the entire volume under common conventions and cannot be ignored when calling the output a spine.
+
+The referenced historical evaluator could silently return an abstract graph polynomial after a spatial-evaluation exception. The retained records do not identify every call that used that path, and no retrospective fallback count is invented. Nor is the fallback assumed to explain the normalization or component discrepancies without a corresponding trace. Consequently, zero recorded outer errors is not evidence that all spatial computations succeeded. The unchanged map is not used as quantitative evidence of normalized spatial classes.
+
+\paragraph{Display filtering and the withdrawn class interpretation}
+After abstract grouping, a further filter replaced connected regions with fewer than four parameter cells by the most frequent neighboring label, for up to three passes. This additional, order-dependent spatial relabeling is not described adequately by ``contraction stabilization.'' The audited changes are
+\begin{table}[!t]
+\centering\small
+\begin{tabular}{lrrr}
+\hline
+Path & Before filter: labels/regions & Displayed: labels/regions & Changed cells\\\hline
+Schwarz-P $\to$ Diamond & $15/19$ & $3/3$ & $18$\\
+Gyroid $\to$ Schwarz-P & $20/64$ & $11/16$ & $67$\\
+Gyroid $\to$ Diamond & $52/88$ & $14/15$ & $86$\\\hline
+\end{tabular}
+\caption{\textbf{Documented postprocessing of the unchanged TPMS display.} Counts refer to operational labels and connected parameter-grid regions, not established topological classes. The last column counts distinct cells whose final label differs, totaling $171$; the corresponding $18$, $71$ and $94$ reassignment operations can revisit a cell.}
+\label{supptab:tpms_filter}
+\end{table}
+
+The displayed $3/11/14$ label counts, $3/16/15$ region counts and the five interval annotations in \SuppFigpanelref{fig:tpms_phase_maps}{d} are therefore not claimed as topology conclusions. The figure is preserved as a historical filtered illustration. Small filtered regions have not been demonstrated to be noise, and a constant display label is not a certified optimization corridor. Corrected software records, unfiltered audits and changed-cell information in the cited repository are separate evidence rather than a retroactive change to these retained pixels.
+
+\paragraph{Independent critical-point analysis: a separate validation target}
+For a smooth scalar sublevel set on a compact domain, the absence of level-critical points and appropriate boundary tangencies supplies regularity conditions for continuation \cite{kg_milnor1963morse}. At fixed $\lambda$, candidate interior events obey
+\begin{equation}
+\nabla F_\lambda(\mathbf r_*)=0,\qquad c_*(\lambda)=F_\lambda(\mathbf r_*).
+\label{suppeq:tpms_morse_discriminant}
+\end{equation}
+The spherical wall adds constrained candidates,
+\begin{equation}
+\nabla F_\lambda(\mathbf r_*)=\eta\mathbf r_*,\qquad\|\mathbf r_*\|=R,\qquad c_*=F_\lambda(\mathbf r_*).
+\label{suppeq:tpms_boundary_critical}
+\end{equation}
+These equations specify an independent source-geometric problem. Their critical-value branches are not identified with the black boundaries of the filtered image. A stationary event can be degenerate, several events can share a critical value, and a Hessian index gives the local attachment type rather than a complete global classification without attachment information. Later certified-continuation work in the research records is an independent audit and is not what the unchanged figure plots.
+
+A local neck model remains useful as a prospective interpretation after an actual nondegenerate event has been established. For an index-one point, with $\kappa_i>0$,
+\begin{equation}
+F_\lambda-c_*\simeq\frac12\left(-\kappa_1u^2+\kappa_2v^2+\kappa_3w^2\right).
+\label{suppeq:tpms_local_index_one}
+\end{equation}
+At $u=0$, $\delta=c-c_*>0$ gives $\kappa_2v^2+\kappa_3w^2\leq2\delta$ and hence
+\begin{equation}
+A_{\mathrm{neck}}\simeq\frac{2\pi\delta}{\sqrt{\kappa_2\kappa_3}},\qquad r_{\mathrm{neck}}\propto\sqrt\delta.
+\label{suppeq:tpms_neck_scaling}
+\end{equation}
+This is a local geometric consequence of the assumed normal form, not a measured property of every displayed boundary. Under a further fixed-effective-length, Poiseuille-like cylindrical-throat model, hydraulic conductance would scale as $r^4\sim\delta^2$. A slender solid bridge with fixed characteristic length would instead have axial stiffness or solid thermal conductance proportional to area, and bending rigidity proportional to a fourth moment. Those additional model assumptions need not describe an actual evolving TPMS neck; no macroscopic transport or mechanical exponent is inferred here.
+
+Replacing $F_\lambda$ by $-F_\lambda$ reverses Hessian signs, interchanging local Morse indices $k$ and $3-k$. This relates local solid and complementary-phase descriptions, but does not by itself predict whether a global network gains a component, handle or transport pathway. Mechanical, permeability and thermal studies \cite{kg_maskery2018tpms,kg_castro2019tpms_permeability,kg_santos2020tpms_permeability,kg_liu2022tpms_topological_design,kg_gado2024tpms} motivate future response calculations for independently validated geometries; they do not establish response changes for these historical map labels.
+
+A prospective robustness margin could be defined as
+\begin{equation}
+\rho_{\mathrm{top}}(\lambda,c)=\operatorname{dist}_{\mathrm{norm}}\!\left[(\lambda,c),\partial\mathcal P_{\mathrm{top}}\right],
+\label{suppeq:tpms_topological_margin}
+\end{equation}
+where $\partial\mathcal P_{\mathrm{top}}$ would have to be an independently justified transition set and the parameter metric explicitly specified. That set has not been determined by the retained filtered image, so no numerical manufacturing tolerance, topology-preserving design corridor or inverse-design guarantee is obtained from it. Spatially graded controls introduce additional interfaces and cannot be certified solely by assigning each local parameter value a color from a homogeneous scan.
+
+The same interfaces could be explored for other finite-thickness inputs, including ion-density level sets around topological colloids \cite{kg_everts2018doublelayer}, toroidal-droplet simulations \cite{kg_wu2024torusdroplets}, nematic-droplet transitions \cite{kg_koizumi2023nematic} and cavitation geometries \cite{kg_wang2014bubble,kg_wang2015bubble}. These are prospective applications, not additional validations in this manuscript. Each requires its own source interpretation, boundary convention and reconstruction checks before a spatial-graph signature can be related to the continuous physical geometry.
+\FloatBarrier
