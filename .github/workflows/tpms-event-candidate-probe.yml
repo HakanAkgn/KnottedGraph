@@ -1,0 +1,46 @@
+name: TPMS certified event candidates
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['.github/workflows/tpms-event-candidate-probe.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install frozen package and verify numerical code
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+          uv run --no-sync pytest -q tests/core/test_critical_events.py tests/core/test_tpms_event_membership.py
+          uv run --no-sync ruff check dev/audit_refined_tpms_records.py dev/certify_tpms_event_candidates.py tests/core/test_tpms_event_membership.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: refined-tpms-shard-0
+          run-id: 35411858561
+          github-token: ${{ github.token }}
+          path: input-shard
+      - name: Identify actual stationary events in the first completed adaptive shard
+        run: |
+          uv run --no-sync python dev/certify_tpms_event_candidates.py --input input-shard --out event-results --seconds 600
+          git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: tpms-stationary-event-probe
+          path: event-results
+          retention-days: 30
