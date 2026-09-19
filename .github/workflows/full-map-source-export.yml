@@ -1,0 +1,32 @@
+name: Full-map source export
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['.github/workflows/full-map-source-export.yml']
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 32
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Export exact delta and supporting wheels
+        run: |
+          mkdir -p /tmp/full-map-source/wheels
+          git diff --binary a07076db584801f19b0fa9f0854c2af5bf6636ea HEAD > /tmp/full-map-source/changes.patch
+          git rev-parse HEAD > /tmp/full-map-source/commit.txt
+          git log --format=fuller -16 > /tmp/full-map-source/history.txt
+          python -m pip download --only-binary=:all: --no-deps --dest /tmp/full-map-source/wheels minorminer fasteners homebase dwave-graphs dimod ruff
+          sha256sum /tmp/full-map-source/changes.patch /tmp/full-map-source/wheels/* > /tmp/full-map-source/SHA256SUMS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: full-map-source
+          path: /tmp/full-map-source
+          retention-days: 30
