@@ -1,0 +1,58 @@
+name: Replay complete retained TPMS event evidence
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths:
+      - 'dev/collect_saved_tpms_events.py'
+      - 'dev/certify_tpms_event_candidates.py'
+      - 'tests/core/test_empty_event_shards.py'
+      - '.github/workflows/tpms-event-archive-recovery.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install frozen package and verify empty-cohort regression
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+          mkdir -p event-recovery
+          uv run --no-sync pytest -q --junitxml=event-recovery/tests.xml
+          uv run --no-sync ruff check dev/collect_saved_tpms_events.py dev/certify_tpms_event_candidates.py tests/core/test_empty_event_shards.py
+          uv run --no-sync python dev/check_repository_consistency.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: complete-tpms-event-review
+          run-id: 35414418156
+          github-token: ${{ github.token }}
+          path: retained-events
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: refined-tpms-shard-*
+          run-id: 35411858561
+          github-token: ${{ github.token }}
+          path: retained-continuation
+      - name: Replay every positive event and collect the complete partition
+        run: |
+          uv run --no-sync python dev/collect_saved_tpms_events.py --saved retained-events --continuation retained-continuation --out event-recovery/verified
+          git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: complete-replayed-tpms-events
+          path: event-recovery
+          retention-days: 30

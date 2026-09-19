@@ -152,6 +152,9 @@ def main():
         'source_continuation_plan': json.loads((args.input / 'plan.json').read_text()),
     })
     results = []
+    # An empty selection is a completed empty result, not a missing result file.
+    # Keep the same output contract for every shard, including zero-row shards.
+    write_json(args.out / 'event_records.json', results)
     started = monotonic()
     for number, row in enumerate(selected):
         if monotonic() - started >= args.seconds:
