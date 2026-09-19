@@ -1,0 +1,96 @@
+{
+  "scope": "Executed analytic TPMS regularity cover and exact full-grid numerical aggregate",
+  "adaptive_source_commit": "5ee415ec44a3a5c50ccf52d9962107310b13c83e",
+  "adaptive_run_id": 35411858561,
+  "aggregate_source_commit": "3a85d92e5428d09bbbeefa9cf7be423c3e7346bb",
+  "aggregate_run_id": 35414065921,
+  "aggregate_job_id": 105819114634,
+  "aggregate_conclusion": "success",
+  "original_root_rectangles": 1200,
+  "maximum_parameter_refinement_depth": 2,
+  "total_parent_and_leaf_records": 4956,
+  "accepted_leaf_rectangles": 2538,
+  "unresolved_leaf_rectangles": 1479,
+  "complete_exact_parameter_partition_verified": true,
+  "both_regular_interval_replays_executed_in_each_leaf_run": true,
+  "regular_interval_replays_reexecuted_by_aggregate_collector": false,
+  "aggregate_checks": [
+    "all twenty expected shards completed",
+    "exact original analytic-field and parameter-domain fingerprints",
+    "compressed certificate SHA256 values",
+    "same source revision and refinement protocol",
+    "complete four-child subdivisions and no orphan records",
+    "every finest parameter tile covered exactly once",
+    "recorded primary and rational verification for every accepted leaf"
+  ],
+  "by_family": {
+    "schwarz_p_to_diamond": {
+      "original_root_rectangles": 400,
+      "certified_root_rectangles": 332,
+      "accepted_leaf_rectangles": 704,
+      "unresolved_leaf_rectangles": 389,
+      "certified_parameter_area_fraction": 0.93921875,
+      "unresolved_parameter_area_fraction": 0.06078125,
+      "connected_certified_cover_components": 9
+    },
+    "gyroid_to_schwarz_p": {
+      "original_root_rectangles": 400,
+      "certified_root_rectangles": 317,
+      "accepted_leaf_rectangles": 775,
+      "unresolved_leaf_rectangles": 435,
+      "certified_parameter_area_fraction": 0.93203125,
+      "unresolved_parameter_area_fraction": 0.06796875,
+      "connected_certified_cover_components": 6
+    },
+    "gyroid_to_diamond": {
+      "original_root_rectangles": 400,
+      "certified_root_rectangles": 265,
+      "accepted_leaf_rectangles": 1059,
+      "unresolved_leaf_rectangles": 655,
+      "certified_parameter_area_fraction": 0.89765625,
+      "unresolved_parameter_area_fraction": 0.10234375,
+      "connected_certified_cover_components": 14
+    }
+  },
+  "complete_isotopy_classification_established": false,
+  "cover_component_counts_are_distinct_topology_class_counts": false,
+  "unresolved_cells_are_proved_topology_changes": false,
+  "source_to_voxel_correspondence_established": false,
+  "figures_regenerated": false,
+  "manuscript_rebuilt": false,
+  "full_map_aggregate": {
+    "numerical_source_commit": "9be4e508f2ca7a48f580253be5de5d5392f055d0",
+    "hamiltonian": {
+      "requested_and_recorded": 7140,
+      "graph_retract_cells": 7139,
+      "evaluated_subcubic_or_isolated_vertex_cells": 7116,
+      "nontrivial_cells_with_two_generic_projection_checks": 3842,
+      "fixed_diagram_evaluated_cells": 5,
+      "time_budget_cells": 18,
+      "existing_cavity_route_not_revised_cells": 1,
+      "distinct_completed_polynomial_values_not_isotopy_classes": 45,
+      "data_sha256": "ec3ae06a1fa7341d76a89d4d74f9f79348cdbc3ac25557a06e33c792e8610d1a"
+    },
+    "tpms": {
+      "requested_and_recorded": 1323,
+      "graph_retract_cells": 1252,
+      "evaluated_subcubic_or_isolated_vertex_cells": 1001,
+      "nontrivial_cells_with_two_generic_projection_checks": 1001,
+      "fixed_diagram_evaluated_cells": 73,
+      "time_budget_cells": 178,
+      "existing_cavity_route_not_revised_cells": 71,
+      "distinct_completed_polynomial_values_not_isotopy_classes": 55,
+      "data_sha256": "4c54591edf12b746af218509b6fd6275c16f6127086310edcde8135fc75c3d5b"
+    }
+  },
+  "review_artifact": {
+    "id": 10575941567,
+    "name": "complete-numerical-review",
+    "size_bytes": 8913504,
+    "sha256": "01c6118a7355358a1686aa2d875910a410795dfb3798cb6a4e272e5aea55c2b1",
+    "retention_days": 30,
+    "contains_all_regular_interval_proof_trees": false,
+    "proof_tree_location": "twenty refined-tpms-shard-N artifacts from adaptive_run_id",
+    "exported_attachment": "KnottedGraph_complete_numerical_review.zip"
+  }
+}
