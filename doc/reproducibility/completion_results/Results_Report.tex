@@ -1,0 +1,117 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=19mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,amsmath,amssymb,graphicx,booktabs,tabularx,caption}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\captionsetup{font=small,labelfont=bf}
+\input{numbers}
+\begin{document}
+{\LARGE\bfseries Full-grid spatial-graph results\par}
+{\large Hamiltonian maps, TPMS critical events and reconstruction checks\par}
+19 September 2026
+
+\section*{1. Computations and the objects they describe}
+A parameterized solid and a selected graph extracted from that solid carry different equivalence questions. We therefore retain three separate objects: the analytic sublevel set, its finite closed-voxel realization, and the embedded graph obtained by checked elementary collapses. Polynomial values label the selected embedded graphs; regularity certificates describe continuation of the analytic solids. Neither object is silently substituted for the other.
+
+The complete Hamiltonian scan contains 7,140 points at $120^3$, with 60 interpolation samples including both endpoints. The spacing is $1/59$. The five energy-prefix lengths are 16, 24, 16, 24 and 39, taken from \texttt{linspace(0.30,5.25,50)}. The three TPMS grids contain 1,323 points at the same voxel resolution, retaining $\lambda\in\texttt{linspace(0,1,21)}$ and $c\in\texttt{linspace(0,0.3,21)}$.
+
+Every originally timed-out noncavity graph was retried without changing its vertices or polyline points. Forty generic projections were ranked by crossing count before bounded exact evaluation. Two distinct completed projections were required to agree for a subcubic spatial value; higher-valence results remain fixed-diagram values. The table includes all original grid points and the accepted retry outcomes.
+
+\begin{center}\input{table_outcomes}\end{center}
+
+The cavity entries were recognized but not recomputed through a new treatment. They are not failed spatial evaluations and are not filled with abstract graph polynomials. An uncompleted value remains unavailable. All original records and unsuccessful attempts are retained in the data package.
+
+\subsection*{Analytic event evidence}
+The adaptive analytic calculation partitions the three original parameter domains into \RegularLeaves{} certified regular rectangles and 1,479 initially unresolved rectangles. Local critical-point certificates, exact stationary branches and the subsequent level-resolved system now establish event existence in \EventCells{} of the initially unresolved rectangles. The remaining \UnknownCells{} rectangles are unknown. These are counts of rectangles, not counts of distinct critical points, curves or topology-changing transitions.
+
+\begin{center}\input{table_events}\end{center}
+
+The area columns use exact rational arithmetic on the stored binary parameter endpoints before decimal reporting. An event-containing rectangle can contain mostly regular points: its area is not the area of the critical set. The connected components of the certified regular cover provide positive continuation relations, not a proof that separate components are inequivalent.
+
+\newpage
+\section*{2. Hamiltonian Yamada-signature maps}
+\begin{figure}[h!]
+\centering\includegraphics[width=\textwidth]{Figures/PhaseDIagrams_Compact.pdf}
+\caption{Full-resolution normalized Yamada signatures of the selected embedded graphs across the five original Hamiltonian interpolation families. Colors identify exact polynomial coefficient lists within each panel, with the complete color--polynomial registry retained in \texttt{figure\_source\_data.json}. Gray cells have no admissible completed spatial value in this figure: higher-valence fixed diagrams, uncompleted evaluations and the excluded cavity route remain separate in the data. No small-region relabeling, abstract contraction grouping or abstract polynomial substitution is applied.}
+\end{figure}
+The original vertically stacked notebook layout is supplied separately as \texttt{PhaseDIagrams.pdf}; the compact layout above uses the same arrays. The parameter grid and voxel resolution are unchanged between layouts. Black lines separate adjacent completed polynomial labels, rather than fitted continuum phase boundaries.
+
+The finite momentum-space box is retained. Opposite faces are not identified periodically. Consequently, these results describe the specified finite-domain realizations. A source mask touching the boundary is not silently interpreted as a compact object in a periodic Brillouin torus.
+
+The native collapse witness starts from the complete closed-cell complex, records each elementary free-face collapse, rebuilds the initial complex and checks every move independently of the collapse generator. Successful graph endpoints also satisfy the independent digital component/cycle check. This controls the retraction of the represented voxel complex. It does not certify the preceding analytic-to-voxel approximation.
+
+\newpage
+\section*{3. TPMS spatial signatures and the original geometry strip}
+\begin{figure}[h!]
+\centering\includegraphics[width=\textwidth]{Figures/PorousMaterialPhaseMap.pdf}
+\caption{Restored three-map/five-geometry presentation. The top panels show normalized spatial signatures of the selected subcubic graphs on the complete $21\times21$ parameter grids at $120^3$. The lower strip retains all five original Gyroid-to-Diamond sample points, $c=0.105$ and $\lambda=0,0.05,0.25,0.55,0.85$, with the original viewing directions. Transparent surfaces are the exact exposed faces of the closed voxel complexes; black curves retain every graph polyline point and red markers denote vertices. Surface rasterization does not remove geometric faces. Gray indicates no admissible completed spatial signature, not a new phase.}
+\end{figure}
+A single selected-spine polynomial is not automatically invariant under all changes of spine representing a handlebody. For this reason, the panels are identified as spatial-signature maps. The five representative points are retained as geometric samples, not relabeled as five proved distinct source-solid regimes.
+
+The corrected figures do not reuse the earlier display-filter output. In particular, a region is never removed because it occupies fewer than a chosen number of pixels or parameter cells. Fixed-diagram values remain available in the raw records but are not shown with the same status as projection-independent subcubic values.
+
+For every representative the package retains the source mask, physical gridlines, full collapse witness and full embedded graph. Figure-source metadata records the number of exposed quadrilateral faces, vertices, edges and polyline points, together with hashes of the actual inputs. This makes the restored geometry strip traceable to the new numerical run rather than to a historical rendering.
+
+\newpage
+\section*{4. Analytic continuation and critical-event certification}
+\begin{figure}[h!]
+\centering\includegraphics[width=\textwidth]{Figures/PorousMaterialContinuationMap.pdf}
+\caption{A separate analytic-continuation map in the same presentation. Colors label connected components of the certified regular-rectangle cover, locally within each family. Gray rectangles contain a proved stationary event; white rectangles remain unresolved. Distinct colors are not asserted to be distinct ambient-isotopy classes. The lower geometries are the same retained voxel/graph samples as in the spatial-signature figure; displaying them beside analytic certificates does not itself prove analytic-to-voxel correspondence.}
+\end{figure}
+The first event search fixed $\lambda$ and enclosed the resulting critical level. The additional calculation instead fixes a level inside the requested rectangle and treats $\lambda$ as an unknown. For an interior event it solves
+\begin{align}
+\nabla h_\lambda(x,y,z)&=0,& h_\lambda(x,y,z)-c&=0.
+\end{align}
+On the spherical wall, the square system is
+\begin{align}
+\nabla h_\lambda-\mu(x,y,z)&=0,& x^2+y^2+z^2-R^2&=0,& h_\lambda-c&=0.
+\end{align}
+Numerical roots propose boxes only. For each accepted box, both interval backends recompute a strict Krawczyk inclusion and a contraction bound below one. The entire $\lambda$ enclosure must lie inside the query rectangle, the fixed level must lie inside its level interval, and a bulk box must lie strictly inside the ball. The new method certified \NewEvents{} further rectangles without relaxing these acceptance conditions.
+
+\newpage
+\section*{5. What the voxel audit establishes}
+A deformation retract can preserve homotopy while the original voxel object has singular local neighborhoods. We therefore tested every lattice-vertex link of every original sampled mask. The occupied octants form a triangular subcomplex of an octahedral sphere. An interior manifold vertex has the complete sphere as its link; a boundary manifold vertex has a disk. The implementation checks incidence, connectedness, all link-vertex links, Euler characteristic and the boundary cycle for all 256 octant patterns.
+
+\begin{center}\input{table_links}\end{center}
+
+This is an exact finite incidence test of the chosen closed-voxel realization. Face-sharing cubes pass, whereas cubes meeting only at an edge or a point fail. Disconnected balls and a shell remain valid manifolds with boundary. Passing does not imply that a shell is a handlebody or that a voxel object is ambient-isotopic to its analytic source.
+
+\subsection*{Comparison within a common analytic certificate}
+The package also searches for pairs of original TPMS sample points lying in one certified regular analytic rectangle. For every retained example it freshly replays that rectangle's complete regularity certificate with both interval backends and retains both sampled sources and available graph witnesses. Up to twelve examples of each type are retained: \HomologyConflicts{} digital-homology conflicts and \SignatureVariations{} selected-spine signature variations.
+
+When the digital Betti tuples differ inside one such rectangle, the two voxel realizations cannot both recover the homotopy type of their analytically isotopic source solids. A difference of selected-spine polynomials alone has a weaker implication: it demonstrates that this extracted signature is not constant across the certified source family, but does not isolate whether discretization or the choice of spine causes the difference. The exact cases, coordinates and certificates are in \texttt{continuum\_vs\_digital\_witnesses.json}.
+
+\subsection*{The central exact singularity}
+For the retained Schwarz-P-to-Diamond field,
+\begin{align}
+h_\lambda={}&(1-\lambda)(\cos x+\cos y+\cos z)\nonumber\\
+&+\lambda(\cos x\cos y\cos z-\sin x\sin y\sin z),
+\end{align}
+the critical branches $c=1-2\lambda$ at $(\pi,0,0)$ and $c=2\lambda-1$ at $(\pi,\pi,0)$ are exact. At $\lambda=1/2,c=0$, the whole line $(\pi,t,0)$ inside the ball is stationary. A certificate requiring an isolated unique gradient root cannot cover a segment of this line. Exact branch witnesses therefore complement, rather than replace, the local isolated-root calculation.
+
+\newpage
+\section*{6. Reproducibility and remaining scope}
+\input{provenance}
+
+The immutable full-grid numerical source is \texttt{9be4e508f2ca7a48f580253be5de5d5392f055d0}. Its Actions run is \texttt{35411673566}. The unchanged-geometry retry run is \texttt{35418420467}; the augmented event run is \texttt{35418578004}. Their code, plans, parameters, successful values and failed attempts remain separately identifiable in the merged records.
+
+The environment is pinned by \texttt{uv.lock}; execution uses Python 3.13 with \texttt{uv sync --all-extras --group dev --group docs --frozen}. OpenMP, OpenBLAS and MKL thread counts are one. Original cells had a 90-second budget for sampling, reconstruction and polynomial evaluation. The retry samples forty valid projections, evaluates at most six with 30 seconds per view, and retains a 210-second overall case limit. These budgets are resource limits, not classifications.
+
+The categorical arrays, exact coefficient legends, geometry identities and physical parameter edges are retained in \texttt{figure\_source\_data.json}. The CSV files provide all original points, baseline and final statuses, and provenance hashes. The \texttt{data/} directory retains the merged records, event certificates, per-mask manifold tests and comparison witnesses. Full representative geometry is in \texttt{representatives/}. The larger full-grid masks and collapse archives remain in the twenty original run artifacts. Actions retention is 30 days; it is not a permanent research-data deposit.
+
+\subsection*{Manuscript integration}
+The package supplies a separate manuscript insertion draft and corrected figure captions. It does not reconstruct the unavailable current 42-page manuscript source. Earlier September drafts are not silently substituted for that source. Author, affiliation and funding information is not invented. The all-word formula work and existing cavity implementation are unchanged, and no result has been merged into the protected integration branch.
+
+The correct Reidemeister-II condition for the manuscript is that the same physical strand passes over at both crossings of the cancellable bigon. This figure-independent wording is included in the insertion draft; no claim is made that the absent original TikZ source was edited.
+
+\subsection*{Claims that remain separate}
+Completing the finite parameter scans does not supply a complete classification of analytic solids into distinct ambient-isotopy classes. The regularity cover proves positive continuation within its connected components; event certificates prove existence of stationary events; the voxel collapse and link tests characterize the represented cubical complexes; and normalized subcubic polynomials characterize the selected spatial graphs. A theorem or certificate connecting these different objects must be supplied before stronger identifications are made.
+
+\begin{thebibliography}{9}
+\bibitem{source} KnottedGraph research branch, immutable source revisions and executed workflow artifacts listed above, \url{https://github.com/HakanAkgn/KnottedGraph}.
+\bibitem{pv} S. Plantinga and G. Vegter, Isotopic approximation of implicit curves and surfaces, Symposium on Geometry Processing (2004), 251--260. DOI: \href{https://doi.org/10.2312/SGP/SGP04/251-260}{10.2312/SGP/SGP04/251-260}.
+\bibitem{wellcomposed} R. Gonzalez-Diaz, M. J. Jimenez and B. Medrano, 3D well-composed polyhedral complexes, Discrete Applied Mathematics \textbf{183} (2015), 59--77. DOI: \href{https://doi.org/10.1016/j.dam.2014.08.036}{10.1016/j.dam.2014.08.036}.
+\end{thebibliography}
+\end{document}

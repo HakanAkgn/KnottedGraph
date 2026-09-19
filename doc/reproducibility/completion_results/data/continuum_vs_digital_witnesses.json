@@ -1,0 +1,2072 @@
+{
+  "digital_homology_conflict_examples": [
+    {
+      "c_bounds": [
+        0.0,
+        0.015
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "b644f4ed83ad2aa99a689cc7afd662143bd57eac9c21fb5437b1b4995612463d",
+        "id": "tpms_gyroid_to_diamond_c000_l000",
+        "lambda": 0.0,
+        "level": 0.0,
+        "source_mask_sha256": "fc8bd38b386defe03b012a131b422d0b6e722a29c8ac61789ad85563b2748654",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -16,
+          "handle_rank": 17,
+          "interior_voxels": 164776,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "first_betti": [
+        1,
+        17,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 636,
+            "no_level": 1098,
+            "outside_ball": 458,
+            "wall_transverse": 948
+          },
+          "nodes": 6279,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 636,
+            "no_level": 1098,
+            "outside_ball": 458,
+            "wall_transverse": 948
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6279,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "digital_homology_conflict",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c000",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c000.json.gz",
+      "regularity_certificate_sha256": "08994453aaa14b9cb6ee643c161bbd386358a864a4ee0752312e4a95a121b10e",
+      "second": {
+        "graph_sha256": "e6b6ed7486067983057b3588110a0b312f2eeae3e208f74f5f89e4ace7fd78cd",
+        "id": "tpms_gyroid_to_diamond_c001_l000",
+        "lambda": 0.0,
+        "level": 0.015,
+        "source_mask_sha256": "df95a5f4e23df797561ec6fc1816b52fb189c550e9f33f53f1ed89d3b6135acb",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -13,
+          "handle_rank": 14,
+          "interior_voxels": 166339,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "second_betti": [
+        1,
+        14,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.0,
+        0.015
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "b644f4ed83ad2aa99a689cc7afd662143bd57eac9c21fb5437b1b4995612463d",
+        "id": "tpms_gyroid_to_diamond_c000_l000",
+        "lambda": 0.0,
+        "level": 0.0,
+        "source_mask_sha256": "fc8bd38b386defe03b012a131b422d0b6e722a29c8ac61789ad85563b2748654",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -16,
+          "handle_rank": 17,
+          "interior_voxels": 164776,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "first_betti": [
+        1,
+        17,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 636,
+            "no_level": 1098,
+            "outside_ball": 458,
+            "wall_transverse": 948
+          },
+          "nodes": 6279,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 636,
+            "no_level": 1098,
+            "outside_ball": 458,
+            "wall_transverse": 948
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6279,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "digital_homology_conflict",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c000",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c000.json.gz",
+      "regularity_certificate_sha256": "08994453aaa14b9cb6ee643c161bbd386358a864a4ee0752312e4a95a121b10e",
+      "second": {
+        "graph_sha256": "c41ac5baff6be6950e60d8fb6c616d604177ae39cdaeda275ce74d2b60115702",
+        "id": "tpms_gyroid_to_diamond_c001_l001",
+        "lambda": 0.05,
+        "level": 0.015,
+        "source_mask_sha256": "40fe230075e230ea03bceaf119b78c69b1fb8006481a7ff49df8e631158b4983",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -22,
+          "handle_rank": 23,
+          "interior_voxels": 166258,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "second_betti": [
+        1,
+        23,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.0,
+        0.015
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "18cb5efb0f9a146786394cefc834f44d2610fc935e3b564b068aee64cc8616bf",
+        "id": "tpms_gyroid_to_diamond_c000_l001",
+        "lambda": 0.05,
+        "level": 0.0,
+        "source_mask_sha256": "605e52020c76c810c889783e03ffb887994fc340064e9ef93f1b25f3d6273379",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -16,
+          "handle_rank": 17,
+          "interior_voxels": 164650,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "first_betti": [
+        1,
+        17,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 636,
+            "no_level": 1098,
+            "outside_ball": 458,
+            "wall_transverse": 948
+          },
+          "nodes": 6279,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 636,
+            "no_level": 1098,
+            "outside_ball": 458,
+            "wall_transverse": 948
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6279,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "digital_homology_conflict",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c000",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c000.json.gz",
+      "regularity_certificate_sha256": "08994453aaa14b9cb6ee643c161bbd386358a864a4ee0752312e4a95a121b10e",
+      "second": {
+        "graph_sha256": "e6b6ed7486067983057b3588110a0b312f2eeae3e208f74f5f89e4ace7fd78cd",
+        "id": "tpms_gyroid_to_diamond_c001_l000",
+        "lambda": 0.0,
+        "level": 0.015,
+        "source_mask_sha256": "df95a5f4e23df797561ec6fc1816b52fb189c550e9f33f53f1ed89d3b6135acb",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -13,
+          "handle_rank": 14,
+          "interior_voxels": 166339,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "second_betti": [
+        1,
+        14,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.0,
+        0.015
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "18cb5efb0f9a146786394cefc834f44d2610fc935e3b564b068aee64cc8616bf",
+        "id": "tpms_gyroid_to_diamond_c000_l001",
+        "lambda": 0.05,
+        "level": 0.0,
+        "source_mask_sha256": "605e52020c76c810c889783e03ffb887994fc340064e9ef93f1b25f3d6273379",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -16,
+          "handle_rank": 17,
+          "interior_voxels": 164650,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "first_betti": [
+        1,
+        17,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 636,
+            "no_level": 1098,
+            "outside_ball": 458,
+            "wall_transverse": 948
+          },
+          "nodes": 6279,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 636,
+            "no_level": 1098,
+            "outside_ball": 458,
+            "wall_transverse": 948
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6279,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "digital_homology_conflict",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c000",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c000.json.gz",
+      "regularity_certificate_sha256": "08994453aaa14b9cb6ee643c161bbd386358a864a4ee0752312e4a95a121b10e",
+      "second": {
+        "graph_sha256": "c41ac5baff6be6950e60d8fb6c616d604177ae39cdaeda275ce74d2b60115702",
+        "id": "tpms_gyroid_to_diamond_c001_l001",
+        "lambda": 0.05,
+        "level": 0.015,
+        "source_mask_sha256": "40fe230075e230ea03bceaf119b78c69b1fb8006481a7ff49df8e631158b4983",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -22,
+          "handle_rank": 23,
+          "interior_voxels": 166258,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "second_betti": [
+        1,
+        23,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.0,
+        0.015
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "e6b6ed7486067983057b3588110a0b312f2eeae3e208f74f5f89e4ace7fd78cd",
+        "id": "tpms_gyroid_to_diamond_c001_l000",
+        "lambda": 0.0,
+        "level": 0.015,
+        "source_mask_sha256": "df95a5f4e23df797561ec6fc1816b52fb189c550e9f33f53f1ed89d3b6135acb",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -13,
+          "handle_rank": 14,
+          "interior_voxels": 166339,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "first_betti": [
+        1,
+        14,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 636,
+            "no_level": 1098,
+            "outside_ball": 458,
+            "wall_transverse": 948
+          },
+          "nodes": 6279,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 636,
+            "no_level": 1098,
+            "outside_ball": 458,
+            "wall_transverse": 948
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6279,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "digital_homology_conflict",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c000",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c000.json.gz",
+      "regularity_certificate_sha256": "08994453aaa14b9cb6ee643c161bbd386358a864a4ee0752312e4a95a121b10e",
+      "second": {
+        "graph_sha256": "c41ac5baff6be6950e60d8fb6c616d604177ae39cdaeda275ce74d2b60115702",
+        "id": "tpms_gyroid_to_diamond_c001_l001",
+        "lambda": 0.05,
+        "level": 0.015,
+        "source_mask_sha256": "40fe230075e230ea03bceaf119b78c69b1fb8006481a7ff49df8e631158b4983",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -22,
+          "handle_rank": 23,
+          "interior_voxels": 166258,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "second_betti": [
+        1,
+        23,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.015,
+        0.03
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "e6b6ed7486067983057b3588110a0b312f2eeae3e208f74f5f89e4ace7fd78cd",
+        "id": "tpms_gyroid_to_diamond_c001_l000",
+        "lambda": 0.0,
+        "level": 0.015,
+        "source_mask_sha256": "df95a5f4e23df797561ec6fc1816b52fb189c550e9f33f53f1ed89d3b6135acb",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -13,
+          "handle_rank": 14,
+          "interior_voxels": 166339,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "first_betti": [
+        1,
+        14,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 652,
+            "no_level": 1071,
+            "outside_ball": 467,
+            "wall_transverse": 971
+          },
+          "nodes": 6321,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 652,
+            "no_level": 1071,
+            "outside_ball": 467,
+            "wall_transverse": 971
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6321,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "digital_homology_conflict",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c001",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c001.json.gz",
+      "regularity_certificate_sha256": "1ab91d3acff82a8505fd57e87d1c8358b21944fd49b3e628fc99f4c56be26320",
+      "second": {
+        "graph_sha256": "c41ac5baff6be6950e60d8fb6c616d604177ae39cdaeda275ce74d2b60115702",
+        "id": "tpms_gyroid_to_diamond_c001_l001",
+        "lambda": 0.05,
+        "level": 0.015,
+        "source_mask_sha256": "40fe230075e230ea03bceaf119b78c69b1fb8006481a7ff49df8e631158b4983",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -22,
+          "handle_rank": 23,
+          "interior_voxels": 166258,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "second_betti": [
+        1,
+        23,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.015,
+        0.03
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "e6b6ed7486067983057b3588110a0b312f2eeae3e208f74f5f89e4ace7fd78cd",
+        "id": "tpms_gyroid_to_diamond_c001_l000",
+        "lambda": 0.0,
+        "level": 0.015,
+        "source_mask_sha256": "df95a5f4e23df797561ec6fc1816b52fb189c550e9f33f53f1ed89d3b6135acb",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -13,
+          "handle_rank": 14,
+          "interior_voxels": 166339,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "first_betti": [
+        1,
+        14,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 652,
+            "no_level": 1071,
+            "outside_ball": 467,
+            "wall_transverse": 971
+          },
+          "nodes": 6321,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 652,
+            "no_level": 1071,
+            "outside_ball": 467,
+            "wall_transverse": 971
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6321,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "digital_homology_conflict",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c001",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c001.json.gz",
+      "regularity_certificate_sha256": "1ab91d3acff82a8505fd57e87d1c8358b21944fd49b3e628fc99f4c56be26320",
+      "second": {
+        "graph_sha256": "fb5b8c6c31681b2b442deecb34382149a9c4f0873a0fd871497b5247a6fbbec0",
+        "id": "tpms_gyroid_to_diamond_c002_l000",
+        "lambda": 0.0,
+        "level": 0.03,
+        "source_mask_sha256": "a973fd6462793cf3e5ce5b8aa8617da2edc3087ce25b13d7ce38824c3271d4c4",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -16,
+          "handle_rank": 17,
+          "interior_voxels": 167947,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "second_betti": [
+        1,
+        17,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.015,
+        0.03
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "e6b6ed7486067983057b3588110a0b312f2eeae3e208f74f5f89e4ace7fd78cd",
+        "id": "tpms_gyroid_to_diamond_c001_l000",
+        "lambda": 0.0,
+        "level": 0.015,
+        "source_mask_sha256": "df95a5f4e23df797561ec6fc1816b52fb189c550e9f33f53f1ed89d3b6135acb",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -13,
+          "handle_rank": 14,
+          "interior_voxels": 166339,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "first_betti": [
+        1,
+        14,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 652,
+            "no_level": 1071,
+            "outside_ball": 467,
+            "wall_transverse": 971
+          },
+          "nodes": 6321,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 652,
+            "no_level": 1071,
+            "outside_ball": 467,
+            "wall_transverse": 971
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6321,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "digital_homology_conflict",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c001",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c001.json.gz",
+      "regularity_certificate_sha256": "1ab91d3acff82a8505fd57e87d1c8358b21944fd49b3e628fc99f4c56be26320",
+      "second": {
+        "graph_sha256": "0f7ba2d8db439653d33dfefd0beac1e8642051dbb4d0e0dbf46f5f6c5f8ec3fd",
+        "id": "tpms_gyroid_to_diamond_c002_l001",
+        "lambda": 0.05,
+        "level": 0.03,
+        "source_mask_sha256": "4b3a0f08654749245830006046a201a2ac1dbf389c10dddfb2554edcdc41751a",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -16,
+          "handle_rank": 17,
+          "interior_voxels": 167956,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "second_betti": [
+        1,
+        17,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.015,
+        0.03
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "c41ac5baff6be6950e60d8fb6c616d604177ae39cdaeda275ce74d2b60115702",
+        "id": "tpms_gyroid_to_diamond_c001_l001",
+        "lambda": 0.05,
+        "level": 0.015,
+        "source_mask_sha256": "40fe230075e230ea03bceaf119b78c69b1fb8006481a7ff49df8e631158b4983",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -22,
+          "handle_rank": 23,
+          "interior_voxels": 166258,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "first_betti": [
+        1,
+        23,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 652,
+            "no_level": 1071,
+            "outside_ball": 467,
+            "wall_transverse": 971
+          },
+          "nodes": 6321,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 652,
+            "no_level": 1071,
+            "outside_ball": 467,
+            "wall_transverse": 971
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6321,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "digital_homology_conflict",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c001",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c001.json.gz",
+      "regularity_certificate_sha256": "1ab91d3acff82a8505fd57e87d1c8358b21944fd49b3e628fc99f4c56be26320",
+      "second": {
+        "graph_sha256": "fb5b8c6c31681b2b442deecb34382149a9c4f0873a0fd871497b5247a6fbbec0",
+        "id": "tpms_gyroid_to_diamond_c002_l000",
+        "lambda": 0.0,
+        "level": 0.03,
+        "source_mask_sha256": "a973fd6462793cf3e5ce5b8aa8617da2edc3087ce25b13d7ce38824c3271d4c4",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -16,
+          "handle_rank": 17,
+          "interior_voxels": 167947,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "second_betti": [
+        1,
+        17,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.015,
+        0.03
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "c41ac5baff6be6950e60d8fb6c616d604177ae39cdaeda275ce74d2b60115702",
+        "id": "tpms_gyroid_to_diamond_c001_l001",
+        "lambda": 0.05,
+        "level": 0.015,
+        "source_mask_sha256": "40fe230075e230ea03bceaf119b78c69b1fb8006481a7ff49df8e631158b4983",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -22,
+          "handle_rank": 23,
+          "interior_voxels": 166258,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "first_betti": [
+        1,
+        23,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 652,
+            "no_level": 1071,
+            "outside_ball": 467,
+            "wall_transverse": 971
+          },
+          "nodes": 6321,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 652,
+            "no_level": 1071,
+            "outside_ball": 467,
+            "wall_transverse": 971
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6321,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "digital_homology_conflict",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c001",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c001.json.gz",
+      "regularity_certificate_sha256": "1ab91d3acff82a8505fd57e87d1c8358b21944fd49b3e628fc99f4c56be26320",
+      "second": {
+        "graph_sha256": "0f7ba2d8db439653d33dfefd0beac1e8642051dbb4d0e0dbf46f5f6c5f8ec3fd",
+        "id": "tpms_gyroid_to_diamond_c002_l001",
+        "lambda": 0.05,
+        "level": 0.03,
+        "source_mask_sha256": "4b3a0f08654749245830006046a201a2ac1dbf389c10dddfb2554edcdc41751a",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -16,
+          "handle_rank": 17,
+          "interior_voxels": 167956,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "second_betti": [
+        1,
+        17,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.03,
+        0.045
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "fb5b8c6c31681b2b442deecb34382149a9c4f0873a0fd871497b5247a6fbbec0",
+        "id": "tpms_gyroid_to_diamond_c002_l000",
+        "lambda": 0.0,
+        "level": 0.03,
+        "source_mask_sha256": "a973fd6462793cf3e5ce5b8aa8617da2edc3087ce25b13d7ce38824c3271d4c4",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -16,
+          "handle_rank": 17,
+          "interior_voxels": 167947,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "first_betti": [
+        1,
+        17,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 669,
+            "no_level": 1137,
+            "outside_ball": 490,
+            "wall_transverse": 1018
+          },
+          "nodes": 6627,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 669,
+            "no_level": 1137,
+            "outside_ball": 490,
+            "wall_transverse": 1018
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6627,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "digital_homology_conflict",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c002",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c002.json.gz",
+      "regularity_certificate_sha256": "166eb9b9f1031d57560dc8450c7878a30055fe60cb7dabc5d0573aba6a977e7e",
+      "second": {
+        "graph_sha256": "52204fc55f68bb5c9c06de9faf0635dea5cbab079e26ec5df14c538750dfa3c8",
+        "id": "tpms_gyroid_to_diamond_c003_l000",
+        "lambda": 0.0,
+        "level": 0.045,
+        "source_mask_sha256": "849f56d6cf23d421ac1f8c72c0bd0fd09a6c00d3dcaaf3e957a0956f6142716a",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 169474,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.03,
+        0.045
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "0f7ba2d8db439653d33dfefd0beac1e8642051dbb4d0e0dbf46f5f6c5f8ec3fd",
+        "id": "tpms_gyroid_to_diamond_c002_l001",
+        "lambda": 0.05,
+        "level": 0.03,
+        "source_mask_sha256": "4b3a0f08654749245830006046a201a2ac1dbf389c10dddfb2554edcdc41751a",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -16,
+          "handle_rank": 17,
+          "interior_voxels": 167956,
+          "touches_boundary": false
+        },
+        "yamada": "0"
+      },
+      "first_betti": [
+        1,
+        17,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 669,
+            "no_level": 1137,
+            "outside_ball": 490,
+            "wall_transverse": 1018
+          },
+          "nodes": 6627,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 669,
+            "no_level": 1137,
+            "outside_ball": 490,
+            "wall_transverse": 1018
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6627,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "digital_homology_conflict",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c002",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c002.json.gz",
+      "regularity_certificate_sha256": "166eb9b9f1031d57560dc8450c7878a30055fe60cb7dabc5d0573aba6a977e7e",
+      "second": {
+        "graph_sha256": "52204fc55f68bb5c9c06de9faf0635dea5cbab079e26ec5df14c538750dfa3c8",
+        "id": "tpms_gyroid_to_diamond_c003_l000",
+        "lambda": 0.0,
+        "level": 0.045,
+        "source_mask_sha256": "849f56d6cf23d421ac1f8c72c0bd0fd09a6c00d3dcaaf3e957a0956f6142716a",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 169474,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    }
+  ],
+  "maximum_retained_examples_per_type": 12,
+  "scope": "Each pair lies in one freshly verified regular analytic rectangle. A different voxel Betti tuple obstructs simultaneous correct continuum reconstruction; different spine polynomials alone do not identify the source of disagreement.",
+  "spine_signature_variation_examples": [
+    {
+      "c_bounds": [
+        0.12,
+        0.135
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "64059091083b0a15bf80b6069327d1002efc2bffbd5cd259c1dfef2bf6a8d673",
+        "id": "tpms_gyroid_to_diamond_c008_l000",
+        "lambda": 0.0,
+        "level": 0.12,
+        "source_mask_sha256": "f2f37eea65cf8e3fc1478ec4408ae6777ec716a2b4b4678ee724ccfcb458db79",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 177545,
+          "touches_boundary": false
+        },
+        "yamada": "-A**16 + 4*A**15 - 13*A**14 + 28*A**13 - 53*A**12 + 80*A**11 - 110*A**10 + 128*A**9 - 138*A**8 + 128*A**7 - 110*A**6 + 80*A**5 - 53*A**4 + 28*A**3 - 13*A**2 + 4*A - 1"
+      },
+      "first_betti": [
+        1,
+        8,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 487,
+            "no_level": 1803,
+            "outside_ball": 1044,
+            "wall_transverse": 1716
+          },
+          "nodes": 10099,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 487,
+            "no_level": 1803,
+            "outside_ball": 1044,
+            "wall_transverse": 1716
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 10099,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "spine_signature_variation",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c008",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c008.json.gz",
+      "regularity_certificate_sha256": "bbe9262f8d689b5441b6128a251d5b18c91362f9bd68eef2de677db9c396a0b5",
+      "second": {
+        "graph_sha256": "aaac1ce3a7cae53ce0fab6e0af121f4640b521f2658bfb91cbda8046c79219a3",
+        "id": "tpms_gyroid_to_diamond_c009_l001",
+        "lambda": 0.05,
+        "level": 0.135,
+        "source_mask_sha256": "8d02024f9fe975172b4aeab7abe23794d33a99a9f3b6726f72a4ce3da2d38759",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 179683,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.12,
+        0.135
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "bd7a524d74fa7da942a32242d8b8a519e63763f4338838f8da597af5b347f9ff",
+        "id": "tpms_gyroid_to_diamond_c009_l000",
+        "lambda": 0.0,
+        "level": 0.135,
+        "source_mask_sha256": "d55601344a30f9cc08ce76227e834b81e6dc693bc2b3c92c6c383d549411056b",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 179123,
+          "touches_boundary": false
+        },
+        "yamada": "-A**16 + 4*A**15 - 13*A**14 + 28*A**13 - 53*A**12 + 80*A**11 - 110*A**10 + 128*A**9 - 138*A**8 + 128*A**7 - 110*A**6 + 80*A**5 - 53*A**4 + 28*A**3 - 13*A**2 + 4*A - 1"
+      },
+      "first_betti": [
+        1,
+        8,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 487,
+            "no_level": 1803,
+            "outside_ball": 1044,
+            "wall_transverse": 1716
+          },
+          "nodes": 10099,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 487,
+            "no_level": 1803,
+            "outside_ball": 1044,
+            "wall_transverse": 1716
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 10099,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "spine_signature_variation",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c008",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c008.json.gz",
+      "regularity_certificate_sha256": "bbe9262f8d689b5441b6128a251d5b18c91362f9bd68eef2de677db9c396a0b5",
+      "second": {
+        "graph_sha256": "aaac1ce3a7cae53ce0fab6e0af121f4640b521f2658bfb91cbda8046c79219a3",
+        "id": "tpms_gyroid_to_diamond_c009_l001",
+        "lambda": 0.05,
+        "level": 0.135,
+        "source_mask_sha256": "8d02024f9fe975172b4aeab7abe23794d33a99a9f3b6726f72a4ce3da2d38759",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 179683,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.135,
+        0.15
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "bd7a524d74fa7da942a32242d8b8a519e63763f4338838f8da597af5b347f9ff",
+        "id": "tpms_gyroid_to_diamond_c009_l000",
+        "lambda": 0.0,
+        "level": 0.135,
+        "source_mask_sha256": "d55601344a30f9cc08ce76227e834b81e6dc693bc2b3c92c6c383d549411056b",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 179123,
+          "touches_boundary": false
+        },
+        "yamada": "-A**16 + 4*A**15 - 13*A**14 + 28*A**13 - 53*A**12 + 80*A**11 - 110*A**10 + 128*A**9 - 138*A**8 + 128*A**7 - 110*A**6 + 80*A**5 - 53*A**4 + 28*A**3 - 13*A**2 + 4*A - 1"
+      },
+      "first_betti": [
+        1,
+        8,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 472,
+            "no_level": 1267,
+            "outside_ball": 740,
+            "wall_transverse": 1200
+          },
+          "nodes": 7357,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 472,
+            "no_level": 1267,
+            "outside_ball": 740,
+            "wall_transverse": 1200
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 7357,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "spine_signature_variation",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c009",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c009.json.gz",
+      "regularity_certificate_sha256": "2d39abb92398af70bd62dd27b2bd5d94b7328d69584a8983651e5fe0462c97ad",
+      "second": {
+        "graph_sha256": "aaac1ce3a7cae53ce0fab6e0af121f4640b521f2658bfb91cbda8046c79219a3",
+        "id": "tpms_gyroid_to_diamond_c009_l001",
+        "lambda": 0.05,
+        "level": 0.135,
+        "source_mask_sha256": "8d02024f9fe975172b4aeab7abe23794d33a99a9f3b6726f72a4ce3da2d38759",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 179683,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.135,
+        0.15
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "bd7a524d74fa7da942a32242d8b8a519e63763f4338838f8da597af5b347f9ff",
+        "id": "tpms_gyroid_to_diamond_c009_l000",
+        "lambda": 0.0,
+        "level": 0.135,
+        "source_mask_sha256": "d55601344a30f9cc08ce76227e834b81e6dc693bc2b3c92c6c383d549411056b",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 179123,
+          "touches_boundary": false
+        },
+        "yamada": "-A**16 + 4*A**15 - 13*A**14 + 28*A**13 - 53*A**12 + 80*A**11 - 110*A**10 + 128*A**9 - 138*A**8 + 128*A**7 - 110*A**6 + 80*A**5 - 53*A**4 + 28*A**3 - 13*A**2 + 4*A - 1"
+      },
+      "first_betti": [
+        1,
+        8,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 472,
+            "no_level": 1267,
+            "outside_ball": 740,
+            "wall_transverse": 1200
+          },
+          "nodes": 7357,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 472,
+            "no_level": 1267,
+            "outside_ball": 740,
+            "wall_transverse": 1200
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 7357,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "spine_signature_variation",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c009",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c009.json.gz",
+      "regularity_certificate_sha256": "2d39abb92398af70bd62dd27b2bd5d94b7328d69584a8983651e5fe0462c97ad",
+      "second": {
+        "graph_sha256": "ba2d748e8b140fcb6ecdc407747f2c0239cef07ab76450c23d33eb2601b9e6ab",
+        "id": "tpms_gyroid_to_diamond_c010_l001",
+        "lambda": 0.05,
+        "level": 0.15,
+        "source_mask_sha256": "8ce9a5ce23739801edc60500118668364096b67a54da4305002a4c162b6082fd",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 181241,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.135,
+        0.15
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "aaac1ce3a7cae53ce0fab6e0af121f4640b521f2658bfb91cbda8046c79219a3",
+        "id": "tpms_gyroid_to_diamond_c009_l001",
+        "lambda": 0.05,
+        "level": 0.135,
+        "source_mask_sha256": "8d02024f9fe975172b4aeab7abe23794d33a99a9f3b6726f72a4ce3da2d38759",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 179683,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "first_betti": [
+        1,
+        8,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 472,
+            "no_level": 1267,
+            "outside_ball": 740,
+            "wall_transverse": 1200
+          },
+          "nodes": 7357,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 472,
+            "no_level": 1267,
+            "outside_ball": 740,
+            "wall_transverse": 1200
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 7357,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "spine_signature_variation",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c009",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c009.json.gz",
+      "regularity_certificate_sha256": "2d39abb92398af70bd62dd27b2bd5d94b7328d69584a8983651e5fe0462c97ad",
+      "second": {
+        "graph_sha256": "2053b02a5c360e7c857585e9df6b2164a1f72720e624d2c8c98c239da25df5fd",
+        "id": "tpms_gyroid_to_diamond_c010_l000",
+        "lambda": 0.0,
+        "level": 0.15,
+        "source_mask_sha256": "a7a480df825300a14437c3a6297166e9b010178ad3da4af26145807c6974658d",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 180671,
+          "touches_boundary": false
+        },
+        "yamada": "-A**16 + 4*A**15 - 13*A**14 + 28*A**13 - 53*A**12 + 80*A**11 - 110*A**10 + 128*A**9 - 138*A**8 + 128*A**7 - 110*A**6 + 80*A**5 - 53*A**4 + 28*A**3 - 13*A**2 + 4*A - 1"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.135,
+        0.15
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "2053b02a5c360e7c857585e9df6b2164a1f72720e624d2c8c98c239da25df5fd",
+        "id": "tpms_gyroid_to_diamond_c010_l000",
+        "lambda": 0.0,
+        "level": 0.15,
+        "source_mask_sha256": "a7a480df825300a14437c3a6297166e9b010178ad3da4af26145807c6974658d",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 180671,
+          "touches_boundary": false
+        },
+        "yamada": "-A**16 + 4*A**15 - 13*A**14 + 28*A**13 - 53*A**12 + 80*A**11 - 110*A**10 + 128*A**9 - 138*A**8 + 128*A**7 - 110*A**6 + 80*A**5 - 53*A**4 + 28*A**3 - 13*A**2 + 4*A - 1"
+      },
+      "first_betti": [
+        1,
+        8,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 472,
+            "no_level": 1267,
+            "outside_ball": 740,
+            "wall_transverse": 1200
+          },
+          "nodes": 7357,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 472,
+            "no_level": 1267,
+            "outside_ball": 740,
+            "wall_transverse": 1200
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 7357,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "spine_signature_variation",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c009",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c009.json.gz",
+      "regularity_certificate_sha256": "2d39abb92398af70bd62dd27b2bd5d94b7328d69584a8983651e5fe0462c97ad",
+      "second": {
+        "graph_sha256": "ba2d748e8b140fcb6ecdc407747f2c0239cef07ab76450c23d33eb2601b9e6ab",
+        "id": "tpms_gyroid_to_diamond_c010_l001",
+        "lambda": 0.05,
+        "level": 0.15,
+        "source_mask_sha256": "8ce9a5ce23739801edc60500118668364096b67a54da4305002a4c162b6082fd",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 181241,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.15,
+        0.16499999999999998
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "2053b02a5c360e7c857585e9df6b2164a1f72720e624d2c8c98c239da25df5fd",
+        "id": "tpms_gyroid_to_diamond_c010_l000",
+        "lambda": 0.0,
+        "level": 0.15,
+        "source_mask_sha256": "a7a480df825300a14437c3a6297166e9b010178ad3da4af26145807c6974658d",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 180671,
+          "touches_boundary": false
+        },
+        "yamada": "-A**16 + 4*A**15 - 13*A**14 + 28*A**13 - 53*A**12 + 80*A**11 - 110*A**10 + 128*A**9 - 138*A**8 + 128*A**7 - 110*A**6 + 80*A**5 - 53*A**4 + 28*A**3 - 13*A**2 + 4*A - 1"
+      },
+      "first_betti": [
+        1,
+        8,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 469,
+            "no_level": 1136,
+            "outside_ball": 676,
+            "wall_transverse": 1044
+          },
+          "nodes": 6649,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 469,
+            "no_level": 1136,
+            "outside_ball": 676,
+            "wall_transverse": 1044
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6649,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "spine_signature_variation",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c010",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c010.json.gz",
+      "regularity_certificate_sha256": "a7b56771cf73fd2ef4c06ffb60483abf4aab44192a7a7b15cfc0e53604b2fc06",
+      "second": {
+        "graph_sha256": "ba2d748e8b140fcb6ecdc407747f2c0239cef07ab76450c23d33eb2601b9e6ab",
+        "id": "tpms_gyroid_to_diamond_c010_l001",
+        "lambda": 0.05,
+        "level": 0.15,
+        "source_mask_sha256": "8ce9a5ce23739801edc60500118668364096b67a54da4305002a4c162b6082fd",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 181241,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.15,
+        0.16499999999999998
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "2053b02a5c360e7c857585e9df6b2164a1f72720e624d2c8c98c239da25df5fd",
+        "id": "tpms_gyroid_to_diamond_c010_l000",
+        "lambda": 0.0,
+        "level": 0.15,
+        "source_mask_sha256": "a7a480df825300a14437c3a6297166e9b010178ad3da4af26145807c6974658d",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 180671,
+          "touches_boundary": false
+        },
+        "yamada": "-A**16 + 4*A**15 - 13*A**14 + 28*A**13 - 53*A**12 + 80*A**11 - 110*A**10 + 128*A**9 - 138*A**8 + 128*A**7 - 110*A**6 + 80*A**5 - 53*A**4 + 28*A**3 - 13*A**2 + 4*A - 1"
+      },
+      "first_betti": [
+        1,
+        8,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 469,
+            "no_level": 1136,
+            "outside_ball": 676,
+            "wall_transverse": 1044
+          },
+          "nodes": 6649,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 469,
+            "no_level": 1136,
+            "outside_ball": 676,
+            "wall_transverse": 1044
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6649,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "spine_signature_variation",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c010",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c010.json.gz",
+      "regularity_certificate_sha256": "a7b56771cf73fd2ef4c06ffb60483abf4aab44192a7a7b15cfc0e53604b2fc06",
+      "second": {
+        "graph_sha256": "ca3e3de7cae0734a17b7c1b807395a4754931e94b7a936fb7fcf6b82ec5418e5",
+        "id": "tpms_gyroid_to_diamond_c011_l001",
+        "lambda": 0.05,
+        "level": 0.16499999999999998,
+        "source_mask_sha256": "f768f3d97b8573d02f81e013622ac23fd0e179344f14ef377a852414d8237687",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 182897,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.15,
+        0.16499999999999998
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "ba2d748e8b140fcb6ecdc407747f2c0239cef07ab76450c23d33eb2601b9e6ab",
+        "id": "tpms_gyroid_to_diamond_c010_l001",
+        "lambda": 0.05,
+        "level": 0.15,
+        "source_mask_sha256": "8ce9a5ce23739801edc60500118668364096b67a54da4305002a4c162b6082fd",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 181241,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "first_betti": [
+        1,
+        8,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 469,
+            "no_level": 1136,
+            "outside_ball": 676,
+            "wall_transverse": 1044
+          },
+          "nodes": 6649,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 469,
+            "no_level": 1136,
+            "outside_ball": 676,
+            "wall_transverse": 1044
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6649,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "spine_signature_variation",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c010",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c010.json.gz",
+      "regularity_certificate_sha256": "a7b56771cf73fd2ef4c06ffb60483abf4aab44192a7a7b15cfc0e53604b2fc06",
+      "second": {
+        "graph_sha256": "913b52a0ebb4389a11fed282d8300d56387bb3b16ddd461bdf4a6b94a6ab90c5",
+        "id": "tpms_gyroid_to_diamond_c011_l000",
+        "lambda": 0.0,
+        "level": 0.16499999999999998,
+        "source_mask_sha256": "4c35814ccb322eb03b4cc9f009640f78f960c99879439da3bec85ac9c0e87d05",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 182315,
+          "touches_boundary": false
+        },
+        "yamada": "-A**16 + 4*A**15 - 13*A**14 + 28*A**13 - 53*A**12 + 80*A**11 - 110*A**10 + 128*A**9 - 138*A**8 + 128*A**7 - 110*A**6 + 80*A**5 - 53*A**4 + 28*A**3 - 13*A**2 + 4*A - 1"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.15,
+        0.16499999999999998
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "913b52a0ebb4389a11fed282d8300d56387bb3b16ddd461bdf4a6b94a6ab90c5",
+        "id": "tpms_gyroid_to_diamond_c011_l000",
+        "lambda": 0.0,
+        "level": 0.16499999999999998,
+        "source_mask_sha256": "4c35814ccb322eb03b4cc9f009640f78f960c99879439da3bec85ac9c0e87d05",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 182315,
+          "touches_boundary": false
+        },
+        "yamada": "-A**16 + 4*A**15 - 13*A**14 + 28*A**13 - 53*A**12 + 80*A**11 - 110*A**10 + 128*A**9 - 138*A**8 + 128*A**7 - 110*A**6 + 80*A**5 - 53*A**4 + 28*A**3 - 13*A**2 + 4*A - 1"
+      },
+      "first_betti": [
+        1,
+        8,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 469,
+            "no_level": 1136,
+            "outside_ball": 676,
+            "wall_transverse": 1044
+          },
+          "nodes": 6649,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 469,
+            "no_level": 1136,
+            "outside_ball": 676,
+            "wall_transverse": 1044
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6649,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "spine_signature_variation",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c010",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c010.json.gz",
+      "regularity_certificate_sha256": "a7b56771cf73fd2ef4c06ffb60483abf4aab44192a7a7b15cfc0e53604b2fc06",
+      "second": {
+        "graph_sha256": "ca3e3de7cae0734a17b7c1b807395a4754931e94b7a936fb7fcf6b82ec5418e5",
+        "id": "tpms_gyroid_to_diamond_c011_l001",
+        "lambda": 0.05,
+        "level": 0.16499999999999998,
+        "source_mask_sha256": "f768f3d97b8573d02f81e013622ac23fd0e179344f14ef377a852414d8237687",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 182897,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.16499999999999998,
+        0.18
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "913b52a0ebb4389a11fed282d8300d56387bb3b16ddd461bdf4a6b94a6ab90c5",
+        "id": "tpms_gyroid_to_diamond_c011_l000",
+        "lambda": 0.0,
+        "level": 0.16499999999999998,
+        "source_mask_sha256": "4c35814ccb322eb03b4cc9f009640f78f960c99879439da3bec85ac9c0e87d05",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 182315,
+          "touches_boundary": false
+        },
+        "yamada": "-A**16 + 4*A**15 - 13*A**14 + 28*A**13 - 53*A**12 + 80*A**11 - 110*A**10 + 128*A**9 - 138*A**8 + 128*A**7 - 110*A**6 + 80*A**5 - 53*A**4 + 28*A**3 - 13*A**2 + 4*A - 1"
+      },
+      "first_betti": [
+        1,
+        8,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 461,
+            "no_level": 1082,
+            "outside_ball": 633,
+            "wall_transverse": 952
+          },
+          "nodes": 6255,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 461,
+            "no_level": 1082,
+            "outside_ball": 633,
+            "wall_transverse": 952
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6255,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "spine_signature_variation",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c011",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c011.json.gz",
+      "regularity_certificate_sha256": "27104c6e1469f31c782f3f25ec85bf9560f706f425bc206d06272884342c7576",
+      "second": {
+        "graph_sha256": "ca3e3de7cae0734a17b7c1b807395a4754931e94b7a936fb7fcf6b82ec5418e5",
+        "id": "tpms_gyroid_to_diamond_c011_l001",
+        "lambda": 0.05,
+        "level": 0.16499999999999998,
+        "source_mask_sha256": "f768f3d97b8573d02f81e013622ac23fd0e179344f14ef377a852414d8237687",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 182897,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    },
+    {
+      "c_bounds": [
+        0.16499999999999998,
+        0.18
+      ],
+      "family": "gyroid_to_diamond",
+      "first": {
+        "graph_sha256": "913b52a0ebb4389a11fed282d8300d56387bb3b16ddd461bdf4a6b94a6ab90c5",
+        "id": "tpms_gyroid_to_diamond_c011_l000",
+        "lambda": 0.0,
+        "level": 0.16499999999999998,
+        "source_mask_sha256": "4c35814ccb322eb03b4cc9f009640f78f960c99879439da3bec85ac9c0e87d05",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 182315,
+          "touches_boundary": false
+        },
+        "yamada": "-A**16 + 4*A**15 - 13*A**14 + 28*A**13 - 53*A**12 + 80*A**11 - 110*A**10 + 128*A**9 - 138*A**8 + 128*A**7 - 110*A**6 + 80*A**5 - 53*A**4 + 28*A**3 - 13*A**2 + 4*A - 1"
+      },
+      "first_betti": [
+        1,
+        8,
+        0
+      ],
+      "fresh_replays": {
+        "primary": {
+          "counts": {
+            "bulk_regular": 461,
+            "no_level": 1082,
+            "outside_ball": 633,
+            "wall_transverse": 952
+          },
+          "nodes": 6255,
+          "reason": "cover_recomputed",
+          "valid": true
+        },
+        "rational": {
+          "counts": {
+            "bulk_regular": 461,
+            "no_level": 1082,
+            "outside_ball": 633,
+            "wall_transverse": 952
+          },
+          "mpmath_transcendentals_used": false,
+          "nodes": 6255,
+          "reason": "cover_recomputed_with_rational_Taylor_trigonometry",
+          "valid": true
+        }
+      },
+      "kind": "spine_signature_variation",
+      "lambda_bounds": [
+        0.0,
+        0.05
+      ],
+      "regular_leaf_id": "gyroid_to_diamond_lambda000_c011",
+      "regularity_certificate": "comparison_witnesses/gyroid_to_diamond_lambda000_c011.json.gz",
+      "regularity_certificate_sha256": "27104c6e1469f31c782f3f25ec85bf9560f706f425bc206d06272884342c7576",
+      "second": {
+        "graph_sha256": "5f669a6f370ee67355f804f355c8e47f499f81611d56fb185ae1ecc68081c8fe",
+        "id": "tpms_gyroid_to_diamond_c012_l000",
+        "lambda": 0.0,
+        "level": 0.18,
+        "source_mask_sha256": "59afd3960f4254306d88d52b08bb4f58fa4ed5f8b356ce5e1d0a80b23b95af6b",
+        "volume": {
+          "boundary_components": 1,
+          "boundary_faces": [],
+          "connected_components": 1,
+          "enclosed_voids": 0,
+          "euler_characteristic": -7,
+          "handle_rank": 8,
+          "interior_voxels": 183906,
+          "touches_boundary": false
+        },
+        "yamada": "2*A**15 - 7*A**14 + 21*A**13 - 42*A**12 + 74*A**11 - 106*A**10 + 136*A**9 - 152*A**8 + 152*A**7 - 136*A**6 + 106*A**5 - 74*A**4 + 42*A**3 - 21*A**2 + 7*A - 2"
+      },
+      "second_betti": [
+        1,
+        8,
+        0
+      ]
+    }
+  ]
+}

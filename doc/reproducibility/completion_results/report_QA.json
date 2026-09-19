@@ -1,0 +1,147 @@
+{
+  "automated_checks_only": true,
+  "latex_overfull_box_count": 0,
+  "latex_underfull_box_count": 0,
+  "pdf_files": {
+    "Figures/PhaseDIagrams.pdf": {
+      "bytes": 152663,
+      "pages": [
+        {
+          "height_pt": 848.6395263671875,
+          "out_of_page_text": [],
+          "page": 1,
+          "preview": "QA/PhaseDIagrams-page-1.png",
+          "text_characters": 347,
+          "width_pt": 606.7337646484375
+        }
+      ],
+      "sha256": "6483d5c21bf2636abb2f8c6a6abea3b85daeaa3d789d21dd8cc371975956c514"
+    },
+    "Figures/PhaseDIagrams_Compact.pdf": {
+      "bytes": 154854,
+      "pages": [
+        {
+          "height_pt": 578.6395263671875,
+          "out_of_page_text": [],
+          "page": 1,
+          "preview": "QA/PhaseDIagrams_Compact-page-1.png",
+          "text_characters": 411,
+          "width_pt": 1068.478515625
+        }
+      ],
+      "sha256": "b231584f94a53d0640ef767a1e3fb8c1650959ec35e906e2f2d8d1e78f232928"
+    },
+    "Figures/PorousMaterialContinuationMap.pdf": {
+      "bytes": 845800,
+      "pages": [
+        {
+          "height_pt": 492.15557861328125,
+          "out_of_page_text": [],
+          "page": 1,
+          "preview": "QA/PorousMaterialContinuationMap-page-1.png",
+          "text_characters": 308,
+          "width_pt": 1112.0361328125
+        }
+      ],
+      "sha256": "5bb92ac2213418eeee884868b2401eefd3d59a688e6bd0395d1c06d962464506"
+    },
+    "Figures/PorousMaterialPhaseMap.pdf": {
+      "bytes": 651065,
+      "pages": [
+        {
+          "height_pt": 492.15557861328125,
+          "out_of_page_text": [],
+          "page": 1,
+          "preview": "QA/PorousMaterialPhaseMap-page-1.png",
+          "text_characters": 308,
+          "width_pt": 1112.3719482421875
+        }
+      ],
+      "sha256": "f6f7840e63077d6206324f3a69614c71e298b39d558ff8530dbdb2207abdb2b0"
+    },
+    "Figures/TPMS_EventEvidence.pdf": {
+      "bytes": 274404,
+      "pages": [
+        {
+          "height_pt": 262.93975830078125,
+          "out_of_page_text": [],
+          "page": 1,
+          "preview": "QA/TPMS_EventEvidence-page-1.png",
+          "text_characters": 320,
+          "width_pt": 1104.239501953125
+        }
+      ],
+      "sha256": "aebb9daeb88aa6137ba566b1c860b50495204178ec3d9219d3a0d82c54f5eb80"
+    },
+    "Figures/TPMS_SpatialSignatures.pdf": {
+      "bytes": 64713,
+      "pages": [
+        {
+          "height_pt": 265.43951416015625,
+          "out_of_page_text": [],
+          "page": 1,
+          "preview": "QA/TPMS_SpatialSignatures-page-1.png",
+          "text_characters": 263,
+          "width_pt": 1104.442138671875
+        }
+      ],
+      "sha256": "ded7db1b3c2a3f6a0bcb7818a53dbc9287145ccf21b38893376ccf713b41ca06"
+    },
+    "Results_Report.pdf": {
+      "bytes": 1930263,
+      "pages": [
+        {
+          "height_pt": 841.8900146484375,
+          "out_of_page_text": [],
+          "page": 1,
+          "preview": "QA/Results_Report-page-1.png",
+          "text_characters": 2978,
+          "width_pt": 595.2760009765625
+        },
+        {
+          "height_pt": 841.8900146484375,
+          "out_of_page_text": [],
+          "page": 2,
+          "preview": "QA/Results_Report-page-2.png",
+          "text_characters": 2068,
+          "width_pt": 595.2760009765625
+        },
+        {
+          "height_pt": 841.8900146484375,
+          "out_of_page_text": [],
+          "page": 3,
+          "preview": "QA/Results_Report-page-3.png",
+          "text_characters": 2045,
+          "width_pt": 595.2760009765625
+        },
+        {
+          "height_pt": 841.8900146484375,
+          "out_of_page_text": [],
+          "page": 4,
+          "preview": "QA/Results_Report-page-4.png",
+          "text_characters": 1674,
+          "width_pt": 595.2760009765625
+        },
+        {
+          "height_pt": 841.8900146484375,
+          "out_of_page_text": [],
+          "page": 5,
+          "preview": "QA/Results_Report-page-5.png",
+          "text_characters": 2503,
+          "width_pt": 595.2760009765625
+        },
+        {
+          "height_pt": 841.8900146484375,
+          "out_of_page_text": [],
+          "page": 6,
+          "preview": "QA/Results_Report-page-6.png",
+          "text_characters": 3358,
+          "width_pt": 595.2760009765625
+        }
+      ],
+      "sha256": "47f9e02243a1f59a64f4293095a1a3731607beff9d47951f990602381c3dea37"
+    }
+  },
+  "undefined_reference_or_citation_errors": [],
+  "visual_inspection_claimed": false
+}
