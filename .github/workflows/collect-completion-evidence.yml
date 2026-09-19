@@ -1,0 +1,81 @@
+name: Collect completion evidence and exact voxel-link audit
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['.github/workflows/collect-completion-evidence.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install and test exact local-link checker
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+          uv run --no-sync pytest -q tests/extraction/test_voxel_links.py
+          uv run --no-sync ruff check dev/voxel_link_audit.py dev/collect_completion_evidence.py tests/extraction/test_voxel_links.py
+      - name: Require completed retry and event runs
+        run: |
+          gh run watch 35418420467 --interval 30 --exit-status >/tmp/retry-status.log 2>&1
+          gh run watch 35418578004 --interval 30 --exit-status >/tmp/event-status.log 2>&1
+      - uses: actions/download-artifact@v4
+        with:
+          name: complete-full-map-summary
+          run-id: 35411673566
+          github-token: ${{ github.token }}
+          path: inputs/maps
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: archived-spatial-retry-*
+          run-id: 35418420467
+          github-token: ${{ github.token }}
+          path: inputs/retries
+      - uses: actions/download-artifact@v4
+        with:
+          name: complete-replayed-tpms-events
+          run-id: 35415827400
+          github-token: ${{ github.token }}
+          path: inputs/events
+      - uses: actions/download-artifact@v4
+        with:
+          name: level-resolved-tpms-evidence
+          run-id: 35418578004
+          github-token: ${{ github.token }}
+          path: inputs/additional
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: full-map-shard-*
+          run-id: 35411673566
+          github-token: ${{ github.token }}
+          path: inputs/geometry
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: refined-tpms-shard-*
+          run-id: 35411858561
+          github-token: ${{ github.token }}
+          path: inputs/continuation
+      - name: Collect, replay and test every closed-voxel source
+        run: |
+          uv run --no-sync python dev/collect_completion_evidence.py --maps inputs/maps --retries inputs/retries --events inputs/events/verified --additional inputs/additional/new-events --artifacts inputs/geometry --continuation inputs/continuation --out completion-evidence
+          git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: completion-evidence
+          path: completion-evidence
+          retention-days: 30
