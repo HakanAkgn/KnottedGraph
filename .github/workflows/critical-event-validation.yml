@@ -1,0 +1,40 @@
+name: Critical-event certificate validation
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['src/knotted_graph/core/critical_events.py', 'tests/core/test_critical_events.py', '.github/workflows/critical-event-validation.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install frozen environment
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+      - name: Test local-root certificates and complete repository
+        run: |
+          mkdir critical-results
+          uv run --no-sync pytest -q --junitxml=critical-results/tests.xml
+          uv run --no-sync ruff check src/knotted_graph/core/critical_events.py tests/core/test_critical_events.py
+          uv run --no-sync python dev/check_repository_consistency.py
+          git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: critical-event-validation
+          path: critical-results
+          retention-days: 30
