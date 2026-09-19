@@ -1,0 +1,58 @@
+name: Complete remaining archived spatial evaluations
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['.github/workflows/complete-archived-polynomials.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  retry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        shard: [0,1,2,3,4,5,6,7,8,9]
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install frozen environment and test geometry-preserving evaluator
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+          uv run --no-sync pytest -q tests/applications/test_archived_spatial_retry.py
+          uv run --no-sync ruff check dev/retry_archived_spatial_evaluations.py tests/applications/test_archived_spatial_retry.py
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: full-map-shard-*
+          run-id: 35411673566
+          github-token: ${{ github.token }}
+          path: retained-graphs
+      - uses: actions/download-artifact@v4
+        with:
+          name: complete-full-map-summary
+          run-id: 35411673566
+          github-token: ${{ github.token }}
+          path: retained-records
+      - name: Re-evaluate every Hamiltonian timeout in this shard
+        run: uv run --no-sync python dev/retry_archived_spatial_evaluations.py --root retained-graphs --records retained-records/hamiltonian_records.json --out retry-results/hamiltonian --shard ${{ matrix.shard }} --shards 10
+      - name: Re-evaluate every TPMS timeout in this shard
+        run: uv run --no-sync python dev/retry_archived_spatial_evaluations.py --root retained-graphs --records retained-records/tpms_records.json --out retry-results/tpms --shard ${{ matrix.shard }} --shards 10
+      - run: git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: archived-spatial-retry-${{ matrix.shard }}
+          path: retry-results
+          retention-days: 30
