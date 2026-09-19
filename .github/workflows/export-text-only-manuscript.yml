@@ -1,0 +1,81 @@
+name: Export complete checked manuscript source
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['.github/workflows/export-text-only-manuscript.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Obtain the completed text-only source artifact
+        run: gh run download 35424060841 --repo HakanAkgn/KnottedGraph --name KnottedGraph-text-only-arxiv-revision --dir checked-artifact
+      - name: Publish only the exact checked source and QA records
+        run: |
+          python -m pip install uv==0.12.16
+          uv run --no-project --python 3.13 python - <<'PY'
+          import base64
+          from hashlib import sha256
+          import json
+          import os
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+          repo = 'HakanAkgn/KnottedGraph'
+          branch = 'research/solid-spine-maps-41dc87c'
+          if os.environ['GITHUB_REPOSITORY'] != repo or os.environ['GITHUB_REF_NAME'] != branch:
+              raise RuntimeError('wrong publication target')
+          prefix = 'doc/reproducibility/text_only_submission/'
+          root = Path('checked-artifact/text-revision-output')
+          qa = json.loads((root/'TEXT_REVISION_QA.json').read_text())
+          source = (root/'Third_draft.tex').read_bytes()
+          if (sha256(source).hexdigest() != qa['source_sha256']
+                  or qa['source_commit'] != 'ae21b3303d9eb794895b5eceaa2c51c40c26cc2d'
+                  or not qa['all_17_original_figure_paths_and_options_preserved']
+                  or qa['undefined_static_targets'] or qa['duplicate_labels']):
+              raise ValueError('checked artifact integrity failed')
+          def call(method,path,data=None):
+              body = None if data is None else json.dumps(data).encode()
+              request = Request('https://api.github.com/repos/'+repo+'/'+path, data=body, method=method,
+                  headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                           'Accept':'application/vnd.github+json','Content-Type':'application/json',
+                           'X-GitHub-Api-Version':'2022-11-28','User-Agent':'KnottedGraph-text-export'})
+              with urlopen(request,timeout=60) as response:
+                  return json.load(response)
+          ref = 'git/refs/heads/'+branch
+          head = os.environ['GITHUB_SHA']
+          if call('GET',ref)['object']['sha'] != head:
+              raise RuntimeError('branch has advanced; refusing to overwrite')
+          parent = call('GET','git/commits/'+head)
+          entries = []
+          for name in ('Third_draft.tex','arxiv_abstract.txt','TEXT_REVISION_QA.json'):
+              raw = (root/name).read_bytes()
+              blob = call('POST','git/blobs',{'content':base64.b64encode(raw).decode(),'encoding':'base64'})
+              entries.append({'path':prefix+name,'mode':'100644','type':'blob','sha':blob['sha']})
+          tree = call('POST','git/trees',{'base_tree':parent['tree']['sha'],'tree':entries})
+          commit = call('POST','git/commits',{'tree':tree['sha'],'parents':[head],
+              'message':'Export complete validated text-only manuscript and abstract\n\nThe source matches the completed assembly artifact byte for byte. All seventeen\nfigure references and the inline TikZ remain unchanged. These are source-level\nchecks, not a full-project PDF build. No scientific code, figure asset or protected\nintegration ref is changed.'})
+          if call('GET',ref)['object']['sha'] != head:
+              raise RuntimeError('branch advanced during export; no ref changed')
+          call('PATCH',ref,{'sha':commit['sha'],'force':False})
+          receipt = {'commit':commit['sha'],'parent':head,'source_sha256':qa['source_sha256'],
+                     'published_paths':[e['path'] for e in entries],
+                     'protected_integration_branch_changed':False}
+          Path('export_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          print('CHECKED_TEXT_EXPORT '+json.dumps(receipt),flush=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: text-only-source-export-receipt
+          path: export_receipt.json
+          retention-days: 30
