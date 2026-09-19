@@ -1,0 +1,41 @@
+name: Exact original TPMS critical branches
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['.github/workflows/exact-tpms-branches.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install frozen environment
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+      - name: Check full suite and exact symbolic branch identities
+        run: |
+          mkdir exact-tpms-results
+          uv run --no-sync pytest -q --junitxml=exact-tpms-results/tests.xml
+          uv run --no-sync ruff check dev/verify_exact_tpms_branches.py tests/core/test_exact_tpms_branches.py
+          uv run --no-sync python dev/verify_exact_tpms_branches.py --out exact-tpms-results/branch_identities.json
+          uv run --no-sync python dev/check_repository_consistency.py
+          git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: exact-tpms-branch-identities
+          path: exact-tpms-results
+          retention-days: 30
