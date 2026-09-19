@@ -1,0 +1,47 @@
+name: Level-resolved critical-event certificates
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['.github/workflows/level-resolved-tpms-events.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  events:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install and test safe augmented-system verifier
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+          mkdir -p level-results
+          uv run --no-sync pytest -q --junitxml=level-results/tests.xml
+          uv run --no-sync ruff check --ignore E701 dev/level_resolved_tpms_events.py tests/core/test_level_resolved_events.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: complete-replayed-tpms-events
+          run-id: 35415827400
+          github-token: ${{ github.token }}
+          path: retained-events
+      - name: Examine every remaining unknown cell
+        run: |
+          uv run --no-sync python dev/level_resolved_tpms_events.py --input retained-events/verified --out level-results/new-events
+          git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: level-resolved-tpms-evidence
+          path: level-results
+          retention-days: 30
