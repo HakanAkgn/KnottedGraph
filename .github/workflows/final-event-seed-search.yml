@@ -1,0 +1,93 @@
+name: Final unknown-cell event search and verified merge
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['.github/workflows/final-event-seed-search.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        shard: [0,1,2,3,4,5,6,7,8,9]
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install and verify event methods
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+          uv run --no-sync pytest -q tests/core/test_level_resolved_events.py tests/core/test_critical_events.py
+          uv run --no-sync ruff check dev/resolve_remaining_tpms_cells.py
+          uv run --no-sync python -c "import sys;sys.path.insert(0,'dev');from resolve_remaining_tpms_cells import exact_gyroid_schwarz_identity;print(exact_gyroid_schwarz_identity())"
+      - name: Require completed full-grid collector
+        run: gh run watch 35419427023 --interval 30 --exit-status >/tmp/evidence-status.log 2>&1
+      - uses: actions/download-artifact@v4
+        with:
+          name: completion-evidence
+          run-id: 35419427023
+          github-token: ${{ github.token }}
+          path: input-data
+      - name: Try alternative critical-point starts with unchanged certificate conditions
+        run: uv run --no-sync python dev/resolve_remaining_tpms_cells.py --data input-data --out final-events --shard ${{ matrix.shard }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: final-event-retry-${{ matrix.shard }}
+          path: final-events
+          retention-days: 30
+  collect:
+    needs: search
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install frozen collector environment
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+      - uses: actions/download-artifact@v4
+        with:
+          name: completion-evidence
+          run-id: 35419427023
+          github-token: ${{ github.token }}
+          path: input-data
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: final-event-retry-*
+          path: event-retries
+      - name: Independently replay and merge every positive event
+        run: |
+          uv run --no-sync python dev/resolve_remaining_tpms_cells.py --data input-data --root event-retries --out final-completion-evidence
+          git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: final-completion-evidence
+          path: final-completion-evidence
+          retention-days: 30

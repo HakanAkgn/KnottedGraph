@@ -1,0 +1,34 @@
+% Standalone insertion draft, not a rebuilt copy of the current manuscript.
+% Load graphicx, booktabs, amsmath and caption; place this file and its generated
+% table fragments alongside the Figures directory from the results package.
+\subsection{Full-grid spatial signatures and analytic continuation}
+We retain the analytic source, its closed-voxel realization and its selected embedded graph as separate objects. The complete Hamiltonian scan contains 7,140 parameter points at $120^3$, with 60 equally spaced interpolation values including both endpoints, so that $\Delta\lambda=1/59$. The three TPMS scans contain all 1,323 original parameter points at the same voxel resolution. No small-region relabeling or abstract polynomial fallback is applied.
+
+Timed-out evaluations are retried on the identical archived embedded graphs. Forty generic projections are ranked by crossing count; at least two completed projections must agree exactly for a normalized subcubic spatial value. Higher-valence evaluations remain fixed-diagram quantities. The complete status accounting is
+\begin{center}\input{table_outcomes}\end{center}
+The existing cavity implementation is unchanged, and cases assigned to that route are not claimed to have been recomputed here.
+
+\begin{figure*}[t]
+\centering\includegraphics[width=\textwidth]{Figures/PhaseDIagrams_Compact.pdf}
+\caption{Normalized Yamada-signature maps of the selected embedded graphs across the complete original Hamiltonian grids. Colors are exact polynomial labels within each panel, not a complete classification of analytic source solids. Gray cells have no admissible completed spatial value; fixed-diagram, resource-limited and cavity-route outcomes remain distinct in the accompanying data. No filtered or abstract-contraction labels are substituted.}
+\label{fig:completion_hamiltonian_signatures}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering\includegraphics[width=\textwidth]{Figures/PorousMaterialPhaseMap.pdf}
+\caption{TPMS spatial signatures with the original three-map/five-geometry arrangement. The geometry strip retains $c=0.105$ and $\lambda=0,0.05,0.25,0.55,0.85$ in the Gyroid-to-Diamond family. Every exposed voxel face and every graph polyline point is retained. The five sampled geometries are not asserted to define five distinct source-topology regimes.}
+\label{fig:completion_tpms_signatures}
+\end{figure*}
+
+To distinguish source continuation from a selected-spine signature, we independently certify regular rectangles of the analytic parameter domain. A local critical-point calculation proves existence of events in some of the remaining rectangles. The additional level-resolved calculation fixes $c$ inside a queried rectangle and solves $(\nabla h_\lambda,h_\lambda-c)=0$ for $(x,y,z,\lambda)$. On the spherical boundary it solves $(\nabla h_\lambda-\mu\mathbf{x},|\mathbf{x}|^2-R^2,h_\lambda-c)=0$. Accepted results require strict interval inclusion, a contraction bound below one and verified membership in the original query. Their parameter-area accounting is
+\begin{center}\input{table_events}\end{center}
+The event column measures the area of event-containing rectangles, not the area of the critical set. Unknown rectangles are not treated as inequivalent, and disconnected components of the regular cover are not asserted to represent distinct ambient-isotopy classes.
+
+\subsection{Closed-voxel local neighborhoods and source correspondence}
+Each lattice vertex is assigned its eight-octant occupancy pattern. Its link is a triangular subcomplex of the octahedral sphere. A nonempty link must be a disk at a manifold boundary point or a sphere at an interior point. The finite incidence test checks connectedness, all link-vertex links, Euler characteristic and boundary incidence. Its results for the full original grids are
+\begin{center}\input{table_links}\end{center}
+This local manifold test is independent of the elementary-collapse witness. Neither a successful local test nor a matching digital Betti tuple proves analytic-to-voxel correspondence. For pairs within one verified regular analytic rectangle, different digital Betti tuples obstruct simultaneous correct reconstruction of both source homotopy types. Different selected-spine polynomials alone do not determine whether discretization or spine choice causes the variation.
+
+% Corrected manuscript wording for the Reidemeister-II discussion:
+% A two-crossing bigon is removed only when the same physical strand passes
+% over at both crossings, as required for a Reidemeister-II move.
