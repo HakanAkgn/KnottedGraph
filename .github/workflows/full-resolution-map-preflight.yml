@@ -1,0 +1,44 @@
+name: Full-resolution map preflight
+on:
+  push:
+    branches: [research/solid-spine-maps-41dc87c]
+    paths: ['dev/run_full_resolution_maps.py', 'tests/extraction/test_full_map_plan.py', '.github/workflows/full-resolution-map-preflight.yml']
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MPLBACKEND: Agg
+      PYVISTA_OFF_SCREEN: 'true'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install frozen package
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y libboost-dev
+          python -m pip install uv==0.12.16
+          uv sync --all-extras --group dev --group docs --frozen
+          g++ -O3 -std=c++17 dev/full_map_collapse.cpp -o /tmp/kg-collapse
+      - name: Validate tests and full-resolution controls
+        run: |
+          uv run --no-sync pytest -q
+          uv run --no-sync ruff check dev/full_map_kernel.py dev/run_full_resolution_maps.py tests/extraction/test_full_map_kernel.py tests/extraction/test_full_map_plan.py
+          uv run --no-sync python dev/run_full_resolution_maps.py --mode preflight --dimension 120 --kernel /tmp/kg-collapse --out preflight-results --case-seconds 120
+          git ls-files '*.tex' '*.bib' '*.zip' '*Phase*pdf' '*phase*pdf' '*tpms*py' > preflight-results/source-inventory.txt
+          cat preflight-results/source-inventory.txt
+          git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: full-resolution-map-preflight
+          path: preflight-results
+          retention-days: 30
