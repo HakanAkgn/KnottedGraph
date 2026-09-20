@@ -147,3 +147,132 @@ def test_two_stage_projection_selection_matches_exhaustive_full_sampling():
     assert actual.rotation_angles == expected.rotation_angles
     assert actual.num_crossings == expected.num_crossings
     assert actual.pd_code == expected.pd_code
+
+
+
+def test_hard_normalized_projection_rescue_accepts_two_port_width_gain(monkeypatch):
+    graph = _embedded_edge()
+    angles = np.asarray(
+        [
+            [0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [2.0, 0.0, 0.0],
+        ]
+    )
+    initial = ProjectionResult(
+        processor=_FakeProcessor(value=0),
+        rotation_angles=(0.0, 0.0, 0.0),
+        rotation_order="ZYX",
+        pd_code="initial",
+        num_crossings=13,
+    )
+    crossing_counts = {0.0: 13, 1.0: 21, 2.0: 14}
+    peak_ports = {0.0: 15, 1.0: 13, 2.0: 14}
+
+    monkeypatch.setattr(
+        pd_code,
+        "generate_isotopy_angles",
+        lambda count, order: angles,
+    )
+
+    def fake_compute(graph, rotation_angles, rotation_order):
+        key = float(rotation_angles[0])
+        return ProjectionResult(
+            processor=_FakeProcessor(value=int(key)),
+            rotation_angles=rotation_angles,
+            rotation_order=rotation_order,
+            pd_code=f"pd-{key}",
+            num_crossings=crossing_counts[key],
+        )
+
+    monkeypatch.setattr(pd_code, "_compute_projection", fake_compute)
+    monkeypatch.setattr(
+        pd_code,
+        "_projection_yamada_peak_ports",
+        lambda projection: peak_ports[float(projection.rotation_angles[0])],
+    )
+
+    rescued = pd_code._rescue_projection_for_normalized_yamada(
+        graph,
+        initial,
+        rotation_order="ZYX",
+        num_rotation_samples=3,
+    )
+
+    assert rescued.rotation_angles == (1.0, 0.0, 0.0)
+    assert rescued.num_crossings == 21
+
+
+def test_hard_normalized_projection_rescue_rejects_one_port_width_gain(monkeypatch):
+    graph = _embedded_edge()
+    angles = np.asarray([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
+    initial = ProjectionResult(
+        processor=_FakeProcessor(value=0),
+        rotation_angles=(0.0, 0.0, 0.0),
+        rotation_order="ZYX",
+        pd_code="initial",
+        num_crossings=13,
+    )
+    monkeypatch.setattr(
+        pd_code,
+        "generate_isotopy_angles",
+        lambda count, order: angles,
+    )
+    monkeypatch.setattr(
+        pd_code,
+        "_compute_projection",
+        lambda graph, rotation_angles, rotation_order: ProjectionResult(
+            processor=_FakeProcessor(value=1),
+            rotation_angles=rotation_angles,
+            rotation_order=rotation_order,
+            pd_code="alternate",
+            num_crossings=14,
+        ),
+    )
+    monkeypatch.setattr(
+        pd_code,
+        "_projection_yamada_peak_ports",
+        lambda projection: (
+            15 if projection.rotation_angles == (0.0, 0.0, 0.0) else 14
+        ),
+    )
+
+    rescued = pd_code._rescue_projection_for_normalized_yamada(
+        graph,
+        initial,
+        rotation_order="ZYX",
+        num_rotation_samples=2,
+    )
+
+    assert rescued is initial
+
+
+def test_unnormalized_yamada_never_invokes_complexity_projection_rescue(monkeypatch):
+    initial = ProjectionResult(
+        processor=_FakeProcessor(value=23),
+        rotation_angles=(0.0, 0.0, 0.0),
+        rotation_order="ZYX",
+        pd_code="historical",
+        num_crossings=13,
+    )
+    monkeypatch.setattr(pd_code, "select_projection", lambda *args, **kwargs: initial)
+
+    def fail_rescue(*args, **kwargs):
+        raise AssertionError("unnormalized Yamada must retain historical projection policy")
+
+    monkeypatch.setattr(
+        pd_code,
+        "_rescue_projection_for_normalized_yamada",
+        fail_rescue,
+    )
+
+    A = sp.Symbol("A")
+    result = compute_yamada_polynomial(
+        _embedded_edge(),
+        A,
+        normalize=False,
+        return_result=True,
+    )
+
+    assert result.polynomial == 23
+    assert result.projection is initial
