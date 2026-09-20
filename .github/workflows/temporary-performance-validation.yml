@@ -40,6 +40,99 @@ jobs:
           assert native_factorized_available(), factorized_import_error()
           PY
 
+      - name: Diagnose canonical triangular-prism reconstruction
+        run: |
+          uv run --no-sync python - <<'PY'
+          import networkx as nx
+          import numpy as np
+
+          from dev.run_skeletonization_45_validation import ORIGINAL_CASES, deform, voxelize
+          from knotted_graph.extraction import skeletonize_volume
+          from knotted_graph.extraction._native import (
+              _compact_graph,
+              _compact_summary,
+              _select_hops,
+              _skeleton_native,
+              native_persistent_extract,
+          )
+          from knotted_graph.extraction._optimized import _sparse_adjacency_python
+          from knotted_graph.extraction._topology_optimized import (
+              _diagnostic_summary,
+              _prepared_components,
+              _trace_prepared,
+              persistent_extract,
+          )
+
+          case = next(item for item in ORIGINAL_CASES if item.name == "triangular_prism")
+          target = deform(case.graph, "rotate")
+          skeleton = skeletonize_volume(voxelize(target, 1))
+          coords, adjacency = _sparse_adjacency_python(skeleton)
+          prepared = _prepared_components(coords, adjacency)
+          native_candidates = list(_skeleton_native.plan_candidates(skeleton, 4))
+
+          print("skeleton voxels", int(np.count_nonzero(skeleton)))
+          for hops, native_candidate in enumerate(native_candidates):
+              py_graph = _trace_prepared(prepared, hops)
+              py_summary = _diagnostic_summary(
+                  py_graph,
+                  max_degree=3,
+                  anomaly_ratio=0.15,
+              )
+              native_graph = _compact_graph(native_candidate)
+              native_summary = _compact_summary(
+                  native_candidate,
+                  max_degree=3,
+                  anomaly_ratio=0.15,
+              )
+              print(
+                  "h", hops,
+                  "python", py_graph.number_of_nodes(), py_graph.number_of_edges(),
+                  sorted(dict(py_graph.degree()).values()),
+                  "clean", py_summary[1], "safe", py_summary[4],
+              )
+              print(
+                  "h", hops,
+                  "native", native_graph.number_of_nodes(), native_graph.number_of_edges(),
+                  sorted(dict(native_graph.degree()).values()),
+                  "clean", native_summary[1], "safe", native_summary[3],
+                  "iso", nx.is_isomorphic(py_graph, native_graph),
+              )
+              print("fingerprints", py_summary[3], native_summary[2])
+
+          selected_native_hops = _select_hops(
+              native_candidates,
+              max_degree=3,
+              anomaly_ratio=0.15,
+          )
+          py_selected = persistent_extract(
+              coords,
+              adjacency,
+              max_degree=3,
+              max_hops=4,
+              anomaly_ratio=0.15,
+          )
+          native_selected = native_persistent_extract(
+              skeleton,
+              max_degree=3,
+              max_hops=4,
+              anomaly_ratio=0.15,
+          )
+          print("native selected hops", selected_native_hops)
+          print(
+              "selected python",
+              py_selected.number_of_nodes(),
+              py_selected.number_of_edges(),
+              sorted(dict(py_selected.degree()).values()),
+          )
+          print(
+              "selected native",
+              native_selected.number_of_nodes(),
+              native_selected.number_of_edges(),
+              sorted(dict(native_selected.degree()).values()),
+              "iso", nx.is_isomorphic(py_selected, native_selected),
+          )
+          PY
+
       - name: Run exact optimization regression suites
         run: >
           uv run --no-sync pytest -q
