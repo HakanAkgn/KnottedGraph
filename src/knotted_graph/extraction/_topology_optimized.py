@@ -328,15 +328,10 @@ def persistent_extract(
             previous[2]
             and previous[4]
             and current[2]
+            and current[4]
             and previous[3] == current[3]
             and nx.is_isomorphic(previous[1], current[1])
         ):
-            # The earlier scale is the candidate we return, so its constrained
-            # short-edge guard must pass.  The later scale is only a persistence
-            # witness: requiring that witness to pass the same short-edge guard
-            # can discard a topology that is stable across two scales merely
-            # because the coarser representative is already approaching its
-            # next junction merge.
             return previous[0]
         previous = current
 
