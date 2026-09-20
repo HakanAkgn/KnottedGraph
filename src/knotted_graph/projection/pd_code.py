@@ -598,11 +598,14 @@ class PDCode:
         if len(coords) < 2:
             return []
         segments = np.asarray(
-            [LineString([coords[i], coords[i + 1]]) for i in range(len(coords) - 1)],
+            shapely.linestrings(np.stack((coords[:-1], coords[1:]), axis=1)),
             dtype=object,
         )
-        query_geometries = shapely.buffer(segments, float(tolerance))
-        pairs = crossing_tree.query(query_geometries)
+        pairs = crossing_tree.query(
+            segments,
+            predicate="dwithin",
+            distance=float(tolerance),
+        )
         if pairs.size == 0:
             return []
 
@@ -956,6 +959,19 @@ def _compute_projection(
     )
 
 
+def _count_projection_crossings(
+    skeleton_graph: nx.MultiGraph,
+    rotation_angles: tuple[float, float, float],
+    rotation_order: str,
+) -> int:
+    """Count one normalized graph projection without constructing full PD data."""
+    processor = PDCode(skeleton_graph, _already_normalized=True)
+    return processor.count_crossings(
+        rotation_angles=rotation_angles,
+        rotation_order=rotation_order,
+    )
+
+
 def sample_projections(
     skeleton_graph: nx.MultiGraph,
     *,
@@ -1020,22 +1036,61 @@ def select_projection(
     if exact_angles is not None:
         return _compute_projection(skeleton_graph, exact_angles, rotation_order)
 
-    # Keep the public sampling contract intact.  ``sample_projections`` performs
-    # its own normalization for direct callers, while each per-angle PDCode now
-    # trusts the already-normalized graph and avoids another O(total points) copy.
+    # Projection selection needs the full PD only for the winning view. Count
+    # crossings for every deterministic direction first, rank by
+    # (crossing_count, generation_order), then fully construct candidates in
+    # that order until one succeeds. Direct callers of sample_projections keep
+    # the historical contract of receiving every complete valid PD.
     num_rotation_samples = _validate_positive_integer(
         num_rotation_samples,
         name="num_rotation_samples",
     )
-    projections = sample_projections(
-        skeleton_graph,
-        num_rotation_samples=num_rotation_samples,
-        rotation_order=rotation_order,
-    )
-    return min(
-        enumerate(projections),
-        key=lambda indexed: (indexed[1].num_crossings, indexed[0]),
-    )[1]
+    errors: list[str] = []
+    ranked: list[
+        tuple[int, int, tuple[float, float, float]]
+    ] = []
+    for sample_index, angles in enumerate(
+        generate_isotopy_angles(num_rotation_samples, order=rotation_order)
+    ):
+        candidate_angles = tuple(float(angle) for angle in angles)
+        try:
+            crossing_count = _count_projection_crossings(
+                skeleton_graph,
+                candidate_angles,
+                rotation_order,
+            )
+        except Exception as exc:
+            errors.append(f"sample {sample_index}: {exc}")
+            continue
+        ranked.append((crossing_count, sample_index, candidate_angles))
+
+    for expected_crossings, sample_index, candidate_angles in sorted(ranked):
+        try:
+            projection = _compute_projection(
+                skeleton_graph,
+                candidate_angles,
+                rotation_order,
+            )
+        except Exception as exc:
+            errors.append(f"sample {sample_index}: {exc}")
+            continue
+        if projection.num_crossings != expected_crossings:
+            raise RuntimeError(
+                "Projection crossing-count prepass disagreed with full PD "
+                f"construction for sample {sample_index}: "
+                f"{expected_crossings} != {projection.num_crossings}."
+            )
+        if errors:
+            warnings.warn(
+                f"{len(errors)} projection candidate(s) failed during selection; "
+                f"using sample {sample_index}. First failure: {errors[0]}",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+        return projection
+
+    details = "; ".join(errors) if errors else "no samples were generated"
+    raise RuntimeError(f"All projection samples failed: {details}")
 
 
 def compute_yamada_polynomial(
