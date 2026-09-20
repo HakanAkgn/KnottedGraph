@@ -1093,6 +1093,83 @@ def select_projection(
     raise RuntimeError(f"All projection samples failed: {details}")
 
 
+def _projection_yamada_peak_ports(
+    projection: ProjectionResult,
+) -> int:
+    """Return the exact factorized-frontier peak planned for one projection."""
+    from knotted_graph.invariants.yamada.factorized_frontier import (
+        build_factorized_frontier,
+    )
+
+    prepared = Yamada.from_PDCode(
+        projection.processor
+    )._prepare_compact_state_builder()
+    data = build_factorized_frontier(prepared)
+    return int(data["factor_order_peak_ports"])
+
+
+def _rescue_projection_for_normalized_yamada(
+    skeleton_graph: nx.MultiGraph,
+    initial: ProjectionResult,
+    *,
+    rotation_order: str,
+    num_rotation_samples: int,
+) -> ProjectionResult:
+    """Replace a hard minimum-crossing view only for a clear frontier-width win."""
+    initial_peak = _projection_yamada_peak_ports(initial)
+    if (
+        initial.num_crossings < 12
+        or initial_peak < 12
+        or initial.rotation_angles is None
+    ):
+        return initial
+
+    angles_in_order = [
+        tuple(float(angle) for angle in angles)
+        for angles in generate_isotopy_angles(
+            num_rotation_samples,
+            order=rotation_order,
+        )
+    ]
+    initial_index = next(
+        (
+            index
+            for index, angles in enumerate(angles_in_order)
+            if angles == initial.rotation_angles
+        ),
+        -1,
+    )
+    best = initial
+    best_peak = initial_peak
+    best_key = (
+        initial_peak,
+        initial.num_crossings,
+        initial_index if initial_index >= 0 else num_rotation_samples,
+    )
+
+    for sample_index, angles in enumerate(angles_in_order):
+        if angles == initial.rotation_angles:
+            continue
+        try:
+            projection = _compute_projection(
+                skeleton_graph,
+                angles,
+                rotation_order,
+            )
+            peak = _projection_yamada_peak_ports(projection)
+        except Exception:
+            continue
+        key = (peak, projection.num_crossings, sample_index)
+        if key < best_key:
+            best = projection
+            best_peak = peak
+            best_key = key
+
+    if initial_peak - best_peak < 2:
+        return initial
+    return best
+
+
 def compute_yamada_polynomial(
     skeleton_graph: nx.MultiGraph,
     variable: sp.Symbol,
@@ -1107,10 +1184,13 @@ def compute_yamada_polynomial(
 ) -> sp.Expr | YamadaComputationResult:
     """Compute a spatial graph's Yamada polynomial from a planar projection.
 
-    When ``rotation_angles`` is omitted, the function samples deterministic
-    viewing directions and evaluates the valid projection with the fewest
-    crossings. Supplying angles bypasses sampling and uses that projection
-    directly.
+    When ``rotation_angles`` is omitted, the function first selects the
+    valid sampled projection with the fewest crossings. For normalized Yamada
+    evaluation only, a hard selected diagram may then be replaced by another
+    sampled view when exact factorized-frontier planning predicts a reduction
+    of at least two live ports. Supplying angles bypasses sampling and uses that
+    projection directly; unnormalized evaluation retains the minimum-crossing
+    policy exactly.
 
     Parameters
     ----------
@@ -1188,6 +1268,18 @@ def compute_yamada_polynomial(
         rotation_order=rotation_order,
         num_rotation_samples=num_rotation_samples,
     )
+    if rotation_angles is None and normalize:
+        normalized_graph = ensure_embedding(
+            skeleton_graph,
+            copy=True,
+            normalize=True,
+        )
+        projection = _rescue_projection_for_normalized_yamada(
+            normalized_graph,
+            projection,
+            rotation_order=rotation_order,
+            num_rotation_samples=num_rotation_samples,
+        )
     if (
         crossing_warning_threshold is not None
         and projection.num_crossings >= crossing_warning_threshold
