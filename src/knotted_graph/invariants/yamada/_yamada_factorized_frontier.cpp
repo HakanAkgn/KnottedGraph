@@ -1,7 +1,12 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#if __has_include(<boost/multiprecision/cpp_int.hpp>)
 #include <boost/multiprecision/cpp_int.hpp>
+#define KNOTTED_GRAPH_HAS_BOOST_CPP_INT 1
+#else
+#define KNOTTED_GRAPH_HAS_BOOST_CPP_INT 0
+#endif
 
 #include <algorithm>
 #include <cstdint>
@@ -14,9 +19,149 @@
 
 namespace py = pybind11;
 using FastCoeff = std::int64_t;
-using BigCoeff = boost::multiprecision::cpp_int;
 
 namespace {
+
+#if KNOTTED_GRAPH_HAS_BOOST_CPP_INT
+using BigCoeff = boost::multiprecision::cpp_int;
+#else
+class BigCoeff {
+public:
+    static constexpr std::uint32_t base = 1000000000U;
+
+    BigCoeff() = default;
+    BigCoeff(long long value) { assign(value); }
+
+    friend bool operator==(const BigCoeff& value, int other) {
+        if (other == 0) return value.digits_.empty();
+        return value == BigCoeff(other);
+    }
+    friend bool operator!=(const BigCoeff& value, int other) {
+        return !(value == other);
+    }
+    friend bool operator==(const BigCoeff& left, const BigCoeff& right) {
+        return left.negative_ == right.negative_ && left.digits_ == right.digits_;
+    }
+    friend BigCoeff operator-(BigCoeff value) {
+        if (!value.digits_.empty()) value.negative_ = !value.negative_;
+        return value;
+    }
+    friend BigCoeff operator+(const BigCoeff& left, const BigCoeff& right) {
+        if (left.negative_ == right.negative_) {
+            BigCoeff out;
+            out.negative_ = left.negative_;
+            out.digits_ = add_abs(left.digits_, right.digits_);
+            out.normalize();
+            return out;
+        }
+
+        const int ordering = compare_abs(left.digits_, right.digits_);
+        if (ordering == 0) return BigCoeff{};
+        BigCoeff out;
+        if (ordering > 0) {
+            out.negative_ = left.negative_;
+            out.digits_ = sub_abs(left.digits_, right.digits_);
+        } else {
+            out.negative_ = right.negative_;
+            out.digits_ = sub_abs(right.digits_, left.digits_);
+        }
+        out.normalize();
+        return out;
+    }
+
+    std::string str() const {
+        if (digits_.empty()) return "0";
+        std::string out = negative_ ? "-" : "";
+        out += std::to_string(digits_.back());
+        for (std::size_t index = digits_.size() - 1; index-- > 0;) {
+            std::string part = std::to_string(digits_[index]);
+            out.append(9 - part.size(), '0');
+            out += part;
+        }
+        return out;
+    }
+
+private:
+    bool negative_{false};
+    std::vector<std::uint32_t> digits_;
+
+    void assign(long long value) {
+        digits_.clear();
+        negative_ = value < 0;
+        unsigned long long magnitude;
+        if (value < 0) {
+            magnitude = static_cast<unsigned long long>(-(value + 1));
+            ++magnitude;
+        } else {
+            magnitude = static_cast<unsigned long long>(value);
+        }
+        while (magnitude) {
+            digits_.push_back(static_cast<std::uint32_t>(magnitude % base));
+            magnitude /= base;
+        }
+        normalize();
+    }
+
+    void normalize() {
+        while (!digits_.empty() && digits_.back() == 0) digits_.pop_back();
+        if (digits_.empty()) negative_ = false;
+    }
+
+    static int compare_abs(
+        const std::vector<std::uint32_t>& left,
+        const std::vector<std::uint32_t>& right
+    ) {
+        if (left.size() != right.size()) return left.size() < right.size() ? -1 : 1;
+        for (std::size_t index = left.size(); index-- > 0;) {
+            if (left[index] != right[index])
+                return left[index] < right[index] ? -1 : 1;
+        }
+        return 0;
+    }
+
+    static std::vector<std::uint32_t> add_abs(
+        const std::vector<std::uint32_t>& left,
+        const std::vector<std::uint32_t>& right
+    ) {
+        const std::size_t size = std::max(left.size(), right.size());
+        std::vector<std::uint32_t> out;
+        out.reserve(size + 1);
+        std::uint64_t carry = 0;
+        for (std::size_t index = 0; index < size; ++index) {
+            std::uint64_t value = carry;
+            if (index < left.size()) value += left[index];
+            if (index < right.size()) value += right[index];
+            out.push_back(static_cast<std::uint32_t>(value % base));
+            carry = value / base;
+        }
+        if (carry) out.push_back(static_cast<std::uint32_t>(carry));
+        return out;
+    }
+
+    static std::vector<std::uint32_t> sub_abs(
+        const std::vector<std::uint32_t>& larger,
+        const std::vector<std::uint32_t>& smaller
+    ) {
+        std::vector<std::uint32_t> out(larger.size(), 0);
+        std::int64_t borrow = 0;
+        for (std::size_t index = 0; index < larger.size(); ++index) {
+            std::int64_t value =
+                static_cast<std::int64_t>(larger[index]) - borrow;
+            if (index < smaller.size())
+                value -= static_cast<std::int64_t>(smaller[index]);
+            if (value < 0) {
+                value += base;
+                borrow = 1;
+            } else {
+                borrow = 0;
+            }
+            out[index] = static_cast<std::uint32_t>(value);
+        }
+        while (!out.empty() && out.back() == 0) out.pop_back();
+        return out;
+    }
+};
+#endif
 constexpr int EQ_NEG = 0;
 constexpr int EQ_POS = 1;
 constexpr int CROSSING = 2;
@@ -364,7 +509,12 @@ py::object coeff_to_py(FastCoeff value) {
 }
 
 py::object coeff_to_py(const BigCoeff& value) {
-    return py::module_::import("builtins").attr("int")(value.convert_to<std::string>());
+#if KNOTTED_GRAPH_HAS_BOOST_CPP_INT
+    const std::string text = value.convert_to<std::string>();
+#else
+    const std::string text = value.str();
+#endif
+    return py::module_::import("builtins").attr("int")(text);
 }
 
 template <typename Coeff>
