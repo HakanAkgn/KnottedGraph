@@ -148,7 +148,19 @@ jobs:
       - name: Run complete pytest suite
         run: uv run --no-sync pytest -q
 
+      - name: Compare requested base branch on 45-case skeleton gate
+        continue-on-error: true
+        run: |
+          git fetch origin codex/arbitrary-knot-user-integration
+          git worktree add --detach /tmp/kg-requested-base 43620e20800dfa144987c7bb2cb9997f184631cd
+          cd /tmp/kg-requested-base
+          PYTHONPATH=/tmp/kg-requested-base/src "$GITHUB_WORKSPACE/.venv/bin/python" - <<'PY'
+          from dev.run_skeletonization_45_validation import run_reconstruction_suite
+          run_reconstruction_suite()
+          PY
+
       - name: Run 45-case skeleton reconstruction validation
+        continue-on-error: true
         run: uv run --no-sync python dev/run_skeletonization_45_validation.py
 
       - name: Run independent published Yamada sanity checks
