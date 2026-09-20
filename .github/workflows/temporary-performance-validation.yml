@@ -58,6 +58,7 @@ jobs:
       - name: Diagnose 45-case base/head parity
         shell: bash
         run: |
+          git fetch --no-tags origin 43620e20800dfa144987c7bb2cb9997f184631cd
           git worktree add --detach /tmp/kg-requested-base 43620e20800dfa144987c7bb2cb9997f184631cd
           uv run --no-sync python - <<'PY'
           import networkx as nx
