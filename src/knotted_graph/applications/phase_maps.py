@@ -632,8 +632,14 @@ def _material_factories(
     if h0.rows != h0.cols:
         raise ValueError("material scans require square Hamiltonians")
 
+    hamiltonian_cache: dict[float, sp.Matrix] = {}
+    eigvals_cache: dict[float, np.ndarray] = {}
+
     def h_at(lam: float):
-        return sp.Matrix(_linear_blend(h0, h1, lam))
+        key = float(lam)
+        if key not in hamiltonian_cache:
+            hamiltonian_cache[key] = sp.Matrix(_linear_blend(h0, h1, key))
+        return hamiltonian_cache[key]
 
     def common_options():
         options = {
@@ -650,30 +656,43 @@ def _material_factories(
         return options
 
     def object_factory(lam: float, parameter: float):
+        key = float(lam)
         if material_mode == "gap":
-            return MaterialFermiSurface(
-                h_at(lam),
+            obj = MaterialFermiSurface(
+                h_at(key),
                 band_pair=band_pair,
                 gap_tol=float(parameter),
                 **common_options(),
             )
-        if band_index is None:
-            raise ValueError("band_index is required for material_mode='energy'")
-        return MaterialBandEnergySurface(
-            h_at(lam),
-            energy=float(parameter),
-            band_index=int(band_index),
-            energy_tol=float(energy_tol),
-            reference_band_pair=band_pair,
-            **common_options(),
-        )
+        else:
+            if band_index is None:
+                raise ValueError("band_index is required for material_mode='energy'")
+            obj = MaterialBandEnergySurface(
+                h_at(key),
+                energy=float(parameter),
+                band_index=int(band_index),
+                energy_tol=float(energy_tol),
+                reference_band_pair=band_pair,
+                **common_options(),
+            )
+
+        cached = eigvals_cache.get(key)
+        if cached is not None:
+            obj.__dict__["eigvals_sorted"] = cached
+        return obj
 
     def graph_factory(lam: float, parameter: float):
-        return _graph_from_skeleton_like(
-            object_factory(lam, parameter),
+        key = float(lam)
+        obj = object_factory(key, parameter)
+        graph = _graph_from_skeleton_like(
+            obj,
             graph_options,
             force_genus_zero_vertex=force_genus_zero_vertex,
         )
+        eigvals = obj.__dict__.get("eigvals_sorted")
+        if eigvals is not None and key not in eigvals_cache:
+            eigvals_cache[key] = eigvals
+        return graph
 
     return object_factory, graph_factory
 
