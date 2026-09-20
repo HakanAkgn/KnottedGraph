@@ -78,28 +78,6 @@ def _trace_cycle(coords: np.ndarray, adjacency: list[list[int]]) -> np.ndarray:
     raise RuntimeError("pure skeleton cycle could not be traced")
 
 
-def _drop_trace_endpoint_duplicates(points: np.ndarray) -> np.ndarray:
-    """Match the historical adjacent-dedup mask without scanning the full path.
-
-    A traced voxel chain has distinct consecutive interior samples by
-    construction. Only snapping the two endpoints to rounded junction positions
-    can create an adjacent duplicate, so only positions 1 and -1 can become
-    newly redundant.
-    """
-    if len(points) <= 1:
-        return points
-    drop_second = np.array_equal(points[0], points[1])
-    drop_last = np.array_equal(points[-2], points[-1])
-    if not drop_second and not drop_last:
-        return points
-    keep = np.ones(len(points), dtype=bool)
-    if drop_second:
-        keep[1] = False
-    if drop_last:
-        keep[-1] = False
-    return points[keep]
-
-
 def trace_component(
     coords: np.ndarray,
     adjacency: list[list[int]],
@@ -170,7 +148,10 @@ def trace_component(
                 points = coords[path].astype(float, copy=True)
                 points[0] = graph.nodes[source_component]["pos"]
                 points[-1] = graph.nodes[target_component]["pos"]
-                points = _drop_trace_endpoint_duplicates(points)
+                keep = np.ones(len(points), dtype=bool)
+                if len(points) > 1:
+                    keep[1:] = np.any(np.diff(points, axis=0) != 0, axis=1)
+                points = points[keep]
                 if len(points) < 2:
                     continue
                 graph.add_edge(
