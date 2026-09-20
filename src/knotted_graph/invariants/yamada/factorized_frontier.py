@@ -109,6 +109,8 @@ def _multistart_factor_order(
     port_factor,
     wire_partner,
     initial_order,
+    *,
+    crossing_count: int,
 ):
     """Conservatively rescue genuinely wide factorized production diagrams."""
     initial_plan = _factor_order_plan(
@@ -120,6 +122,7 @@ def _multistart_factor_order(
     count = len(factor_ports)
     if (
         count <= 1
+        or int(crossing_count) < 12
         or initial_plan["peak_ports"] < MULTISTART_MIN_PEAK_PORTS
     ):
         return list(initial_order), initial_plan, False, 1
@@ -293,6 +296,7 @@ def build_factorized_frontier(prepared):
             port_factor,
             wire_partner,
             initial_factor_order,
+            crossing_count=crossing_count,
         )
     )
     initial_order_plan = _factor_order_plan(
