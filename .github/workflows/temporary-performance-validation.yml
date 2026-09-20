@@ -1,0 +1,77 @@
+name: Temporary performance branch validation
+
+on:
+  push:
+    branches:
+      - perf/incremental-yamada-frontier-order
+
+permissions:
+  contents: read
+
+concurrency:
+  group: temporary-performance-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install full validation environment
+        run: uv sync --group dev --group docs --group benchmark --all-extras
+
+      - name: Require all native optimization backends
+        run: |
+          uv run --no-sync python - <<'PY'
+          from knotted_graph.extraction._native import native_skeleton_available, native_skeleton_import_error
+          from knotted_graph.invariants.yamada.native import native_available, native_import_error
+          from knotted_graph.invariants.yamada.factorized_frontier import native_factorized_available, factorized_import_error
+          print("skeleton native:", native_skeleton_available(), native_skeleton_import_error())
+          print("resolved Yamada native:", native_available(), native_import_error())
+          print("factorized Yamada native:", native_factorized_available(), factorized_import_error())
+          assert native_skeleton_available(), native_skeleton_import_error()
+          assert native_available(), native_import_error()
+          assert native_factorized_available(), factorized_import_error()
+          PY
+
+      - name: Run exact optimization regression suites
+        run: >
+          uv run --no-sync pytest -q
+          tests/core/test_topology_aware_skeleton.py
+          tests/core/test_topology_persistence_selection.py
+          tests/extraction
+          tests/projection
+          tests/invariants/yamada
+          tests/applications/test_phase_maps.py
+          tests/applications/test_material_surface_optimization.py
+          tests/applications/test_nodal_regressions.py
+
+      - name: Run complete pytest suite
+        run: uv run --no-sync pytest -q
+
+      - name: Run 45-case skeleton reconstruction validation
+        run: uv run --no-sync python dev/run_skeletonization_45_validation.py
+
+      - name: Run independent published Yamada sanity checks
+        run: uv run --no-sync python dev/run_yamada_sanity_checks.py
+
+      - name: Run stage performance audit
+        run: uv run --no-sync python dev/final_performance_audit.py
+
+      - name: Execute correctness benchmark notebooks
+        env:
+          PYTHONNOUSERSITE: "1"
+          MPLBACKEND: Agg
+          PYVISTA_OFF_SCREEN: "true"
+          PLOTLY_RENDERER: json
+        run: |
+          uv run --no-sync python dev/execute_notebook.py User_guide/benchmarks/01_yamada_sanity_checks.ipynb --timeout 7200
+          uv run --no-sync python dev/execute_notebook.py User_guide/benchmarks/02_application_regression_checks.ipynb --timeout 7200
+          uv run --no-sync python dev/execute_notebook.py User_guide/benchmarks/03_knottedgraph_vs_topoly_scaling.ipynb --timeout 7200
+          uv run --no-sync python dev/execute_notebook.py User_guide/benchmarks/04_thick_handlebody_validation.ipynb --timeout 7200
