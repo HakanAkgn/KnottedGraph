@@ -220,3 +220,50 @@ def test_native_persistence_matches_python_reference_geometry_randomized():
         ):
             assert actual_edge[:4] == expected_edge[:4]
             assert actual_edge[4] == pytest.approx(expected_edge[4], abs=1e-12)
+
+
+
+def _large_disconnected_cross_skeleton():
+    image = np.zeros((125, 125, 125), dtype=bool)
+    centers = (20, 60, 100)
+    for x in centers:
+        for y in centers:
+            for z in centers:
+                image[x - 10 : x + 11, y, z] = True
+                image[x, y - 10 : y + 11, z] = True
+                image[x, y, z - 10 : z + 11] = True
+    assert int(np.count_nonzero(image)) > 1500
+    return image
+
+
+def test_native_persistence_matches_python_reference_above_production_crossover():
+    if not native_skeleton_available():
+        return
+
+    image = _large_disconnected_cross_skeleton()
+    coords, adjacency = _sparse_adjacency_python(image)
+    expected = persistent_extract(
+        coords,
+        adjacency,
+        max_degree=None,
+        max_hops=4,
+        anomaly_ratio=0.15,
+    )
+    actual = native_persistent_extract(
+        image,
+        max_degree=None,
+        max_hops=4,
+        anomaly_ratio=0.15,
+    )
+
+    expected_nodes, expected_edges = _weighted_embedded_signature(expected)
+    actual_nodes, actual_edges = _weighted_embedded_signature(actual)
+    assert actual_nodes == expected_nodes
+    assert len(actual_edges) == len(expected_edges)
+    for actual_edge, expected_edge in zip(
+        actual_edges,
+        expected_edges,
+        strict=True,
+    ):
+        assert actual_edge[:4] == expected_edge[:4]
+        assert actual_edge[4] == pytest.approx(expected_edge[4], abs=1e-12)
