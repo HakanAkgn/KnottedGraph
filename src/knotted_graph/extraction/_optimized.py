@@ -12,6 +12,12 @@ from ._native import (
 )
 from ._topology_optimized import persistent_extract
 
+# Native multi-scale tracing amortizes its setup cost on larger skeletons.
+# The existing Python path remains faster for the small 45-case validation
+# cohort (roughly 270--1200 voxels), while local crossover benchmarks put the
+# native win at about 1500 occupied skeleton voxels and above.
+_NATIVE_EXTRACT_MIN_VOXELS = 1500
+
 _NEIGHBOR_OFFSETS = tuple(
     (dx, dy, dz)
     for dx in (-1, 0, 1)
@@ -208,7 +214,8 @@ def sparse_adjacency_exact_cropped(
     Python implementation as a reference and compiler-free fallback.
     """
     image = np.asarray(image, dtype=bool)
-    if native_skeleton_available():
+    occupied = int(np.count_nonzero(image))
+    if native_skeleton_available() and occupied >= _NATIVE_EXTRACT_MIN_VOXELS:
         return sparse_adjacency_native(image)
     return _sparse_adjacency_python(image)
 
@@ -229,7 +236,8 @@ def extract(
     if max_junction_degree is not None and max_junction_degree < 1:
         raise ValueError("max_junction_degree must be positive")
 
-    if native_skeleton_available():
+    occupied = int(np.count_nonzero(image))
+    if native_skeleton_available() and occupied >= _NATIVE_EXTRACT_MIN_VOXELS:
         return native_persistent_extract(
             image,
             max_degree=max_junction_degree,
