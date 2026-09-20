@@ -8,6 +8,8 @@ import pytest
 from knotted_graph.invariants.yamada.compact import PythonCompactYamadaEvaluator
 from knotted_graph.invariants.yamada.diagram_frontier import (
     FrontierLimitExceeded,
+    _factor_graph,
+    _greedy_factor_order,
     compute_diagram_frontier_laurent,
     plan_diagram_frontier,
 )
@@ -75,6 +77,73 @@ def _random_prepared(seed: int, crossing_count: int):
         minus_partner=minus,
     )
 
+
+
+def _historical_greedy_factor_order(adjacency, factor_ports):
+    """Reference implementation retained only to lock exact planner semantics."""
+    count = len(adjacency)
+    if count <= 1:
+        return list(range(count))
+
+    unprocessed = set(range(count))
+    processed = set()
+    order = []
+    first = min(
+        unprocessed,
+        key=lambda node: (
+            sum(adjacency[node].values()),
+            len(factor_ports[node]),
+            node,
+        ),
+    )
+    order.append(first)
+    processed.add(first)
+    unprocessed.remove(first)
+
+    while unprocessed:
+        def score(node):
+            back = sum(
+                multiplicity
+                for other, multiplicity in adjacency[node].items()
+                if other in processed
+            )
+            future = sum(
+                multiplicity
+                for other, multiplicity in adjacency[node].items()
+                if other in unprocessed
+            )
+            disconnected = 1 if back == 0 and processed else 0
+            return (
+                disconnected,
+                future - back,
+                future,
+                -back,
+                len(factor_ports[node]),
+                node,
+            )
+
+        node = min(unprocessed, key=score)
+        order.append(node)
+        processed.add(node)
+        unprocessed.remove(node)
+    return order
+
+
+def test_incremental_greedy_order_matches_historical_rule_exactly():
+    for crossing_count in range(0, 18):
+        for offset in range(20):
+            prepared = _random_prepared(
+                97100 + 211 * crossing_count + offset,
+                crossing_count,
+            )
+            factor_ports, _port_factor, adjacency, _arcs = _factor_graph(prepared)
+            assert _greedy_factor_order(
+                adjacency,
+                factor_ports,
+            ) == _historical_greedy_factor_order(
+                adjacency,
+                factor_ports,
+            )
 
 def _exhaustive(prepared):
     evaluator = PythonCompactYamadaEvaluator()
