@@ -246,17 +246,20 @@ class PDCode:
     ]:
         """Return vectorized segment geometry and parent-edge metadata.
 
-        Segment order is identical to :meth:`_explode_to_segments`: edge order
-        first, then polyline sample order within each edge.  Keeping the parent
-        edge and cumulative planar distance here lets crossing discovery carry
-        incidence information directly into edge splitting instead of running a
-        second spatial search for the same crossing points.
+        Segment order is identical to the historical explode-to-segments order:
+        edge order first, then polyline sample order within each edge. Keeping
+        the parent edge and cumulative planar distance here lets crossing
+        discovery carry incidence information directly into edge splitting
+        instead of running a second spatial search for the same crossing points.
+
+        Segment lengths are evaluated by the same GEOS primitive used by the
+        historical indexed projection path so fused edge distances remain
+        numerically identical to the legacy two-pass implementation.
         """
         starts: list[np.ndarray] = []
         ends: list[np.ndarray] = []
         edge_ids: list[np.ndarray] = []
-        edge_starts: list[np.ndarray] = []
-        segment_lengths: list[np.ndarray] = []
+        edge_segment_counts: list[int] = []
 
         for edge_id, line in enumerate(multilines.geoms):
             coords = np.asarray(line.coords, dtype=float)
@@ -264,16 +267,11 @@ class PDCode:
                 continue
             left = coords[:-1]
             right = coords[1:]
-            lengths = np.linalg.norm(right[:, :2] - left[:, :2], axis=1)
-            cumulative = np.empty(len(lengths), dtype=float)
-            cumulative[0] = 0.0
-            if len(lengths) > 1:
-                np.cumsum(lengths[:-1], out=cumulative[1:])
+            count = len(left)
             starts.append(left)
             ends.append(right)
-            edge_ids.append(np.full(len(lengths), edge_id, dtype=np.intp))
-            edge_starts.append(cumulative)
-            segment_lengths.append(lengths)
+            edge_ids.append(np.full(count, edge_id, dtype=np.intp))
+            edge_segment_counts.append(count)
 
         if not starts:
             empty_points = np.empty((0, 3), dtype=float)
@@ -292,13 +290,27 @@ class PDCode:
         p1 = np.vstack(ends)
         segment_coords = np.stack((p0, p1), axis=1)
         segments = np.asarray(shapely.linestrings(segment_coords), dtype=object)
+        lengths = np.asarray(shapely.length(segments), dtype=float)
+        cumulative = np.empty(len(lengths), dtype=float)
+
+        offset = 0
+        for count in edge_segment_counts:
+            local = lengths[offset : offset + count]
+            cumulative[offset] = 0.0
+            if count > 1:
+                np.cumsum(
+                    local[:-1],
+                    out=cumulative[offset + 1 : offset + count],
+                )
+            offset += count
+
         return (
             segments,
             p0,
             p1,
             np.concatenate(edge_ids),
-            np.concatenate(edge_starts),
-            np.concatenate(segment_lengths),
+            cumulative,
+            lengths,
         )
 
     @staticmethod
@@ -322,21 +334,21 @@ class PDCode:
     ) -> tuple[list[Point], list[list[tuple[float, int]]]]:
         """Find crossings and their edge distances in one indexed pass.
 
-        Ordinary transverse intersections are solved analytically after one
-        STRtree bounding-box query.  Numerically parallel or endpoint-sensitive
-        candidate pairs fall back to GEOS, preserving the robust historical
-        behavior for degenerate cases.  The returned incidence table removes the
-        former second STRtree search that rediscovered each crossing on every
-        parent edge.
+        GEOS remains the authority for the actual intersection coordinates and
+        line-location distances, exactly as in the historical implementation.
+        The speedup comes from constructing all two-point segments vectorially
+        and retaining each candidate pair's parent-edge identity, which removes
+        the former second STRtree search used to rediscover every crossing on
+        every edge.
         """
         edge_count = len(multilines.geoms)
         (
             segments,
-            p0,
-            p1,
+            _p0,
+            _p1,
             edge_ids,
             edge_starts,
-            segment_lengths,
+            _segment_lengths,
         ) = PDCode._segment_table(multilines)
         if len(segments) < 2:
             return [], [[] for _ in range(edge_count)]
@@ -345,146 +357,63 @@ class PDCode:
         pairs = tree.query(segments)
         left = pairs[0].astype(np.intp, copy=False)
         right = pairs[1].astype(np.intp, copy=False)
-        keep_pair = right > left
-        left = left[keep_pair]
-        right = right[keep_pair]
+        pair_mask = right > left
+        left = left[pair_mask]
+        right = right[pair_mask]
         if left.size == 0:
             return [], [[] for _ in range(edge_count)]
 
-        a0 = p0[left, :2]
-        ar = p1[left, :2] - a0
-        b0 = p0[right, :2]
-        bs = p1[right, :2] - b0
-        qp = b0 - a0
-        denominator = ar[:, 0] * bs[:, 1] - ar[:, 1] * bs[:, 0]
-        scale = np.maximum(
-            np.linalg.norm(ar, axis=1) * np.linalg.norm(bs, axis=1),
-            1.0,
-        )
-        uncertain = np.abs(denominator) <= 1e-12 * scale
-
-        t = np.full(left.size, np.nan, dtype=float)
-        u = np.full(left.size, np.nan, dtype=float)
-        stable = ~uncertain
-        t[stable] = (
-            qp[stable, 0] * bs[stable, 1]
-            - qp[stable, 1] * bs[stable, 0]
-        ) / denominator[stable]
-        u[stable] = (
-            qp[stable, 0] * ar[stable, 1]
-            - qp[stable, 1] * ar[stable, 0]
-        ) / denominator[stable]
-
-        endpoint_sensitive = stable & (
-            (np.abs(t) <= 1e-12)
-            | (np.abs(t - 1.0) <= 1e-12)
-            | (np.abs(u) <= 1e-12)
-            | (np.abs(u - 1.0) <= 1e-12)
-        )
-        uncertain |= endpoint_sensitive
-        stable = ~uncertain
-
+        seg_a = segments[left]
+        seg_b = segments[right]
+        intersections = shapely.intersection(seg_a, seg_b)
         hits: dict[tuple[float, float], list[tuple[int, float]]] = {}
 
-        def record(
-            pair_index: int,
-            point: Point,
-            left_parameter: float,
-            right_parameter: float,
-        ) -> None:
+        for pair_index, (a_segment, b_segment, inter) in enumerate(
+            zip(seg_a, seg_b, intersections, strict=True)
+        ):
+            if inter.is_empty:
+                continue
+            geometry_type = inter.geom_type
+            if geometry_type.startswith("Line") or geometry_type == "GeometryCollection":
+                raise ValueError("Found overlapping (colinear) projected segments")
+            if geometry_type == "Point":
+                points = [inter]
+            elif geometry_type == "MultiPoint":
+                points = list(inter.geoms)
+            else:
+                continue
+
             left_segment = int(left[pair_index])
             right_segment = int(right[pair_index])
-            z_left = float(
-                p0[left_segment, 2]
-                + left_parameter * (p1[left_segment, 2] - p0[left_segment, 2])
-            )
-            z_right = float(
-                p0[right_segment, 2]
-                + right_parameter * (p1[right_segment, 2] - p0[right_segment, 2])
-            )
-            if abs(z_left - z_right) <= tolerance:
-                return
-
-            key = (float(point.x), float(point.y))
-            incidences = hits.setdefault(key, [])
-            incidences.append(
-                (
-                    int(edge_ids[left_segment]),
-                    float(
-                        edge_starts[left_segment]
-                        + left_parameter * segment_lengths[left_segment]
-                    ),
-                )
-            )
-            incidences.append(
-                (
-                    int(edge_ids[right_segment]),
-                    float(
-                        edge_starts[right_segment]
-                        + right_parameter * segment_lengths[right_segment]
-                    ),
-                )
-            )
-
-        interior = stable & (
-            (t >= 0.0)
-            & (t <= 1.0)
-            & (u >= 0.0)
-            & (u <= 1.0)
-        )
-        for pair_index in np.flatnonzero(interior):
-            xy = a0[pair_index] + t[pair_index] * ar[pair_index]
-            record(
-                int(pair_index),
-                Point(float(xy[0]), float(xy[1])),
-                float(t[pair_index]),
-                float(u[pair_index]),
-            )
-
-        uncertain_ids = np.flatnonzero(uncertain)
-        if uncertain_ids.size:
-            uncertain_left = left[uncertain_ids]
-            uncertain_right = right[uncertain_ids]
-            intersections = shapely.intersection(
-                segments[uncertain_left],
-                segments[uncertain_right],
-            )
-            for pair_index, inter in zip(
-                uncertain_ids.tolist(),
-                intersections,
-                strict=True,
-            ):
-                if inter.is_empty:
-                    continue
-                geometry_type = inter.geom_type
-                if geometry_type.startswith("Line") or geometry_type == "GeometryCollection":
-                    raise ValueError("Found overlapping (colinear) projected segments")
-                if geometry_type == "Point":
-                    points = [inter]
-                elif geometry_type == "MultiPoint":
-                    points = list(inter.geoms)
-                else:
+            for point in points:
+                if PDCode._is_true_spatial_contact(
+                    a_segment,
+                    b_segment,
+                    point,
+                    tolerance=tolerance,
+                ):
                     continue
 
-                left_segment = int(left[pair_index])
-                right_segment = int(right[pair_index])
-                for point in points:
-                    left_parameter = PDCode._segment_parameter_at_xy(
-                        p0[left_segment],
-                        p1[left_segment],
-                        point,
+                left_local = float(
+                    shapely.line_locate_point(segments[left_segment], point)
+                )
+                right_local = float(
+                    shapely.line_locate_point(segments[right_segment], point)
+                )
+                key = (float(point.x), float(point.y))
+                incidences = hits.setdefault(key, [])
+                incidences.append(
+                    (
+                        int(edge_ids[left_segment]),
+                        float(edge_starts[left_segment] + left_local),
                     )
-                    right_parameter = PDCode._segment_parameter_at_xy(
-                        p0[right_segment],
-                        p1[right_segment],
-                        point,
+                )
+                incidences.append(
+                    (
+                        int(edge_ids[right_segment]),
+                        float(edge_starts[right_segment] + right_local),
                     )
-                    record(
-                        pair_index,
-                        point,
-                        left_parameter,
-                        right_parameter,
-                    )
+                )
 
         ordered_coordinates = sorted(hits)
         crossing_points = [Point(xy) for xy in ordered_coordinates]
