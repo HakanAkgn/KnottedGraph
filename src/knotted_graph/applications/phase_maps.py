@@ -412,35 +412,58 @@ def make_yamada_phase_map(
         )
 
     name = parameter_name or default_parameter
+    def evaluate_cell(lam: float, parameter: float) -> YamadaPhaseRecord:
+        graph = nx.MultiGraph()
+        yamada = None
+        error = None
+        try:
+            graph = graph_factory(float(lam), float(parameter))
+            if graph_transform is not None:
+                graph = graph_transform(graph)
+            yamada = _compute_yamada(graph, variable, yamada_kwargs)
+            signature = _phase_signature(graph, yamada, None)
+        except Exception as exc:
+            if not continue_on_error:
+                raise
+            error = f"{type(exc).__name__}: {exc}"
+            signature = "error:" + error
+        return YamadaPhaseRecord(
+            lam=float(lam),
+            parameter=float(parameter),
+            parameter_name=name,
+            source_kind=resolved_kind,
+            yamada=yamada,
+            phase_signature=signature,
+            error=error,
+            **_graph_summary(graph),
+        )
+
     records: list[YamadaPhaseRecord] = []
-    for parameter in parameters_arr:
-        for lam in lambdas_arr:
-            graph = nx.MultiGraph()
-            yamada = None
-            error = None
-            try:
-                graph = graph_factory(float(lam), float(parameter))
-                if graph_transform is not None:
-                    graph = graph_transform(graph)
-                yamada = _compute_yamada(graph, variable, yamada_kwargs)
-                signature = _phase_signature(graph, yamada, None)
-            except Exception as exc:
-                if not continue_on_error:
-                    raise
-                error = f"{type(exc).__name__}: {exc}"
-                signature = "error:" + error
-            records.append(
-                YamadaPhaseRecord(
-                    lam=float(lam),
-                    parameter=float(parameter),
-                    parameter_name=name,
-                    source_kind=resolved_kind,
-                    yamada=yamada,
-                    phase_signature=signature,
-                    error=error,
-                    **_graph_summary(graph),
+    if resolved_kind == "material":
+        # The Hamiltonian eigenspectrum depends on lambda but not on gap_tol or
+        # target energy. Process all threshold/energy values for one lambda
+        # together so the material factory can reuse one eigenspectrum while
+        # keeping memory bounded. Restore the historical parameter-major output
+        # order after the scan.
+        grid_records: list[list[YamadaPhaseRecord | None]] = [
+            [None for _ in lambdas_arr] for _ in parameters_arr
+        ]
+        for column, lam in enumerate(lambdas_arr):
+            for row, parameter in enumerate(parameters_arr):
+                grid_records[row][column] = evaluate_cell(
+                    float(lam),
+                    float(parameter),
                 )
-            )
+        records = [
+            record
+            for row in grid_records
+            for record in row
+            if record is not None
+        ]
+    else:
+        for parameter in parameters_arr:
+            for lam in lambdas_arr:
+                records.append(evaluate_cell(float(lam), float(parameter)))
 
     return YamadaPhaseMapResult(
         lambdas=lambdas_arr.copy(),
@@ -691,6 +714,9 @@ def _material_factories(
         )
         eigvals = obj.__dict__.get("eigvals_sorted")
         if eigvals is not None and key not in eigvals_cache:
+            # Material scans are evaluated lambda-major, so a single cached
+            # grid is sufficient and avoids retaining O(n_lambda) large arrays.
+            eigvals_cache.clear()
             eigvals_cache[key] = eigvals
         return graph
 
