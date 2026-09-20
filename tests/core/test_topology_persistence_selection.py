@@ -2,6 +2,7 @@ import networkx as nx
 import numpy as np
 import pytest
 
+from knotted_graph.extraction import _topology_optimized as topology_optimized
 from knotted_graph.extraction import skeleton_image_to_graph
 from knotted_graph.extraction._native import (
     native_persistent_extract,
@@ -267,3 +268,47 @@ def test_native_persistence_matches_python_reference_above_production_crossover(
     ):
         assert actual_edge[:4] == expected_edge[:4]
         assert actual_edge[4] == pytest.approx(expected_edge[4], abs=1e-12)
+
+
+
+def test_clean_unsafe_coarser_scale_can_witness_earlier_safe_persistence(monkeypatch):
+    noisy = nx.MultiGraph(nx.path_graph(3))
+    stable_left = nx.MultiGraph(nx.circular_ladder_graph(3))
+    stable_right = nx.MultiGraph(nx.circular_ladder_graph(3))
+    graphs = {0: noisy, 1: stable_left, 2: stable_right}
+
+    monkeypatch.setattr(
+        topology_optimized,
+        "_prepared_components",
+        lambda coords, adjacency: [object()],
+    )
+    monkeypatch.setattr(
+        topology_optimized,
+        "_trace_prepared",
+        lambda prepared, hops: graphs[hops],
+    )
+
+    def fake_summary(graph, *, max_degree, anomaly_ratio):
+        reduced = nx.MultiGraph(graph)
+        fingerprint = _core_fingerprint(reduced)
+        if graph is noisy:
+            return reduced, False, fingerprint, False
+        if graph is stable_left:
+            return reduced, True, fingerprint, True
+        return reduced, True, fingerprint, False
+
+    monkeypatch.setattr(
+        topology_optimized,
+        "_diagnostic_summary",
+        fake_summary,
+    )
+
+    selected = persistent_extract(
+        np.empty((0, 3), dtype=np.intp),
+        [],
+        max_degree=3,
+        max_hops=2,
+        anomaly_ratio=0.15,
+    )
+
+    assert selected is stable_left
