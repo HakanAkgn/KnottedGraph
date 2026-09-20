@@ -86,25 +86,16 @@ def _factor_graph(prepared):
     return factor_ports, port_factor, adjacency, arcs
 
 
-def _greedy_factor_order(adjacency, factor_ports):
-    """Generic cutwidth-oriented factor order with deterministic tie breaking.
-
-    This is exactly the historical greedy rule, but maintains each unprocessed
-    factor's weighted connection to the processed frontier incrementally.  Only
-    neighbors of the newly selected factor can change score, so a lazy heap
-    avoids rescanning every remaining factor and its adjacency at every step.
-    The score tuple and tie breaking are unchanged.
-    """
+def _greedy_factor_order_from_first(adjacency, factor_ports, first: int):
+    """Run the historical greedy score from one explicit starting factor."""
     count = len(adjacency)
     if count <= 1:
         return list(range(count))
+    if not 0 <= int(first) < count:
+        raise ValueError("first factor is out of range")
+    first = int(first)
 
     weighted_degree = [sum(neighbors.values()) for neighbors in adjacency]
-    first = min(
-        range(count),
-        key=lambda node: (weighted_degree[node], len(factor_ports[node]), node),
-    )
-
     processed = bytearray(count)
     processed[first] = 1
     back = [0] * count
@@ -153,6 +144,27 @@ def _greedy_factor_order(adjacency, factor_ports):
             )
 
     return order
+
+
+def _greedy_factor_order(adjacency, factor_ports):
+    """Generic cutwidth-oriented factor order with deterministic tie breaking.
+
+    This is exactly the historical greedy rule, but maintains each unprocessed
+    factor's weighted connection to the processed frontier incrementally.  Only
+    neighbors of the newly selected factor can change score, so a lazy heap
+    avoids rescanning every remaining factor and its adjacency at every step.
+    The score tuple and tie breaking are unchanged.
+    """
+    count = len(adjacency)
+    if count <= 1:
+        return list(range(count))
+
+    weighted_degree = [sum(neighbors.values()) for neighbors in adjacency]
+    first = min(
+        range(count),
+        key=lambda node: (weighted_degree[node], len(factor_ports[node]), node),
+    )
+    return _greedy_factor_order_from_first(adjacency, factor_ports, first)
 
 
 def plan_diagram_frontier(prepared, *, factor_order=None):
