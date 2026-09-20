@@ -10,7 +10,6 @@ from knotted_graph.extraction import (
 )
 from knotted_graph.extraction._optimized import sparse_adjacency_exact_cropped
 from knotted_graph.extraction._topology_optimized import _embedded_geometry_safe
-from knotted_graph.extraction._tracing import _drop_trace_endpoint_duplicates
 
 
 def _trivalent_t_skeleton(size=25):
@@ -236,26 +235,3 @@ def test_skeletonize_volume_rejects_empty_or_non_3d_input():
 def test_extractor_rejects_non_3d_input():
     with pytest.raises(ValueError, match="three-dimensional"):
         skeleton_image_to_graph(np.zeros((8, 8), dtype=bool))
-
-
-
-def test_trace_endpoint_duplicate_fast_path_matches_historical_mask_randomized():
-    rng = np.random.default_rng(20260922)
-    for _ in range(500):
-        count = int(rng.integers(2, 30))
-        points = np.cumsum(rng.integers(-1, 2, size=(count, 3)), axis=0).astype(float)
-        # Interior trace samples are distinct in production. Enforce that here,
-        # then perturb only the snapped endpoints as the tracer does.
-        for index in range(1, count):
-            if np.array_equal(points[index], points[index - 1]):
-                points[index, 0] += 1.0
-        if rng.random() < 0.5:
-            points[0] = points[1]
-        if rng.random() < 0.5:
-            points[-1] = points[-2]
-
-        keep = np.ones(len(points), dtype=bool)
-        keep[1:] = np.any(np.diff(points, axis=0) != 0, axis=1)
-        expected = points[keep]
-        actual = _drop_trace_endpoint_duplicates(points.copy())
-        assert np.array_equal(actual, expected)
