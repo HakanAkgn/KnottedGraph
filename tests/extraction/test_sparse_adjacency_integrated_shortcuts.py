@@ -2,8 +2,13 @@ from __future__ import annotations
 
 import numpy as np
 
+from knotted_graph.extraction._native import (
+    native_skeleton_available,
+    sparse_adjacency_native,
+)
 from knotted_graph.extraction._optimized import (
     _NEIGHBOR_OFFSETS,
+    _sparse_adjacency_python,
     _suppress_redundant_diagonal_shortcuts,
     sparse_adjacency_exact_cropped,
 )
@@ -73,3 +78,23 @@ def test_integrated_shortcut_suppression_keeps_true_diagonal_chain():
 
     assert len(coords) == 5
     assert [len(row) for row in adjacency] == [1, 2, 2, 2, 1]
+
+
+
+def test_native_sparse_adjacency_matches_python_reference_randomized():
+    if not native_skeleton_available():
+        return
+
+    rng = np.random.default_rng(20260920)
+    for _ in range(200):
+        shape = tuple(int(value) for value in rng.integers(4, 22, size=3))
+        density = float(rng.uniform(0.005, 0.28))
+        image = rng.random(shape) < density
+        if not image.any():
+            image[tuple(int(value) for value in rng.integers(0, shape))] = True
+
+        expected_coords, expected = _sparse_adjacency_python(image)
+        actual_coords, actual = sparse_adjacency_native(image)
+
+        assert np.array_equal(actual_coords, expected_coords)
+        assert actual == expected
