@@ -101,24 +101,35 @@ jobs:
 
           head = outcomes("/tmp/head45.log")
           base = outcomes("/tmp/base45.log")
-          if head != base:
-              differences = [
-                  (left, right)
-                  for left, right in zip(head, base, strict=True)
-                  if left != right
-              ]
+
+          regressions = []
+          improvements = []
+          for head_row, base_row in zip(head, base, strict=True):
+              if head_row[:4] != base_row[:4]:
+                  raise AssertionError(
+                      f"45-case row identity changed: head={head_row}, base={base_row}"
+                  )
+              if base_row[-1] and not head_row[-1]:
+                  regressions.append((head_row, base_row))
+              if head_row[-1] and not base_row[-1]:
+                  improvements.append((head_row, base_row))
+
+          if regressions:
               raise AssertionError(
-                  f"optimized skeleton reconstruction differs from requested base: {differences}"
+                  f"optimized skeleton reconstruction regressed requested-base cases: {regressions}"
               )
 
           passed = sum(row[-1] for row in head)
-          print(f"45-case requested-base parity: exact ({passed}/45 correct on this runner)")
+          print(
+              f"45-case head correctness: {passed}/45; "
+              f"requested-base improvements: {len(improvements)}"
+          )
+          if improvements:
+              print(f"Improved cases: {improvements}")
           if passed != 45:
               failed = [row for row in head if not row[-1]]
-              print(
-                  "NOTE: regenerated benchmark is not 45/45 on this runner, "
-                  "but optimized head and requested base are identical. "
-                  f"Current failures: {failed}"
+              raise AssertionError(
+                  f"optimized skeleton reconstruction is not 45/45: {failed}"
               )
           PY
 
