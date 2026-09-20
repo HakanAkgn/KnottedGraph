@@ -380,10 +380,4 @@ def compute_factorized_frontier_laurent(prepared, *, stats=None):
     if stats is not None:
         stats["coefficient_backend"] = backend
         stats["int64_overflow"] = overflowed
-        stats["factor_order_peak_ports"] = data["factor_order_peak_ports"]
-        stats["factor_order_initial_peak_ports"] = data[
-            "factor_order_initial_peak_ports"
-        ]
-        stats["factor_order_multistart"] = data["factor_order_multistart"]
-        stats["factor_order_candidates"] = data["factor_order_candidates"]
     return tuple((int(power), int(coefficient)) for power, coefficient in value)
