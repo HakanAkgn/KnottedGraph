@@ -128,10 +128,11 @@ def _select_hops(
             left[1]
             and left[3]
             and right[1]
-            and right[3]
             and left[2] == right[2]
             and nx.is_isomorphic(left[0], right[0])
         ):
+            # Match the Python selector: the left representative must be safe;
+            # the right scale is only clean isomorphism evidence.
             return left_hops
 
     classes: list[
