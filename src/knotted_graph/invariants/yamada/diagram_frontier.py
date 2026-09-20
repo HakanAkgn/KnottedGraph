@@ -20,6 +20,7 @@ in the hash key.
 
 from __future__ import annotations
 
+import heapq
 from collections import defaultdict
 
 from .fast import add as laurent_add
@@ -85,35 +86,85 @@ def _factor_graph(prepared):
     return factor_ports, port_factor, adjacency, arcs
 
 
-def _greedy_factor_order(adjacency, factor_ports):
-    """Generic cutwidth-oriented factor order with deterministic tie breaking."""
+def _greedy_factor_order_from_first(adjacency, factor_ports, first: int):
+    """Run the historical greedy score from one explicit starting factor."""
     count = len(adjacency)
     if count <= 1:
         return list(range(count))
-    unprocessed = set(range(count))
-    processed = set()
-    order = []
+    if not 0 <= int(first) < count:
+        raise ValueError("first factor is out of range")
+    first = int(first)
 
-    first = min(
-        unprocessed,
-        key=lambda node: (sum(adjacency[node].values()), len(factor_ports[node]), node),
-    )
-    order.append(first)
-    processed.add(first)
-    unprocessed.remove(first)
+    weighted_degree = [sum(neighbors.values()) for neighbors in adjacency]
+    processed = bytearray(count)
+    processed[first] = 1
+    back = [0] * count
+    for neighbor, multiplicity in adjacency[first].items():
+        back[neighbor] += multiplicity
 
-    while unprocessed:
-        def score(node):
-            back = sum(mult for other, mult in adjacency[node].items() if other in processed)
-            future = sum(mult for other, mult in adjacency[node].items() if other in unprocessed)
-            disconnected = 1 if back == 0 and processed else 0
-            return (disconnected, future - back, future, -back, len(factor_ports[node]), node)
+    versions = [0] * count
+    heap = []
 
-        node = min(unprocessed, key=score)
+    def score(node):
+        back_weight = back[node]
+        future_weight = weighted_degree[node] - back_weight
+        return (
+            1 if back_weight == 0 else 0,
+            future_weight - back_weight,
+            future_weight,
+            -back_weight,
+            len(factor_ports[node]),
+            node,
+        )
+
+    for node in range(count):
+        if not processed[node]:
+            heapq.heappush(heap, (score(node), versions[node], node))
+
+    order = [first]
+    while len(order) < count:
+        while True:
+            candidate_score, version, node = heapq.heappop(heap)
+            if processed[node] or version != versions[node]:
+                continue
+            if candidate_score != score(node):
+                continue
+            break
+
+        processed[node] = 1
         order.append(node)
-        processed.add(node)
-        unprocessed.remove(node)
+        for neighbor, multiplicity in adjacency[node].items():
+            if processed[neighbor]:
+                continue
+            back[neighbor] += multiplicity
+            versions[neighbor] += 1
+            heapq.heappush(
+                heap,
+                (score(neighbor), versions[neighbor], neighbor),
+            )
+
     return order
+
+
+def _greedy_factor_order(adjacency, factor_ports):
+    """Generic cutwidth-oriented factor order with deterministic tie breaking.
+
+    This is exactly the historical greedy rule, but maintains each unprocessed
+    factor's weighted connection to the processed frontier incrementally.  Only
+    neighbors of the newly selected factor can change score, so a lazy heap
+    avoids rescanning every remaining factor and its adjacency at every step.
+    The score tuple and tie breaking are unchanged.
+    """
+    count = len(adjacency)
+    if count <= 1:
+        return list(range(count))
+
+    weighted_degree = [sum(neighbors.values()) for neighbors in adjacency]
+    first = min(
+        range(count),
+        key=lambda node: (weighted_degree[node], len(factor_ports[node]), node),
+    )
+    return _greedy_factor_order_from_first(adjacency, factor_ports, first)
 
 
 def plan_diagram_frontier(prepared, *, factor_order=None):

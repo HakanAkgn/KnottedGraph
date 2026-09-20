@@ -235,3 +235,57 @@ def test_skeletonize_volume_rejects_empty_or_non_3d_input():
 def test_extractor_rejects_non_3d_input():
     with pytest.raises(ValueError, match="three-dimensional"):
         skeleton_image_to_graph(np.zeros((8, 8), dtype=bool))
+
+
+
+def test_production_extractor_keeps_small_skeletons_on_python_reference(monkeypatch):
+    import knotted_graph.extraction._optimized as optimized
+
+    small = np.ones((10, 10, 10), dtype=bool)
+    expected = nx.MultiGraph()
+    expected.add_node("python")
+
+    monkeypatch.setattr(optimized, "native_skeleton_available", lambda: True)
+    monkeypatch.setattr(
+        optimized,
+        "native_persistent_extract",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("small skeleton should not use native persistence")
+        ),
+    )
+    monkeypatch.setattr(
+        optimized,
+        "_sparse_adjacency_python",
+        lambda image: (np.empty((0, 3), dtype=np.intp), []),
+    )
+    monkeypatch.setattr(
+        optimized,
+        "persistent_extract",
+        lambda *args, **kwargs: expected,
+    )
+
+    assert optimized.extract(small) is expected
+
+
+def test_production_extractor_uses_native_persistence_above_crossover(monkeypatch):
+    import knotted_graph.extraction._optimized as optimized
+
+    large = np.ones((12, 12, 12), dtype=bool)
+    expected = nx.MultiGraph()
+    expected.add_node("native")
+
+    monkeypatch.setattr(optimized, "native_skeleton_available", lambda: True)
+    monkeypatch.setattr(
+        optimized,
+        "native_persistent_extract",
+        lambda *args, **kwargs: expected,
+    )
+    monkeypatch.setattr(
+        optimized,
+        "_sparse_adjacency_python",
+        lambda image: (_ for _ in ()).throw(
+            AssertionError("large skeleton should use native persistence")
+        ),
+    )
+
+    assert optimized.extract(large) is expected

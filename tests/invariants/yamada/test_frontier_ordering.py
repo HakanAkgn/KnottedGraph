@@ -3,6 +3,9 @@ from __future__ import annotations
 import random
 
 from knotted_graph.invariants.yamada.diagram_frontier import plan_diagram_frontier
+from knotted_graph.invariants.yamada.factorized_frontier import (
+    build_factorized_frontier,
+)
 from knotted_graph.invariants.yamada.frontier_ordering import (
     MULTISTART_MIN_CROSSINGS,
     plan_frontier_to_target,
@@ -75,3 +78,26 @@ def test_multistart_rescues_known_twelve_crossing_generic_case():
     assert planned["max_boundary_ports"] == 6
     assert planned["ordering_multistart"] is True
     assert planned["ordering_candidates"] == 12
+
+
+
+def test_factorized_production_multistart_rescues_known_wide_case():
+    prepared = _random_crossing_diagram(232068, 12)
+    data = build_factorized_frontier(prepared)
+
+    assert data["factor_order_initial_peak_ports"] == 12
+    assert data["factor_order_peak_ports"] <= 10
+    assert data["factor_order_multistart"] is True
+    assert data["factor_order_candidates"] >= 2
+
+
+def test_factorized_production_skips_multistart_below_measured_crossover():
+    prepared = _random_crossing_diagram(230032, 10)
+    data = build_factorized_frontier(prepared)
+
+    assert data["factor_order_peak_ports"] == 12
+    assert data["factor_order_peak_ports"] == data[
+        "factor_order_initial_peak_ports"
+    ]
+    assert data["factor_order_multistart"] is False
+    assert data["factor_order_candidates"] == 1

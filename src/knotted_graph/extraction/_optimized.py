@@ -5,7 +5,18 @@ from __future__ import annotations
 import networkx as nx
 import numpy as np
 
+from ._native import (
+    native_persistent_extract,
+    native_skeleton_available,
+    sparse_adjacency_native,
+)
 from ._topology_optimized import persistent_extract
+
+# Native multi-scale tracing amortizes its setup cost on larger skeletons.
+# The existing Python path remains faster for the small 45-case validation
+# cohort (roughly 270--1200 voxels), while local crossover benchmarks put the
+# native win at about 1500 occupied skeleton voxels and above.
+_NATIVE_EXTRACT_MIN_VOXELS = 1500
 
 _NEIGHBOR_OFFSETS = tuple(
     (dx, dy, dz)
@@ -124,10 +135,10 @@ def _suppress_redundant_diagonal_shortcuts(
     return reduced
 
 
-def sparse_adjacency_exact_cropped(
+def _sparse_adjacency_python(
     image: np.ndarray,
 ) -> tuple[np.ndarray, list[list[int]]]:
-    """Return deterministic, shortcut-reduced 26-neighbour lists."""
+    """Python reference for deterministic shortcut-reduced 26-neighbour lists."""
     occupied = [
         np.flatnonzero(image.any(axis=(1, 2))),
         np.flatnonzero(image.any(axis=(0, 2))),
@@ -194,6 +205,21 @@ def sparse_adjacency_exact_cropped(
     return coords, adjacency
 
 
+def sparse_adjacency_exact_cropped(
+    image: np.ndarray,
+) -> tuple[np.ndarray, list[list[int]]]:
+    """Return deterministic, shortcut-reduced 26-neighbour lists.
+
+    Use the compiled exact neighbor walk when available; retain the vectorized
+    Python implementation as a reference and compiler-free fallback.
+    """
+    image = np.asarray(image, dtype=bool)
+    occupied = int(np.count_nonzero(image))
+    if native_skeleton_available() and occupied >= _NATIVE_EXTRACT_MIN_VOXELS:
+        return sparse_adjacency_native(image)
+    return _sparse_adjacency_python(image)
+
+
 def extract(
     image: np.ndarray,
     *,
@@ -210,7 +236,16 @@ def extract(
     if max_junction_degree is not None and max_junction_degree < 1:
         raise ValueError("max_junction_degree must be positive")
 
-    coords, adjacency = sparse_adjacency_exact_cropped(image)
+    occupied = int(np.count_nonzero(image))
+    if native_skeleton_available() and occupied >= _NATIVE_EXTRACT_MIN_VOXELS:
+        return native_persistent_extract(
+            image,
+            max_degree=max_junction_degree,
+            max_hops=adaptive_max_hops,
+            anomaly_ratio=anomaly_ratio,
+        )
+
+    coords, adjacency = _sparse_adjacency_python(image)
     return persistent_extract(
         coords,
         adjacency,

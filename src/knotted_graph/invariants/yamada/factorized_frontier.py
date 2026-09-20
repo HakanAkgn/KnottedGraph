@@ -22,7 +22,10 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from .diagram_frontier import _greedy_factor_order
+from .diagram_frontier import (
+    _greedy_factor_order,
+    _greedy_factor_order_from_first,
+)
 
 _FACTORIZED_IMPORT_ERROR: Exception | None = None
 try:
@@ -36,6 +39,13 @@ FACTOR_EQUALITY_POS = 1
 FACTOR_CROSSING = 2
 WIRE_PHYSICAL = 0
 WIRE_IDENTITY = 1
+
+# Hard diagrams may benefit enormously from a different elimination start, but
+# multi-start search must not tax the small/structured cases whose historical
+# greedy order is already excellent.
+MULTISTART_MIN_PEAK_PORTS = 12
+MULTISTART_MIN_IMPROVEMENT = 2
+MULTISTART_MAX_STARTS = 16
 
 
 def native_factorized_available() -> bool:
@@ -56,6 +66,133 @@ def require_native_factorized() -> None:
         "current checkout in the active environment, for example with "
         "`python -m pip install -e '.[benchmark]' --force-reinstall`." + detail
     )
+
+
+def _factor_order_plan(
+    factor_order,
+    factor_ports,
+    port_factor,
+    wire_partner,
+):
+    """Return exact live-port metrics for one factorized elimination order."""
+    processed = bytearray(len(factor_ports))
+    active: list[int] = []
+    peak_ports = 0
+    max_boundary_ports = 0
+    boundary_area = 0
+
+    for factor in factor_order:
+        active.extend(factor_ports[factor])
+        peak_ports = max(peak_ports, len(active))
+        processed[factor] = 1
+        active = [
+            port
+            for port in active
+            if not processed[port_factor[wire_partner[port]]]
+        ]
+        boundary = len(active)
+        max_boundary_ports = max(max_boundary_ports, boundary)
+        boundary_area += boundary
+
+    if active:
+        raise RuntimeError("factorized frontier planner did not close")
+    return {
+        "peak_ports": int(peak_ports),
+        "max_boundary_ports": int(max_boundary_ports),
+        "boundary_area": int(boundary_area),
+    }
+
+
+def _multistart_factor_order(
+    adjacency,
+    factor_ports,
+    port_factor,
+    wire_partner,
+    initial_order,
+    *,
+    crossing_count: int,
+):
+    """Conservatively rescue genuinely wide factorized production diagrams."""
+    initial_plan = _factor_order_plan(
+        initial_order,
+        factor_ports,
+        port_factor,
+        wire_partner,
+    )
+    count = len(factor_ports)
+    if (
+        count <= 1
+        or int(crossing_count) < 12
+        or initial_plan["peak_ports"] < MULTISTART_MIN_PEAK_PORTS
+    ):
+        return list(initial_order), initial_plan, False, 1
+
+    weighted_degree = [sum(neighbors.values()) for neighbors in adjacency]
+    ranked = sorted(
+        range(count),
+        key=lambda node: (
+            weighted_degree[node],
+            len(factor_ports[node]),
+            node,
+        ),
+    )
+    if count <= MULTISTART_MAX_STARTS:
+        starts = ranked
+    else:
+        positions = {
+            round(
+                index * (count - 1) / (MULTISTART_MAX_STARTS - 1)
+            )
+            for index in range(MULTISTART_MAX_STARTS)
+        }
+        starts = [ranked[position] for position in sorted(positions)]
+
+    initial_first = int(initial_order[0])
+    if initial_first not in starts:
+        starts.insert(0, initial_first)
+
+    best_order = list(initial_order)
+    best_plan = initial_plan
+    best_key = (
+        initial_plan["peak_ports"],
+        initial_plan["max_boundary_ports"],
+        initial_plan["boundary_area"],
+        tuple(initial_order),
+    )
+    candidates = 0
+    for first in starts:
+        candidates += 1
+        if first == initial_first:
+            order = list(initial_order)
+        else:
+            order = _greedy_factor_order_from_first(
+                adjacency,
+                factor_ports,
+                first,
+            )
+        plan = _factor_order_plan(
+            order,
+            factor_ports,
+            port_factor,
+            wire_partner,
+        )
+        key = (
+            plan["peak_ports"],
+            plan["max_boundary_ports"],
+            plan["boundary_area"],
+            tuple(order),
+        )
+        if key < best_key:
+            best_order = order
+            best_plan = plan
+            best_key = key
+
+    if (
+        initial_plan["peak_ports"] - best_plan["peak_ports"]
+        < MULTISTART_MIN_IMPROVEMENT
+    ):
+        return list(initial_order), initial_plan, False, candidates
+    return best_order, best_plan, True, candidates
 
 
 def build_factorized_frontier(prepared):
@@ -151,7 +288,23 @@ def build_factorized_frontier(prepared):
         if left != right:
             adjacency[left][right] += 1
             adjacency[right][left] += 1
-    factor_order = _greedy_factor_order(adjacency, factor_ports)
+    initial_factor_order = _greedy_factor_order(adjacency, factor_ports)
+    factor_order, order_plan, ordering_multistart, ordering_candidates = (
+        _multistart_factor_order(
+            adjacency,
+            factor_ports,
+            port_factor,
+            wire_partner,
+            initial_factor_order,
+            crossing_count=crossing_count,
+        )
+    )
+    initial_order_plan = _factor_order_plan(
+        initial_factor_order,
+        factor_ports,
+        port_factor,
+        wire_partner,
+    )
 
     plus_partner = [-1] * len(wire_partner)
     minus_partner = [-1] * len(wire_partner)
@@ -168,6 +321,15 @@ def build_factorized_frontier(prepared):
         "plus_partner": tuple(plus_partner),
         "minus_partner": tuple(minus_partner),
         "factor_order": tuple(factor_order),
+        "factor_order_peak_ports": int(order_plan["peak_ports"]),
+        "factor_order_max_boundary_ports": int(
+            order_plan["max_boundary_ports"]
+        ),
+        "factor_order_initial_peak_ports": int(
+            initial_order_plan["peak_ports"]
+        ),
+        "factor_order_multistart": bool(ordering_multistart),
+        "factor_order_candidates": int(ordering_candidates),
         "original_port_count": original_port_count,
         "crossing_factor_by_index": tuple(crossing_factor_by_index),
     }

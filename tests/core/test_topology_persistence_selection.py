@@ -1,10 +1,18 @@
 import networkx as nx
 import numpy as np
+import pytest
 
+from knotted_graph.extraction import _topology_optimized as topology_optimized
 from knotted_graph.extraction import skeleton_image_to_graph
+from knotted_graph.extraction._native import (
+    native_persistent_extract,
+    native_skeleton_available,
+)
+from knotted_graph.extraction._optimized import _sparse_adjacency_python
 from knotted_graph.extraction._topology_optimized import (
     _best_clean_candidate,
     _core_fingerprint,
+    persistent_extract,
 )
 
 
@@ -123,3 +131,184 @@ def test_unknown_degree_persistence_is_deterministic():
     first = skeleton_image_to_graph(image)
     second = skeleton_image_to_graph(image)
     assert _embedded_signature(first) == _embedded_signature(second)
+
+
+
+def _weighted_embedded_signature(graph: nx.MultiGraph):
+    nodes = tuple(
+        (
+            node,
+            tuple(np.asarray(data["pos"], dtype=float).tolist()),
+        )
+        for node, data in graph.nodes(data=True)
+    )
+    edges = tuple(
+        (
+            u,
+            v,
+            key,
+            tuple(
+                tuple(row)
+                for row in np.asarray(data["pts"], dtype=float).tolist()
+            ),
+            float(data.get("weight", 0.0)),
+        )
+        for u, v, key, data in graph.edges(keys=True, data=True)
+    )
+    return nodes, edges
+
+
+def _random_walk_skeleton(rng, shape=(19, 19, 19)):
+    image = np.zeros(shape, dtype=bool)
+    center = np.asarray(shape, dtype=int) // 2
+    image[tuple(center)] = True
+    offsets = np.asarray(
+        [
+            (dx, dy, dz)
+            for dx in (-1, 0, 1)
+            for dy in (-1, 0, 1)
+            for dz in (-1, 0, 1)
+            if (dx, dy, dz) != (0, 0, 0)
+        ],
+        dtype=int,
+    )
+    seeds = [center.copy()]
+    for _ in range(int(rng.integers(2, 6))):
+        position = seeds[int(rng.integers(0, len(seeds)))].copy()
+        for _ in range(int(rng.integers(8, 28))):
+            position = position + offsets[int(rng.integers(0, len(offsets)))]
+            position = np.minimum(
+                np.maximum(position, 1),
+                np.asarray(shape, dtype=int) - 2,
+            )
+            image[tuple(position)] = True
+            if rng.random() < 0.08:
+                seeds.append(position.copy())
+    return image
+
+
+def test_native_persistence_matches_python_reference_geometry_randomized():
+    if not native_skeleton_available():
+        return
+
+    rng = np.random.default_rng(20260921)
+    for index in range(60):
+        image = _random_walk_skeleton(rng)
+        coords, adjacency = _sparse_adjacency_python(image)
+        max_degree = 3 if index % 2 else None
+        expected = persistent_extract(
+            coords,
+            adjacency,
+            max_degree=max_degree,
+            max_hops=4,
+            anomaly_ratio=0.15,
+        )
+        actual = native_persistent_extract(
+            image,
+            max_degree=max_degree,
+            max_hops=4,
+            anomaly_ratio=0.15,
+        )
+
+        expected_nodes, expected_edges = _weighted_embedded_signature(expected)
+        actual_nodes, actual_edges = _weighted_embedded_signature(actual)
+        assert actual_nodes == expected_nodes
+        assert len(actual_edges) == len(expected_edges)
+        for actual_edge, expected_edge in zip(
+            actual_edges,
+            expected_edges,
+            strict=True,
+        ):
+            assert actual_edge[:4] == expected_edge[:4]
+            assert actual_edge[4] == pytest.approx(expected_edge[4], abs=1e-12)
+
+
+
+def _large_disconnected_cross_skeleton():
+    image = np.zeros((125, 125, 125), dtype=bool)
+    centers = (20, 60, 100)
+    for x in centers:
+        for y in centers:
+            for z in centers:
+                image[x - 10 : x + 11, y, z] = True
+                image[x, y - 10 : y + 11, z] = True
+                image[x, y, z - 10 : z + 11] = True
+    assert int(np.count_nonzero(image)) > 1500
+    return image
+
+
+def test_native_persistence_matches_python_reference_above_production_crossover():
+    if not native_skeleton_available():
+        return
+
+    image = _large_disconnected_cross_skeleton()
+    coords, adjacency = _sparse_adjacency_python(image)
+    expected = persistent_extract(
+        coords,
+        adjacency,
+        max_degree=None,
+        max_hops=4,
+        anomaly_ratio=0.15,
+    )
+    actual = native_persistent_extract(
+        image,
+        max_degree=None,
+        max_hops=4,
+        anomaly_ratio=0.15,
+    )
+
+    expected_nodes, expected_edges = _weighted_embedded_signature(expected)
+    actual_nodes, actual_edges = _weighted_embedded_signature(actual)
+    assert actual_nodes == expected_nodes
+    assert len(actual_edges) == len(expected_edges)
+    for actual_edge, expected_edge in zip(
+        actual_edges,
+        expected_edges,
+        strict=True,
+    ):
+        assert actual_edge[:4] == expected_edge[:4]
+        assert actual_edge[4] == pytest.approx(expected_edge[4], abs=1e-12)
+
+
+
+def test_clean_unsafe_coarser_scale_can_witness_earlier_safe_persistence(monkeypatch):
+    noisy = nx.MultiGraph(nx.path_graph(3))
+    stable_left = nx.MultiGraph(nx.circular_ladder_graph(3))
+    stable_right = nx.MultiGraph(nx.circular_ladder_graph(3))
+    graphs = {0: noisy, 1: stable_left, 2: stable_right}
+
+    monkeypatch.setattr(
+        topology_optimized,
+        "_prepared_components",
+        lambda coords, adjacency: [object()],
+    )
+    monkeypatch.setattr(
+        topology_optimized,
+        "_trace_prepared",
+        lambda prepared, hops: graphs[hops],
+    )
+
+    def fake_summary(graph, *, max_degree, anomaly_ratio):
+        reduced = nx.MultiGraph(graph)
+        fingerprint = _core_fingerprint(reduced)
+        if graph is noisy:
+            return reduced, False, fingerprint, False
+        if graph is stable_left:
+            return reduced, True, fingerprint, True
+        return reduced, True, fingerprint, False
+
+    monkeypatch.setattr(
+        topology_optimized,
+        "_diagnostic_summary",
+        fake_summary,
+    )
+
+    selected = persistent_extract(
+        np.empty((0, 3), dtype=np.intp),
+        [],
+        max_degree=3,
+        max_hops=2,
+        anomaly_ratio=0.15,
+    )
+
+    assert selected is stable_left

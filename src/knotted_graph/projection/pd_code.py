@@ -127,12 +127,15 @@ class PDCode:
             edge_lines = affine_transform(edge_lines, rotation)
 
         self._initialize_vertices(node_points)
-        crossing_points = self._find_all_crossings(
+        crossing_points, crossing_incidences = self._find_crossings_with_incidences(
             edge_lines,
             tolerance=self.tolerance,
         )
         self._initialize_crossings(crossing_points)
-        self._process_edges(edge_lines)
+        self._process_edges(
+            edge_lines,
+            precomputed_intersections=crossing_incidences,
+        )
         self._determine_crossing_types()
 
         self._cache[args] = self._generate_pd_code()
@@ -231,6 +234,225 @@ class PDCode:
         return [Point(xy) for xy in sorted(seen)]
 
     @staticmethod
+    def _segment_table(
+        multilines: MultiLineString,
+    ) -> tuple[
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+    ]:
+        """Return vectorized segment geometry and parent-edge metadata.
+
+        Segment order is identical to the historical explode-to-segments order:
+        edge order first, then polyline sample order within each edge. Keeping
+        the parent edge and cumulative planar distance here lets crossing
+        discovery carry incidence information directly into edge splitting
+        instead of running a second spatial search for the same crossing points.
+
+        Segment lengths are evaluated by the same GEOS primitive used by the
+        historical indexed projection path so fused edge distances remain
+        numerically identical to the legacy two-pass implementation.
+        """
+        starts: list[np.ndarray] = []
+        ends: list[np.ndarray] = []
+        edge_ids: list[np.ndarray] = []
+        edge_segment_counts: list[int] = []
+
+        for edge_id, line in enumerate(multilines.geoms):
+            coords = np.asarray(line.coords, dtype=float)
+            if len(coords) < 2:
+                continue
+            left = coords[:-1]
+            right = coords[1:]
+            count = len(left)
+            starts.append(left)
+            ends.append(right)
+            edge_ids.append(np.full(count, edge_id, dtype=np.intp))
+            edge_segment_counts.append(count)
+
+        if not starts:
+            empty_points = np.empty((0, 3), dtype=float)
+            empty_float = np.empty(0, dtype=float)
+            empty_int = np.empty(0, dtype=np.intp)
+            return (
+                np.empty(0, dtype=object),
+                empty_points,
+                empty_points.copy(),
+                empty_int,
+                empty_float,
+                empty_float.copy(),
+            )
+
+        p0 = np.vstack(starts)
+        p1 = np.vstack(ends)
+        segment_coords = np.stack((p0, p1), axis=1)
+        segments = np.asarray(shapely.linestrings(segment_coords), dtype=object)
+        lengths = np.asarray(shapely.length(segments), dtype=float)
+        cumulative = np.empty(len(lengths), dtype=float)
+
+        offset = 0
+        for count in edge_segment_counts:
+            local = lengths[offset : offset + count]
+            cumulative[offset] = 0.0
+            if count > 1:
+                np.cumsum(
+                    local[:-1],
+                    out=cumulative[offset + 1 : offset + count],
+                )
+            offset += count
+
+        return (
+            segments,
+            p0,
+            p1,
+            np.concatenate(edge_ids),
+            cumulative,
+            lengths,
+        )
+
+    @staticmethod
+    def _segment_parameter_at_xy(
+        p0: np.ndarray,
+        p1: np.ndarray,
+        point: Point,
+    ) -> float:
+        dxy = p1[:2] - p0[:2]
+        denom = float(np.dot(dxy, dxy))
+        if denom <= np.finfo(float).eps:
+            raise ValueError("Projection contains a segment with zero XY extent")
+        target = np.asarray((point.x, point.y), dtype=float)
+        value = float(np.dot(target - p0[:2], dxy) / denom)
+        return min(1.0, max(0.0, value))
+
+    @staticmethod
+    def _find_crossings_with_incidences(
+        multilines: MultiLineString,
+        tolerance: float = 1e-8,
+    ) -> tuple[list[Point], list[list[tuple[float, int]]]]:
+        """Find crossings and their edge distances in one indexed pass.
+
+        GEOS remains the authority for the actual intersection coordinates and
+        line-location distances, exactly as in the historical implementation.
+        The speedup comes from constructing all two-point segments vectorially
+        and retaining each candidate pair's parent-edge identity, which removes
+        the former second STRtree search used to rediscover every crossing on
+        every edge.
+        """
+        edge_count = len(multilines.geoms)
+        (
+            segments,
+            _p0,
+            _p1,
+            edge_ids,
+            edge_starts,
+            _segment_lengths,
+        ) = PDCode._segment_table(multilines)
+        if len(segments) < 2:
+            return [], [[] for _ in range(edge_count)]
+
+        tree = STRtree(segments)
+        pairs = tree.query(segments)
+        left = pairs[0].astype(np.intp, copy=False)
+        right = pairs[1].astype(np.intp, copy=False)
+        pair_mask = right > left
+        left = left[pair_mask]
+        right = right[pair_mask]
+        if left.size == 0:
+            return [], [[] for _ in range(edge_count)]
+
+        seg_a = segments[left]
+        seg_b = segments[right]
+        intersections = shapely.intersection(seg_a, seg_b)
+        hits: dict[tuple[float, float], list[tuple[int, float]]] = {}
+
+        for pair_index, (a_segment, b_segment, inter) in enumerate(
+            zip(seg_a, seg_b, intersections, strict=True)
+        ):
+            if inter.is_empty:
+                continue
+            geometry_type = inter.geom_type
+            if geometry_type.startswith("Line") or geometry_type == "GeometryCollection":
+                raise ValueError("Found overlapping (colinear) projected segments")
+            if geometry_type == "Point":
+                points = [inter]
+            elif geometry_type == "MultiPoint":
+                points = list(inter.geoms)
+            else:
+                continue
+
+            left_segment = int(left[pair_index])
+            right_segment = int(right[pair_index])
+            for point in points:
+                if PDCode._is_true_spatial_contact(
+                    a_segment,
+                    b_segment,
+                    point,
+                    tolerance=tolerance,
+                ):
+                    continue
+
+                left_local = float(
+                    shapely.line_locate_point(segments[left_segment], point)
+                )
+                right_local = float(
+                    shapely.line_locate_point(segments[right_segment], point)
+                )
+                key = (float(point.x), float(point.y))
+                incidences = hits.setdefault(key, [])
+                incidences.append(
+                    (
+                        int(edge_ids[left_segment]),
+                        float(edge_starts[left_segment] + left_local),
+                    )
+                )
+                incidences.append(
+                    (
+                        int(edge_ids[right_segment]),
+                        float(edge_starts[right_segment] + right_local),
+                    )
+                )
+
+        ordered_coordinates = sorted(hits)
+        crossing_points = [Point(xy) for xy in ordered_coordinates]
+        incidence_by_edge: list[list[tuple[float, int]]] = [
+            [] for _ in range(edge_count)
+        ]
+        for crossing_id, coordinate in enumerate(ordered_coordinates):
+            for edge_id, distance in hits[coordinate]:
+                incidence_by_edge[edge_id].append((distance, crossing_id))
+
+        for edge_id, incidences in enumerate(incidence_by_edge):
+            incidence_by_edge[edge_id] = PDCode._deduplicate_crossing_distances(
+                incidences,
+                tolerance=tolerance,
+            )
+        return crossing_points, incidence_by_edge
+
+    def count_crossings(
+        self,
+        rotation_angles: Optional[Sequence[float]] = None,
+        rotation_order: str = "ZYX",
+    ) -> int:
+        """Count projected crossings without constructing vertices/arcs/PD data."""
+        rotation_order = _validate_rotation_order(rotation_order)
+        normalized_angles = _normalize_rotation_angles(rotation_angles)
+        edge_lines = MultiLineString(
+            [LineString(edge_data["pts"]) for edge_data in self.skeleton_graph.edges.values()]
+        )
+        if normalized_angles is not None:
+            matrix = get_rotation_matrix(normalized_angles, rotation_order)
+            rotation = matrix.ravel().tolist() + [0, 0, 0]
+            edge_lines = affine_transform(edge_lines, rotation)
+        crossings, _incidences = self._find_crossings_with_incidences(
+            edge_lines,
+            tolerance=self.tolerance,
+        )
+        return len(crossings)
+
+    @staticmethod
     def _explode_to_segments(lines: MultiLineString | LineString) -> list[LineString]:
         """Break every LineString into individual two-point 3-D segments."""
         line_geoms = [lines] if isinstance(lines, LineString) else list(lines.geoms)
@@ -305,11 +527,14 @@ class PDCode:
         if len(coords) < 2:
             return []
         segments = np.asarray(
-            [LineString([coords[i], coords[i + 1]]) for i in range(len(coords) - 1)],
+            shapely.linestrings(np.stack((coords[:-1], coords[1:]), axis=1)),
             dtype=object,
         )
-        query_geometries = shapely.buffer(segments, float(tolerance))
-        pairs = crossing_tree.query(query_geometries)
+        pairs = crossing_tree.query(
+            segments,
+            predicate="dwithin",
+            distance=float(tolerance),
+        )
         if pairs.size == 0:
             return []
 
@@ -359,10 +584,24 @@ class PDCode:
             tolerance=tolerance,
         )
 
-    def _process_edges(self, edge_lines: MultiLineString) -> None:
+    def _process_edges(
+        self,
+        edge_lines: MultiLineString,
+        precomputed_intersections: list[list[tuple[float, int]]] | None = None,
+    ) -> None:
         edge_keys = list(self.skeleton_graph.edges.keys())
         crossing_points = [crossing.point for crossing in self.crossings.values()]
-        crossing_tree = STRtree(crossing_points) if crossing_points else None
+        crossing_tree = (
+            STRtree(crossing_points)
+            if crossing_points and precomputed_intersections is None
+            else None
+        )
+
+        if (
+            precomputed_intersections is not None
+            and len(precomputed_intersections) != len(edge_keys)
+        ):
+            raise ValueError("precomputed crossing incidences do not match edge count")
 
         for i, (edge_line, edge_key) in enumerate(zip(edge_lines.geoms, edge_keys)):
             self.edge_key_to_index[edge_key] = i
@@ -370,7 +609,9 @@ class PDCode:
             start_vertex_id = self.node_key_to_vertex_id[u]
             end_vertex_id = self.node_key_to_vertex_id[v]
 
-            if crossing_tree is None:
+            if precomputed_intersections is not None:
+                intersections = precomputed_intersections[i]
+            elif crossing_tree is None:
                 intersections = []
             else:
                 intersections = self._project_crossings_on_edge_indexed(
@@ -647,6 +888,19 @@ def _compute_projection(
     )
 
 
+def _count_projection_crossings(
+    skeleton_graph: nx.MultiGraph,
+    rotation_angles: tuple[float, float, float],
+    rotation_order: str,
+) -> int:
+    """Count one normalized graph projection without constructing full PD data."""
+    processor = PDCode(skeleton_graph, _already_normalized=True)
+    return processor.count_crossings(
+        rotation_angles=rotation_angles,
+        rotation_order=rotation_order,
+    )
+
+
 def sample_projections(
     skeleton_graph: nx.MultiGraph,
     *,
@@ -711,22 +965,138 @@ def select_projection(
     if exact_angles is not None:
         return _compute_projection(skeleton_graph, exact_angles, rotation_order)
 
-    # Keep the public sampling contract intact.  ``sample_projections`` performs
-    # its own normalization for direct callers, while each per-angle PDCode now
-    # trusts the already-normalized graph and avoids another O(total points) copy.
+    # Projection selection needs the full PD only for the winning view. Count
+    # crossings for every deterministic direction first, rank by
+    # (crossing_count, generation_order), then fully construct candidates in
+    # that order until one succeeds. Direct callers of sample_projections keep
+    # the historical contract of receiving every complete valid PD.
     num_rotation_samples = _validate_positive_integer(
         num_rotation_samples,
         name="num_rotation_samples",
     )
-    projections = sample_projections(
-        skeleton_graph,
-        num_rotation_samples=num_rotation_samples,
-        rotation_order=rotation_order,
+    errors: list[str] = []
+    ranked: list[
+        tuple[int, int, tuple[float, float, float]]
+    ] = []
+    for sample_index, angles in enumerate(
+        generate_isotopy_angles(num_rotation_samples, order=rotation_order)
+    ):
+        candidate_angles = tuple(float(angle) for angle in angles)
+        try:
+            crossing_count = _count_projection_crossings(
+                skeleton_graph,
+                candidate_angles,
+                rotation_order,
+            )
+        except Exception as exc:
+            errors.append(f"sample {sample_index}: {exc}")
+            continue
+        ranked.append((crossing_count, sample_index, candidate_angles))
+
+    for expected_crossings, sample_index, candidate_angles in sorted(ranked):
+        try:
+            projection = _compute_projection(
+                skeleton_graph,
+                candidate_angles,
+                rotation_order,
+            )
+        except Exception as exc:
+            errors.append(f"sample {sample_index}: {exc}")
+            continue
+        if projection.num_crossings != expected_crossings:
+            raise RuntimeError(
+                "Projection crossing-count prepass disagreed with full PD "
+                f"construction for sample {sample_index}: "
+                f"{expected_crossings} != {projection.num_crossings}."
+            )
+        if errors:
+            warnings.warn(
+                f"{len(errors)} projection candidate(s) failed during selection; "
+                f"using sample {sample_index}. First failure: {errors[0]}",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+        return projection
+
+    details = "; ".join(errors) if errors else "no samples were generated"
+    raise RuntimeError(f"All projection samples failed: {details}")
+
+
+def _projection_yamada_peak_ports(
+    projection: ProjectionResult,
+) -> int:
+    """Return the exact factorized-frontier peak planned for one projection."""
+    from knotted_graph.invariants.yamada.factorized_frontier import (
+        build_factorized_frontier,
     )
-    return min(
-        enumerate(projections),
-        key=lambda indexed: (indexed[1].num_crossings, indexed[0]),
-    )[1]
+
+    prepared = Yamada.from_PDCode(
+        projection.processor
+    )._prepare_compact_state_builder()
+    data = build_factorized_frontier(prepared)
+    return int(data["factor_order_peak_ports"])
+
+
+def _rescue_projection_for_normalized_yamada(
+    skeleton_graph: nx.MultiGraph,
+    initial: ProjectionResult,
+    *,
+    rotation_order: str,
+    num_rotation_samples: int,
+) -> ProjectionResult:
+    """Replace a hard minimum-crossing view only for a clear frontier-width win."""
+    initial_peak = _projection_yamada_peak_ports(initial)
+    if (
+        initial.num_crossings < 12
+        or initial_peak < 12
+        or initial.rotation_angles is None
+    ):
+        return initial
+
+    angles_in_order = [
+        tuple(float(angle) for angle in angles)
+        for angles in generate_isotopy_angles(
+            num_rotation_samples,
+            order=rotation_order,
+        )
+    ]
+    initial_index = next(
+        (
+            index
+            for index, angles in enumerate(angles_in_order)
+            if angles == initial.rotation_angles
+        ),
+        -1,
+    )
+    best = initial
+    best_peak = initial_peak
+    best_key = (
+        initial_peak,
+        initial.num_crossings,
+        initial_index if initial_index >= 0 else num_rotation_samples,
+    )
+
+    for sample_index, angles in enumerate(angles_in_order):
+        if angles == initial.rotation_angles:
+            continue
+        try:
+            projection = _compute_projection(
+                skeleton_graph,
+                angles,
+                rotation_order,
+            )
+            peak = _projection_yamada_peak_ports(projection)
+        except Exception:
+            continue
+        key = (peak, projection.num_crossings, sample_index)
+        if key < best_key:
+            best = projection
+            best_peak = peak
+            best_key = key
+
+    if initial_peak - best_peak < 2:
+        return initial
+    return best
 
 
 def compute_yamada_polynomial(
@@ -743,10 +1113,13 @@ def compute_yamada_polynomial(
 ) -> sp.Expr | YamadaComputationResult:
     """Compute a spatial graph's Yamada polynomial from a planar projection.
 
-    When ``rotation_angles`` is omitted, the function samples deterministic
-    viewing directions and evaluates the valid projection with the fewest
-    crossings. Supplying angles bypasses sampling and uses that projection
-    directly.
+    When ``rotation_angles`` is omitted, the function first selects the
+    valid sampled projection with the fewest crossings. For normalized Yamada
+    evaluation only, a hard selected diagram may then be replaced by another
+    sampled view when exact factorized-frontier planning predicts a reduction
+    of at least two live ports. Supplying angles bypasses sampling and uses that
+    projection directly; unnormalized evaluation retains the minimum-crossing
+    policy exactly.
 
     Parameters
     ----------
@@ -824,6 +1197,18 @@ def compute_yamada_polynomial(
         rotation_order=rotation_order,
         num_rotation_samples=num_rotation_samples,
     )
+    if rotation_angles is None and normalize:
+        normalized_graph = ensure_embedding(
+            skeleton_graph,
+            copy=True,
+            normalize=True,
+        )
+        projection = _rescue_projection_for_normalized_yamada(
+            normalized_graph,
+            projection,
+            rotation_order=rotation_order,
+            num_rotation_samples=num_rotation_samples,
+        )
     if (
         crossing_warning_threshold is not None
         and projection.num_crossings >= crossing_warning_threshold
