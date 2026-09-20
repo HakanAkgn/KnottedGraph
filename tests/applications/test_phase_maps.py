@@ -309,3 +309,47 @@ def test_unified_phase_map_collapses_no_core_skeletons_to_vertex(monkeypatch):
     assert record.error is None
     assert record.nodes == 1
     assert record.edges == 0
+
+
+
+def test_material_phase_map_reuses_eigenspectrum_across_threshold_axis(monkeypatch):
+    from knotted_graph.applications.material_surface import MaterialFermiSurface
+
+    _patch_yamada(monkeypatch)
+    original_eigvalsh = np.linalg.eigvalsh
+    calls = {"count": 0}
+
+    def counted_eigvalsh(values):
+        calls["count"] += 1
+        return original_eigvalsh(values)
+
+    def skeleton_graph(self, **kwargs):
+        # Force the expensive cached property to be consumed exactly as the real
+        # mask/skeleton workflow does, while keeping the graph fixture tiny.
+        _ = self.eigvals_sorted
+        return _triangle_graph()
+
+    monkeypatch.setattr(np.linalg, "eigvalsh", counted_eigvalsh)
+    monkeypatch.setattr(MaterialFermiSurface, "skeleton_graph", skeleton_graph)
+
+    kx, ky, kz = sp.symbols("kx ky kz", real=True)
+    h0 = sp.diag(kx, ky, kz)
+    h1 = sp.diag(kx + sp.Rational(1, 10), ky, kz)
+
+    result = make_yamada_phase_map(
+        h0,
+        h1,
+        source_kind="material",
+        material_mode="gap",
+        band_pair=(0, 1),
+        lambdas=[0.0, 1.0],
+        parameters=[0.02, 0.04, 0.06],
+        k_symbols=(kx, ky, kz),
+        dimension=5,
+        force_genus_zero_vertex=False,
+    )
+
+    assert len(result.records) == 6
+    assert all(record.error is None for record in result.records)
+    # One grid diagonalization per lambda, not once per (lambda, threshold).
+    assert calls["count"] == 2
