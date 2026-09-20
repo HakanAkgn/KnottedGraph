@@ -353,3 +353,44 @@ def test_material_phase_map_reuses_eigenspectrum_across_threshold_axis(monkeypat
     assert all(record.error is None for record in result.records)
     # One grid diagonalization per lambda, not once per (lambda, threshold).
     assert calls["count"] == 2
+
+
+
+def test_material_energy_phase_map_reuses_eigenspectrum_across_energy_axis(monkeypatch):
+    from knotted_graph.applications.material_surface import MaterialFermiSurface
+
+    _patch_yamada(monkeypatch)
+    original_eigvalsh = np.linalg.eigvalsh
+    calls = {"count": 0}
+
+    def counted_eigvalsh(values):
+        calls["count"] += 1
+        return original_eigvalsh(values)
+
+    def skeleton_graph(self, **kwargs):
+        _ = self.eigvals_sorted
+        return _triangle_graph()
+
+    monkeypatch.setattr(np.linalg, "eigvalsh", counted_eigvalsh)
+    monkeypatch.setattr(MaterialFermiSurface, "skeleton_graph", skeleton_graph)
+
+    kx, ky, kz = sp.symbols("kx ky kz", real=True)
+    h0 = sp.diag(kx, ky, kz)
+    h1 = sp.diag(kx + sp.Rational(1, 10), ky, kz)
+
+    result = make_yamada_phase_map(
+        h0,
+        h1,
+        source_kind="material",
+        material_mode="energy",
+        band_index=1,
+        lambdas=[0.0, 1.0],
+        parameters=[-0.1, 0.0, 0.1],
+        k_symbols=(kx, ky, kz),
+        dimension=5,
+        force_genus_zero_vertex=False,
+    )
+
+    assert len(result.records) == 6
+    assert all(record.error is None for record in result.records)
+    assert calls["count"] == 2
