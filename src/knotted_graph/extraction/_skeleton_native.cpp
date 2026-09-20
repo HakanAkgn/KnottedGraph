@@ -569,11 +569,7 @@ PYBIND11_MODULE(_skeleton_native, module) {
     module.def(
         "sparse_adjacency",
         [](py::array_t<bool, py::array::c_style | py::array::forcecast> image) {
-            SparseSkeleton sparse;
-            {
-                py::gil_scoped_release release;
-                sparse = build_sparse(image);
-            }
+            SparseSkeleton sparse = build_sparse(image);
             return sparse_to_python(sparse);
         }
     );
@@ -585,15 +581,11 @@ PYBIND11_MODULE(_skeleton_native, module) {
             int max_hops
         ) {
             if (max_hops < 0) throw std::invalid_argument("max_hops must be non-negative");
-            SparseSkeleton sparse;
+            SparseSkeleton sparse = build_sparse(image);
             std::vector<GraphData> candidates;
-            {
-                py::gil_scoped_release release;
-                sparse = build_sparse(image);
-                candidates.reserve(static_cast<std::size_t>(max_hops + 1));
-                for (int hops = 0; hops <= max_hops; ++hops)
-                    candidates.push_back(trace_all(sparse, hops));
-            }
+            candidates.reserve(static_cast<std::size_t>(max_hops + 1));
+            for (int hops = 0; hops <= max_hops; ++hops)
+                candidates.push_back(trace_all(sparse, hops));
             py::list out;
             for (int hops = 0; hops <= max_hops; ++hops)
                 out.append(compact_candidate(candidates[static_cast<std::size_t>(hops)], hops));
@@ -608,13 +600,8 @@ PYBIND11_MODULE(_skeleton_native, module) {
             int hops
         ) {
             if (hops < 0) throw std::invalid_argument("hops must be non-negative");
-            SparseSkeleton sparse;
-            GraphData graph;
-            {
-                py::gil_scoped_release release;
-                sparse = build_sparse(image);
-                graph = trace_all(sparse, hops);
-            }
+            SparseSkeleton sparse = build_sparse(image);
+            GraphData graph = trace_all(sparse, hops);
             return materialized_candidate(graph, hops);
         }
     );
