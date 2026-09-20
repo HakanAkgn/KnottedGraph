@@ -55,6 +55,46 @@ jobs:
       - name: Run complete pytest suite
         run: uv run --no-sync pytest -q
 
+      - name: Diagnose 45-case base/head parity
+        shell: bash
+        run: |
+          git worktree add --detach /tmp/kg-requested-base 43620e20800dfa144987c7bb2cb9997f184631cd
+          uv run --no-sync python - <<'PY'
+          import networkx as nx
+          import numpy as np
+          import dev.run_skeletonization_45_validation as suite
+          from knotted_graph.extraction import skeleton_image_to_graph, skeletonize_volume
+
+          case = next(item for item in suite.ORIGINAL_CASES if item.name == "triangular_prism")
+          target = suite.deform(case.graph, "rotate")
+          volume = suite.voxelize(target, 1)
+          skeleton = skeletonize_volume(volume)
+          extracted = skeleton_image_to_graph(skeleton, max_junction_degree=3)
+          reconstructed = suite.cleanup(suite.to_world(extracted))
+          print("HEAD skeleton voxels:", int(np.count_nonzero(skeleton)))
+          print("HEAD extracted:", extracted.number_of_nodes(), extracted.number_of_edges(), sorted(dict(extracted.degree()).values()))
+          print("HEAD reconstructed correct:", nx.is_isomorphic(nx.MultiGraph(case.graph), reconstructed))
+          PY
+          (
+            cd /tmp/kg-requested-base
+            PYTHONPATH=/tmp/kg-requested-base/src "$GITHUB_WORKSPACE/.venv/bin/python" - <<'PY'
+          import networkx as nx
+          import numpy as np
+          import dev.run_skeletonization_45_validation as suite
+          from knotted_graph.extraction import skeleton_image_to_graph, skeletonize_volume
+
+          case = next(item for item in suite.ORIGINAL_CASES if item.name == "triangular_prism")
+          target = suite.deform(case.graph, "rotate")
+          volume = suite.voxelize(target, 1)
+          skeleton = skeletonize_volume(volume)
+          extracted = skeleton_image_to_graph(skeleton, max_junction_degree=3)
+          reconstructed = suite.cleanup(suite.to_world(extracted))
+          print("BASE skeleton voxels:", int(np.count_nonzero(skeleton)))
+          print("BASE extracted:", extracted.number_of_nodes(), extracted.number_of_edges(), sorted(dict(extracted.degree()).values()))
+          print("BASE reconstructed correct:", nx.is_isomorphic(nx.MultiGraph(case.graph), reconstructed))
+          PY
+          )
+
       - name: Run 45-case skeleton reconstruction validation
         run: uv run --no-sync python dev/run_skeletonization_45_validation.py
 
