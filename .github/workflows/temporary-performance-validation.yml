@@ -88,7 +88,7 @@ jobs:
                   "h", hops,
                   "python", py_graph.number_of_nodes(), py_graph.number_of_edges(),
                   sorted(dict(py_graph.degree()).values()),
-                  "clean", py_summary[1], "safe", py_summary[4],
+                  "clean", py_summary[1], "safe", py_summary[3],
               )
               print(
                   "h", hops,
@@ -97,7 +97,7 @@ jobs:
                   "clean", native_summary[1], "safe", native_summary[3],
                   "iso", nx.is_isomorphic(py_graph, native_graph),
               )
-              print("fingerprints", py_summary[3], native_summary[2])
+              print("fingerprints", py_summary[2], native_summary[2])
 
           selected_native_hops = _select_hops(
               native_candidates,
