@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import numpy as np
-from shapely import LineString, Point
+import pytest
+from shapely import LineString, MultiLineString, Point
 from shapely.strtree import STRtree
 
 from knotted_graph.projection.pd_code import PDCode
@@ -65,3 +66,55 @@ def test_indexed_crossing_projection_preserves_tolerance_boundary_behavior():
     )
 
     assert actual == expected
+
+
+
+def test_fused_crossing_incidence_matches_independent_legacy_pipeline_randomized():
+    rng = np.random.default_rng(20260920)
+
+    for _ in range(100):
+        lines = []
+        for edge_index in range(int(rng.integers(2, 7))):
+            count = int(rng.integers(2, 15))
+            xyz = np.cumsum(rng.normal(size=(count, 3)), axis=0)
+            xyz[:, 2] += 0.17 * edge_index
+            lines.append(LineString(xyz))
+
+        geometry = MultiLineString(lines)
+        crossing_points, fused = PDCode._find_crossings_with_incidences(
+            geometry,
+            tolerance=1e-8,
+        )
+        legacy_points = PDCode._find_all_crossings(
+            geometry,
+            tolerance=1e-8,
+        )
+
+        assert len(crossing_points) == len(legacy_points)
+        for actual, expected in zip(crossing_points, legacy_points, strict=True):
+            assert actual.distance(expected) < 1e-9
+
+        if legacy_points:
+            tree = STRtree(legacy_points)
+            legacy = [
+                PDCode._project_crossings_on_edge_indexed(
+                    edge,
+                    legacy_points,
+                    tree,
+                    tolerance=1e-8,
+                )
+                for edge in geometry.geoms
+            ]
+        else:
+            legacy = [[] for _ in geometry.geoms]
+
+        assert len(fused) == len(legacy)
+        for actual, expected in zip(fused, legacy, strict=True):
+            assert len(actual) == len(expected)
+            for (actual_distance, actual_id), (expected_distance, expected_id) in zip(
+                actual,
+                expected,
+                strict=True,
+            ):
+                assert actual_id == expected_id
+                assert actual_distance == pytest.approx(expected_distance, abs=1e-9)
