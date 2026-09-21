@@ -143,39 +143,206 @@ def oriented_edge_polyline(
     return points
 
 
-def validate_embedding(graph: nx.MultiGraph) -> list[str]:
-    """Return issues for a normalizable embedded ``MultiGraph(pos/pts)``."""
+def _point_segment_distance(
+    point: np.ndarray,
+    start: np.ndarray,
+    end: np.ndarray,
+) -> float:
+    direction = end - start
+    denom = float(np.dot(direction, direction))
+    if denom <= np.finfo(float).tiny:
+        return float(np.linalg.norm(point - start))
+    t = float(np.clip(np.dot(point - start, direction) / denom, 0.0, 1.0))
+    return float(np.linalg.norm(point - (start + t * direction)))
 
+
+def _segment_segment_closest(
+    a: np.ndarray,
+    b: np.ndarray,
+    c: np.ndarray,
+    d: np.ndarray,
+) -> tuple[float, np.ndarray, np.ndarray]:
+    """Return distance and closest points for two closed 3-D segments."""
+    u = b - a
+    v = d - c
+    w = a - c
+    aa = float(np.dot(u, u))
+    bb = float(np.dot(u, v))
+    cc = float(np.dot(v, v))
+    dd = float(np.dot(u, w))
+    ee = float(np.dot(v, w))
+    tiny = np.finfo(float).tiny
+
+    if aa <= tiny and cc <= tiny:
+        return float(np.linalg.norm(a - c)), a, c
+    if aa <= tiny:
+        t = float(np.clip(ee / cc, 0.0, 1.0))
+        q = c + t * v
+        return float(np.linalg.norm(a - q)), a, q
+    if cc <= tiny:
+        s = float(np.clip(-dd / aa, 0.0, 1.0))
+        p = a + s * u
+        return float(np.linalg.norm(p - c)), p, c
+
+    denom = aa * cc - bb * bb
+    if abs(denom) > _FLOAT_REL_TOL * max(aa * cc, tiny):
+        s = float(np.clip((bb * ee - cc * dd) / denom, 0.0, 1.0))
+    else:
+        s = 0.0
+    t = (bb * s + ee) / cc
+    if t < 0.0:
+        t = 0.0
+        s = float(np.clip(-dd / aa, 0.0, 1.0))
+    elif t > 1.0:
+        t = 1.0
+        s = float(np.clip((bb - dd) / aa, 0.0, 1.0))
+
+    p = a + s * u
+    q = c + t * v
+    return float(np.linalg.norm(p - q)), p, q
+
+
+def _geometric_embedding_issues(
+    graph: nx.MultiGraph,
+    positions: dict[Any, np.ndarray],
+    polylines: dict[tuple[Any, Any, Any], np.ndarray],
+) -> list[str]:
+    """Detect 3-D contacts that are not represented by graph incidence."""
+    if not polylines:
+        return []
+
+    scale = _point_scale(*positions.values(), *polylines.values())
+    tolerance = max(_FLOAT_REL_TOL * scale, 1e-10 * scale)
+    issues: list[str] = []
+    segments: list[
+        tuple[tuple[Any, Any, Any], int, np.ndarray, np.ndarray]
+    ] = []
+
+    for edge_ref, pts in polylines.items():
+        for index in range(len(pts) - 1):
+            segments.append((edge_ref, index, pts[index], pts[index + 1]))
+
+    for left_index, (left_ref, left_seg, a, b) in enumerate(segments):
+        lu, lv, _ = left_ref
+        left_pts = polylines[left_ref]
+        for right_ref, right_seg, c, d in segments[left_index + 1 :]:
+            ru, rv, _ = right_ref
+
+            if left_ref == right_ref:
+                adjacent = abs(left_seg - right_seg) <= 1
+                closed_adjacent = (
+                    lu == lv
+                    and {left_seg, right_seg} == {0, len(left_pts) - 2}
+                )
+                if adjacent or closed_adjacent:
+                    continue
+
+            if np.any(np.maximum(a, b) + tolerance < np.minimum(c, d)):
+                continue
+            if np.any(np.maximum(c, d) + tolerance < np.minimum(a, b)):
+                continue
+
+            distance, p, q = _segment_segment_closest(a, b, c, d)
+            if distance > tolerance:
+                continue
+
+            common_nodes = set((lu, lv)).intersection((ru, rv))
+            permitted = False
+            for node in common_nodes:
+                node_pos = positions.get(node)
+                if node_pos is None:
+                    continue
+                if (
+                    np.linalg.norm(p - node_pos) <= tolerance
+                    and np.linalg.norm(q - node_pos) <= tolerance
+                ):
+                    left_other = (
+                        b if np.linalg.norm(a - node_pos) <= tolerance else a
+                    )
+                    right_other = (
+                        d if np.linalg.norm(c - node_pos) <= tolerance else c
+                    )
+                    if (
+                        _point_segment_distance(left_other, c, d) > tolerance
+                        and _point_segment_distance(right_other, a, b) > tolerance
+                    ):
+                        permitted = True
+                        break
+
+            if permitted:
+                continue
+
+            issues.append(
+                f"edges {left_ref!r} and {right_ref!r} have an unmodeled 3D contact"
+            )
+            if len(issues) >= 20:
+                return issues
+
+    for node, point in positions.items():
+        for edge_ref, pts in polylines.items():
+            u, v, _ = edge_ref
+            if node in (u, v):
+                continue
+            for index in range(len(pts) - 1):
+                if (
+                    _point_segment_distance(
+                        point, pts[index], pts[index + 1]
+                    )
+                    <= tolerance
+                ):
+                    issues.append(
+                        f"edge {edge_ref!r} passes through unincident vertex {node!r}"
+                    )
+                    break
+            if len(issues) >= 20:
+                return issues
+
+    return issues
+
+
+def validate_embedding(
+    graph: nx.MultiGraph,
+    *,
+    check_geometry: bool = True,
+) -> list[str]:
+    """Return issues for an embedded MultiGraph(pos/pts)."""
     issues: list[str] = []
     if not isinstance(graph, nx.MultiGraph):
         return ["graph is not a networkx.MultiGraph"]
     if graph.is_directed():
         issues.append("graph must be undirected")
     if graph.number_of_nodes() == 0:
-        issues.append("graph has no nodes")
-    if graph.number_of_edges() == 0:
-        issues.append("graph has no edges")
+        return issues
 
     valid_positions: dict[Any, np.ndarray] = {}
+    valid_polylines: dict[tuple[Any, Any, Any], np.ndarray] = {}
+
     for node, data in graph.nodes(data=True):
         if "pos" not in data:
             issues.append(f"node {node!r} is missing 'pos'")
             continue
         try:
-            valid_positions[node] = as_point3(data["pos"], f"node {node!r} pos")
+            valid_positions[node] = as_point3(
+                data["pos"], f"node {node!r} pos"
+            )
         except ValueError as exc:
             issues.append(str(exc))
 
     for u, v, key, data in graph.edges(keys=True, data=True):
-        if data.get("pts") is None:
-            continue
-        try:
-            pts = as_polyline(data["pts"], f"edge {(u, v, key)!r} pts")
-        except ValueError as exc:
-            issues.append(str(exc))
-            continue
         if u not in valid_positions or v not in valid_positions:
             continue
+
+        if data.get("pts") is None:
+            pts = np.vstack([valid_positions[u], valid_positions[v]])
+        else:
+            try:
+                pts = as_polyline(
+                    data["pts"], f"edge {(u, v, key)!r} pts"
+                )
+            except ValueError as exc:
+                issues.append(str(exc))
+                continue
+
         u_pos = valid_positions[u]
         v_pos = valid_positions[v]
         scale = _point_scale(pts, u_pos, v_pos)
@@ -188,7 +355,25 @@ def validate_embedding(graph: nx.MultiGraph) -> list[str]:
             and _points_close(pts[-1], u_pos, scale=scale)
         )
         if not (direct or reverse):
-            issues.append(f"edge {(u, v, key)!r} endpoints do not match node positions")
+            issues.append(
+                f"edge {(u, v, key)!r} endpoints do not match node positions"
+            )
+            continue
+
+        if len(drop_consecutive_duplicates(pts)) < 2:
+            issues.append(
+                f"edge {(u, v, key)!r} collapsed to fewer than two distinct points"
+            )
+            continue
+
+        valid_polylines[(u, v, key)] = pts
+
+    if check_geometry and not issues:
+        issues.extend(
+            _geometric_embedding_issues(
+                graph, valid_positions, valid_polylines
+            )
+        )
 
     return issues
 
@@ -198,10 +383,12 @@ def ensure_embedding(
     *,
     copy: bool = True,
     normalize: bool = True,
+    check_geometry: bool = False,
 ) -> nx.MultiGraph:
     """Validate and optionally normalize an embedded spatial graph."""
-
-    issues = validate_embedding(graph)
+    issues = validate_embedding(
+        graph, check_geometry=check_geometry
+    )
     if issues:
         raise EmbeddingValidationError(issues)
 
@@ -213,15 +400,16 @@ def ensure_embedding(
         data["pos"] = as_point3(data["pos"], "node 'pos'")
 
     for u, v, key, data in result.edges(keys=True, data=True):
-        data["pts"] = oriented_edge_polyline(result, u, v, key, data)
+        data["pts"] = oriented_edge_polyline(
+            result, u, v, key, data
+        )
 
     return result
 
 
 def is_embedding(graph: nx.MultiGraph) -> bool:
-    """Return whether *graph* satisfies the embedded graph contract."""
-
-    return not validate_embedding(graph)
+    """Return whether graph satisfies the strict embedded-graph contract."""
+    return not validate_embedding(graph, check_geometry=True)
 
 
 def idx_to_coord(
@@ -262,24 +450,93 @@ def smooth_edges(
     epsilon: float = 0.0,
     copy: bool = True,
 ) -> nx.MultiGraph:
-    """Simplify edge polylines with Ramer-Douglas-Peucker smoothing."""
+    """Simplify edge polylines without allowing topology-changing shortcuts."""
+    epsilon = float(epsilon)
+    if not np.isfinite(epsilon) or epsilon < 0.0:
+        raise ValueError("epsilon must be finite and non-negative")
 
     H = ensure_embedding(G, copy=copy, normalize=True)
-    for u, v, key, pts in H.edges(keys=True, data="pts"):
-        if pts is None:
-            continue
-        pts_arr = np.asarray(pts, dtype=float)
-        if pts_arr.ndim != 2 or pts_arr.shape[0] < 3:
-            continue
+    if epsilon == 0.0 or H.number_of_edges() == 0:
+        return H
 
-        simplified = fastrdp.rdpN(pts_arr, epsilon)
-        H[u][v][key]["pts"] = oriented_edge_polyline(
+    from knotted_graph.layout.repulsive.decimation import (
+        DecimationOptions,
+        decimate_curve_network,
+    )
+
+    vertices: list[np.ndarray] = []
+    node_indices: dict[Any, int] = {}
+    for node, data in H.nodes(data=True):
+        node_indices[node] = len(vertices)
+        vertices.append(np.asarray(data["pos"], dtype=float))
+
+    edge_indices: dict[str, list[int]] = {}
+    edge_refs: dict[str, tuple[Any, Any, Any]] = {}
+    edge_order: list[str] = []
+
+    for edge_number, (u, v, key, data) in enumerate(
+        H.edges(keys=True, data=True)
+    ):
+        edge_id = f"edge_{edge_number}"
+        points = oriented_edge_polyline(H, u, v, key, data)
+        indices = [node_indices[u]]
+        for point in points[1:-1]:
+            vertices.append(np.asarray(point, dtype=float))
+            indices.append(len(vertices) - 1)
+        indices.append(node_indices[v])
+        edge_indices[edge_id] = indices
+        edge_refs[edge_id] = (u, v, key)
+        edge_order.append(edge_id)
+
+    vertex_array = np.asarray(vertices, dtype=float)
+    scale = _point_scale(vertex_array)
+    clearance = max(
+        _FLOAT_REL_TOL * scale,
+        np.finfo(float).tiny,
+    )
+
+    result = decimate_curve_network(
+        vertex_array,
+        edge_indices,
+        tuple(edge_order),
+        pinned_indices=set(node_indices.values()),
+        options=DecimationOptions(
+            max_passes=max(
+                8,
+                int(
+                    np.ceil(
+                        np.log2(max(2, len(vertex_array)))
+                    )
+                    + 4
+                ),
+            ),
+            min_points_per_edge=2,
+            clearance_fraction=0.0,
+            min_clearance=clearance,
+            max_deviation=epsilon,
+            preserve_pinned_neighbors=True,
+        ),
+    )
+
+    for edge_id in edge_order:
+        u, v, key = edge_refs[edge_id]
+        indices = np.asarray(
+            result.edge_indices[edge_id], dtype=int
+        )
+        H.edges[u, v, key]["pts"] = oriented_edge_polyline(
             H,
             u,
             v,
             key,
-            {"pts": simplified},
+            {"pts": result.vertices[indices]},
         )
+
+    strict_issues = validate_embedding(
+        H, check_geometry=True
+    )
+    if strict_issues:
+        raise EmbeddingValidationError(strict_issues)
+
     return H
 
 
