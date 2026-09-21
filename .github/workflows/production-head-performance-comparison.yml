@@ -28,9 +28,9 @@ jobs:
           git fetch --depth=1 origin perf/incremental-yamada-frontier-order
           git worktree add --detach /tmp/kg-prod FETCH_HEAD
           python -m venv /tmp/kg-prod-venv
-          /tmp/kg-prod-venv/bin/python -m pip install -q '/tmp/kg-prod[nodal]'
+          /tmp/kg-prod-venv/bin/python -m pip install -q '/tmp/kg-prod'
           python -m venv /tmp/kg-head-venv
-          /tmp/kg-head-venv/bin/python -m pip install -q '.[nodal]'
+          /tmp/kg-head-venv/bin/python -m pip install -q '.'
 
       - name: Write representative timing workload
         run: |
