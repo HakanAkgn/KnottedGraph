@@ -305,24 +305,22 @@ def _geometric_embedding_issues(
 
             active.append(current_index)
 
-    # Vertex-edge contacts are usually sparse; use an AABB rejection before the
-    # exact point-segment calculation.
-    for node, point in positions.items():
-        for edge_ref, pts in polylines.items():
-            u, v, _ = edge_ref
-            if node in (u, v):
-                continue
-            for index in range(len(pts) - 1):
-                lo = np.minimum(pts[index], pts[index + 1]) - tolerance
-                hi = np.maximum(pts[index], pts[index + 1]) + tolerance
-                if np.any(point < lo) or np.any(point > hi):
+    # Vectorized broad phase for vertex-edge contacts. Only the very small
+    # candidate set enters the exact point-segment calculation.
+    if segments:
+        expanded_mins = mins - tolerance
+        expanded_maxs = maxs + tolerance
+        for node, point in positions.items():
+            candidates = np.flatnonzero(
+                np.all(point >= expanded_mins, axis=1)
+                & np.all(point <= expanded_maxs, axis=1)
+            )
+            for segment_index in candidates.tolist():
+                edge_ref, _, start, end = segments[segment_index]
+                u, v, _ = edge_ref
+                if node in (u, v):
                     continue
-                if (
-                    _point_segment_distance(
-                        point, pts[index], pts[index + 1]
-                    )
-                    <= tolerance
-                ):
+                if _point_segment_distance(point, start, end) <= tolerance:
                     issues.append(
                         f"edge {edge_ref!r} passes through unincident vertex {node!r}"
                     )
