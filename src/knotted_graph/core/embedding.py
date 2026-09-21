@@ -729,10 +729,9 @@ def _append_edge_pts(path: list[np.ndarray], edge_pts: Any) -> None:
     )
 
 
-def _edge_tag(u: int, v: int, key: int) -> tuple[int, int, int]:
-    """Return a canonical tag for an undirected multiedge."""
-
-    return (u, v, key) if u <= v else (v, u, key)
+def _edge_tag(u: Any, v: Any, key: Any) -> tuple[Any, Any, Any]:
+    """Return a deterministic tag for an undirected multiedge."""
+    return (u, v, key) if repr(u) <= repr(v) else (v, u, key)
 
 
 def _has_cycles(G: nx.MultiGraph) -> bool:
@@ -867,4 +866,4 @@ def simplify_edges(G: nx.MultiGraph) -> nx.MultiGraph:
         else:
             _collapse_cycle_component(G, comp, H)
 
-    return nx.convert_node_labels_to_integers(H)
+    return H
