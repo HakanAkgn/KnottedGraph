@@ -1,0 +1,180 @@
+name: Production head performance comparison
+
+on:
+  push:
+    branches:
+      - validation/systematic-audit-fixes-20260921
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      PYTHONNOUSERSITE: "1"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build isolated production and candidate environments
+        run: |
+          git worktree add --detach /tmp/kg-prod 90301e38dac82d3bf036df0b40fada7543931bd2
+          python -m venv /tmp/kg-prod-venv
+          /tmp/kg-prod-venv/bin/python -m pip install -q '/tmp/kg-prod[nodal]'
+          python -m venv /tmp/kg-head-venv
+          /tmp/kg-head-venv/bin/python -m pip install -q '.[nodal]'
+
+      - name: Write representative timing workload
+        run: |
+          cat > /tmp/kg_perf_compare.py <<'PY'
+          import json
+          import statistics
+          import time
+
+          import networkx as nx
+          import numpy as np
+          import sympy as sp
+
+          from knotted_graph.core import smooth_edges
+          from knotted_graph.projection import compute_yamada_polynomial, select_projection
+
+
+          def median_seconds(fn, repeats=5, warmup=1):
+              for _ in range(warmup):
+                  fn()
+              values = []
+              for _ in range(repeats):
+                  start = time.perf_counter()
+                  fn()
+                  values.append(time.perf_counter() - start)
+              return statistics.median(values)
+
+
+          def crossing_theta():
+              g = nx.MultiGraph()
+              g.add_node("u", pos=np.array([-2.0, 0.0, 0.0]))
+              g.add_node("v", pos=np.array([2.0, 0.0, 0.0]))
+              curves = [
+                  np.array([[-2,0,0],[-1,-1,.5],[1,1,.5],[2,0,0]], float),
+                  np.array([[-2,0,0],[-1,1,-.5],[1,-1,-.5],[2,0,0]], float),
+                  np.array([[-2,0,0],[-1,2,0],[1,2,0],[2,0,0]], float),
+              ]
+              for points in curves:
+                  g.add_edge("u", "v", pts=points)
+              return g
+
+
+          def projection_stress():
+              g = nx.MultiGraph()
+              x = np.linspace(-1.0, 1.0, 81)
+              for index, (slope, intercept) in enumerate(
+                  zip(
+                      (-1.18, -0.74, -0.31, 0.17, 0.61, 1.03),
+                      (-0.21, 0.18, -0.07, 0.25, -0.16, 0.09),
+                      strict=True,
+                  )
+              ):
+                  y = slope*x + intercept + 0.015*np.sin((index+2)*np.pi*x)
+                  z = -0.55 + 0.22*index + 0.01*x
+                  points = np.c_[x, y, z]
+                  u, v = f"u{index}", f"v{index}"
+                  g.add_node(u, pos=points[0].copy())
+                  g.add_node(v, pos=points[-1].copy())
+                  g.add_edge(u, v, pts=points)
+              return g
+
+
+          def cleanup_graph():
+              g = nx.MultiGraph()
+              for edge in range(10):
+                  u, v = f"u{edge}", f"v{edge}"
+                  t = np.linspace(0, 1, 121)
+                  points = np.column_stack([
+                      10*edge + 4*t,
+                      0.3*np.sin(4*np.pi*t) + 3*edge,
+                      0.2*np.cos(3*np.pi*t),
+                  ])
+                  g.add_node(u, pos=points[0].copy())
+                  g.add_node(v, pos=points[-1].copy())
+                  g.add_edge(u, v, pts=points)
+              return g
+
+
+          A = sp.Symbol("A")
+          theta = crossing_theta()
+          stress = projection_stress()
+          cleanup = cleanup_graph()
+
+          yamada_value = compute_yamada_polynomial(
+              theta, A, rotation_angles=(0.0, 0.0, 0.0), normalize=False
+          )
+          projection = select_projection(stress, num_rotation_samples=13)
+
+          result = {
+              "yamada_expr": str(sp.expand(yamada_value)),
+              "projection_crossings": int(projection.num_crossings),
+              "yamada_s": median_seconds(
+                  lambda: compute_yamada_polynomial(
+                      theta, A,
+                      rotation_angles=(0.0, 0.0, 0.0),
+                      normalize=False,
+                  ),
+                  repeats=7,
+                  warmup=2,
+              ),
+              "projection_s": median_seconds(
+                  lambda: select_projection(stress, num_rotation_samples=13),
+                  repeats=5,
+                  warmup=1,
+              ),
+              "cleanup_s": median_seconds(
+                  lambda: smooth_edges(cleanup, epsilon=0.05),
+                  repeats=5,
+                  warmup=1,
+              ),
+          }
+          print(json.dumps(result))
+          PY
+
+      - name: Run production baseline
+        run: /tmp/kg-prod-venv/bin/python /tmp/kg_perf_compare.py > /tmp/prod.json
+
+      - name: Run candidate head
+        run: /tmp/kg-head-venv/bin/python /tmp/kg_perf_compare.py > /tmp/head.json
+
+      - name: Require exact outputs and bounded regression
+        run: |
+          cat /tmp/prod.json
+          cat /tmp/head.json
+          /tmp/kg-head-venv/bin/python - <<'PY'
+          import json
+
+          prod = json.load(open("/tmp/prod.json"))
+          head = json.load(open("/tmp/head.json"))
+
+          assert prod["yamada_expr"] == head["yamada_expr"]
+          assert prod["projection_crossings"] == head["projection_crossings"]
+
+          ratios = {
+              name: head[name] / prod[name]
+              for name in ("yamada_s", "projection_s", "cleanup_s")
+          }
+          print("candidate/production runtime ratios:", ratios)
+
+          # Require that invariant/projection paths stay within 20%.
+          # Cleanup is allowed a larger safety cost because the candidate
+          # explicitly adds topology-preserving collision checks.
+          if ratios["yamada_s"] > 1.20:
+              raise SystemExit(f"Yamada end-to-end regression: {ratios['yamada_s']:.3f}x")
+          if ratios["projection_s"] > 1.20:
+              raise SystemExit(f"projection regression: {ratios['projection_s']:.3f}x")
+          if ratios["cleanup_s"] > 3.0:
+              raise SystemExit(f"cleanup regression too large: {ratios['cleanup_s']:.3f}x")
+          PY
