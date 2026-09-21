@@ -486,11 +486,11 @@ def smooth_edges(
     epsilon: float = 0.0,
     copy: bool = True,
 ) -> nx.MultiGraph:
-    """Simplify edge polylines without returning a geometrically invalid embedding.
+    """Simplify edge polylines without changing the embedded topology.
 
-    RDP remains the fast candidate simplifier. The complete candidate graph is
-    then checked for unmodeled 3-D contacts. If simplification introduces such
-    a contact, the original normalized geometry is returned unchanged.
+    The fast RDP proposal is accepted only when the resulting graph still
+    satisfies the strict 3-D embedding check. If the shortcut would create a
+    self/inter-edge contact, the normalized original geometry is returned.
     """
     epsilon = float(epsilon)
     if not np.isfinite(epsilon) or epsilon < 0.0:
@@ -501,25 +501,23 @@ def smooth_edges(
         return original
 
     candidate = original.copy()
-    for u, v, key, data in candidate.edges(keys=True, data=True):
-        points = np.asarray(data["pts"], dtype=float)
-        if len(points) <= 2:
+    for u, v, key, pts in candidate.edges(keys=True, data="pts"):
+        if pts is None:
             continue
-        reduced = np.asarray(
-            fastrdp.rdp(points, epsilon=epsilon),
-            dtype=float,
-        )
-        if len(reduced) < 2:
+        pts_arr = np.asarray(pts, dtype=float)
+        if pts_arr.ndim != 2 or pts_arr.shape[0] < 3:
             continue
-        reduced[0] = candidate.nodes[u]["pos"]
-        reduced[-1] = candidate.nodes[v]["pos"]
-        data["pts"] = reduced
 
-    strict_issues = validate_embedding(
-        candidate,
-        check_geometry=True,
-    )
-    if strict_issues:
+        simplified = fastrdp.rdpN(pts_arr, epsilon)
+        candidate.edges[u, v, key]["pts"] = oriented_edge_polyline(
+            candidate,
+            u,
+            v,
+            key,
+            {"pts": simplified},
+        )
+
+    if validate_embedding(candidate, check_geometry=True):
         return original
     return candidate
 
