@@ -757,13 +757,15 @@ class MaterialFermiSurface(NodalSkeleton):
         args = (
             smooth_epsilon,
             simplify,
-            id(skeleton_image),
+            None,
             force,
             limit,
             nprev,
         )
+        use_cache = skeleton_image is None
         if (
-            self.skeleton_graph_cache is not None
+            use_cache
+            and self.skeleton_graph_cache is not None
             and self.skeleton_graph_cache_args == args
         ):
             return self.skeleton_graph_cache
@@ -801,8 +803,9 @@ class MaterialFermiSurface(NodalSkeleton):
         graph.graph["is_trivalent"] = is_trivalent(graph)
         self.is_graph_trivalent = graph.graph["is_trivalent"]
 
-        self.skeleton_graph_cache = graph
-        self.skeleton_graph_cache_args = args
+        if use_cache:
+            self.skeleton_graph_cache = graph
+            self.skeleton_graph_cache_args = args
         return graph
 
     @property
