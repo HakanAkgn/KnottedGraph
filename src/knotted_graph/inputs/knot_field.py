@@ -95,9 +95,16 @@ class KnotFunction:
 
     @classmethod
     def torus(cls, p: int, q: int, *, name: str | None = None) -> "KnotFunction":
+        if (
+            isinstance(p, (bool, np.bool_))
+            or isinstance(q, (bool, np.bool_))
+            or not isinstance(p, (int, np.integer))
+            or not isinstance(q, (int, np.integer))
+        ):
+            raise AssertionError("p and q must be positive integers")
         p, q = int(p), int(q)
         if min(p, q) < 1:
-            raise ValueError("p and q must be positive")
+            raise AssertionError("p and q must be positive integers")
         polynomial = SemiholomorphicPolynomial({(p, 0, 0): 1.0, (0, q, 0): -1.0})
         return cls.from_semiholomorphic(
             polynomial, name=name or f"T({p},{q})", expected_components=gcd(p, q),
