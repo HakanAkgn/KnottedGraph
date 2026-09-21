@@ -90,7 +90,12 @@ def _dimensions(dimension: int | Sequence[int]) -> tuple[int, int, int]:
     if isinstance(dimension, (int, np.integer)):
         values = (int(dimension),) * 3
     else:
-        values = tuple(dimension)
+        try:
+            values = tuple(dimension)
+        except TypeError as exc:
+            raise AssertionError(
+                "dimension must be an int or three integers >= 2"
+            ) from exc
         if (
             len(values) != 3
             or any(
