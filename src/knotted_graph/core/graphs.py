@@ -24,34 +24,28 @@ def is_trivalent(G):
 
 
 def BouquetGraph(n):
-    """
-    Construct the Bouquet_n graph.
-    
-    Parameters:
-      n : int
-         The number of petals in the Bouquet_n graph.
-    
-    Returns:
-      A NetworkX MultiGraph representing the Bouquet_n graph.
-    """
-    edge_list = [(0, 0) for _ in range(n)]
-    G = nx.from_edgelist(edge_list, nx.MultiGraph)
+    """Construct the bouquet with one vertex and ``n`` loop edges."""
+    if isinstance(n, bool) or not isinstance(n, int):
+        raise TypeError("n must be a non-negative integer")
+    if n < 0:
+        raise ValueError("n must be a non-negative integer")
+    G = nx.MultiGraph()
+    G.add_node(0)
+    for _ in range(n):
+        G.add_edge(0, 0)
     return G
 
 
 def ThetaGraph(n):
-    """
-    Construct the Theta_n graph.
-    
-    Parameters:
-      n : int
-         The number of edges in the Theta_n graph.
-    
-    Returns:
-      A NetworkX MultiGraph representing the Theta_n graph.
-    """
-    edge_list = [(0, 1) for _ in range(n)]
-    G = nx.from_edgelist(edge_list, nx.MultiGraph)
+    """Construct the two-vertex theta multigraph with ``n`` parallel edges."""
+    if isinstance(n, bool) or not isinstance(n, int):
+        raise TypeError("n must be a non-negative integer")
+    if n < 0:
+        raise ValueError("n must be a non-negative integer")
+    G = nx.MultiGraph()
+    G.add_nodes_from((0, 1))
+    for _ in range(n):
+        G.add_edge(0, 1)
     return G
 
 
@@ -65,7 +59,10 @@ def weisfeiler_lehman_multigraph_hash(
         ):
         """Collapse a (multi)graph into a simple Graph, recording multiplicity."""
         if not g_multi.is_multigraph():
-            return g_multi  # already simple, nothing to do
+            g_simple = g_multi.copy()
+            for u, v in g_simple.edges():
+                g_simple[u][v]["m"] = 1
+            return g_simple
 
         g_simple = nx.Graph() if isinstance(g_multi, nx.MultiGraph) else nx.DiGraph()
         g_simple.add_nodes_from(g_multi.nodes())
