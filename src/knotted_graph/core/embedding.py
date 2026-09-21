@@ -232,33 +232,45 @@ def smooth_edges(
 def remove_leaf_nodes(G: nx.MultiGraph) -> nx.MultiGraph:
     """Remove degree-1 leaves without deleting connected components.
 
-    Each connected component is reduced independently. If iterative leaf
-    removal would erase a tree component entirely, one deterministic
-    representative vertex is retained so the component's homotopy type and
-    connected-component count are preserved.
+    Components are labelled once before pruning. If all surviving vertices of
+    one component are leaves in an iteration, one deterministic representative
+    is retained. This preserves component count without per-component graph
+    copies or repeated connectivity searches.
     """
 
     H = G.copy()
-    result = nx.MultiGraph()
-    result.graph.update(H.graph)
+    component_of: dict[Any, int] = {}
+    live_count: dict[int, int] = {}
+    for component_id, nodes in enumerate(nx.connected_components(H)):
+        component_nodes = list(nodes)
+        live_count[component_id] = len(component_nodes)
+        for node in component_nodes:
+            component_of[node] = component_id
 
-    for component_nodes in nx.connected_components(H):
-        component = H.subgraph(component_nodes).copy()
-        while True:
-            leaves = [node for node, degree in component.degree() if degree == 1]
-            if not leaves:
-                break
-            if len(leaves) == component.number_of_nodes():
-                keep = min(component.nodes(), key=repr)
-                attrs = dict(component.nodes[keep])
-                component.clear()
-                component.add_node(keep, **attrs)
-                break
-            component.remove_nodes_from(leaves)
+    while True:
+        leaves = [node for node, degree in H.degree() if degree == 1]
+        if not leaves:
+            break
 
-        result = nx.compose(result, component)
+        leaves_by_component: dict[int, list[Any]] = {}
+        for node in leaves:
+            leaves_by_component.setdefault(component_of[node], []).append(node)
 
-    return result
+        to_remove: list[Any] = []
+        for component_id, component_leaves in leaves_by_component.items():
+            if len(component_leaves) == live_count[component_id]:
+                keep = min(component_leaves, key=repr)
+                component_leaves = [
+                    node for node in component_leaves if node != keep
+                ]
+            to_remove.extend(component_leaves)
+            live_count[component_id] -= len(component_leaves)
+
+        if not to_remove:
+            break
+        H.remove_nodes_from(to_remove)
+
+    return H
 
 
 def contract_short_edges(
