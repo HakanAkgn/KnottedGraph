@@ -3,9 +3,9 @@ from __future__ import annotations
 import logging
 from typing import Any, Sequence
 
-import fastrdp
 import networkx as nx
 import numpy as np
+import fastrdp
 from numpy.typing import ArrayLike, NDArray
 
 __all__ = [
@@ -35,6 +35,36 @@ class EmbeddingValidationError(ValueError):
         super().__init__("; ".join(self.issues))
 
 
+_FLOAT_REL_TOL = 64.0 * np.finfo(float).eps
+_ENDPOINT_REL_TOL = 1e-9
+
+
+def _point_scale(*points: np.ndarray) -> float:
+    """Return a translation-invariant local scale for geometric comparisons."""
+    arrays = [np.asarray(point, dtype=float).reshape(-1, 3) for point in points]
+    stacked = np.vstack(arrays)
+    if len(stacked) <= 1:
+        return 1.0
+    center = stacked.mean(axis=0)
+    scale = float(np.max(np.linalg.norm(stacked - center, axis=1)))
+    return scale if np.isfinite(scale) and scale > 0.0 else 1.0
+
+
+def _points_close(
+    left: np.ndarray,
+    right: np.ndarray,
+    *,
+    scale: float,
+    rel_tol: float = _ENDPOINT_REL_TOL,
+) -> bool:
+    """Compare points using local extent rather than absolute coordinate size."""
+    distance = float(
+        np.linalg.norm(np.asarray(left, dtype=float) - np.asarray(right, dtype=float))
+    )
+    tolerance = max(_FLOAT_REL_TOL * scale, rel_tol * scale)
+    return distance <= tolerance
+
+
 def as_point3(value: Any, label: str) -> np.ndarray:
     """Return *value* as a finite 3D point."""
 
@@ -59,14 +89,26 @@ def as_polyline(value: Any, label: str) -> np.ndarray:
     return points.copy()
 
 
-def drop_consecutive_duplicates(points: np.ndarray, *, atol: float = 1e-10) -> np.ndarray:
-    """Drop adjacent duplicate points from a polyline."""
+def drop_consecutive_duplicates(
+    points: np.ndarray,
+    *,
+    atol: float | None = None,
+) -> np.ndarray:
+    """Drop only numerically unresolved adjacent samples from a polyline."""
 
+    points = np.asarray(points, dtype=float)
     if len(points) == 0:
         return points
+    if atol is None:
+        threshold = _FLOAT_REL_TOL * _point_scale(points)
+    else:
+        threshold = float(atol)
+        if not np.isfinite(threshold) or threshold < 0.0:
+            raise ValueError("atol must be finite and non-negative")
+
     keep = [0]
     for index in range(1, len(points)):
-        if not np.allclose(points[index], points[keep[-1]], atol=atol, rtol=0.0):
+        if float(np.linalg.norm(points[index] - points[keep[-1]])) > threshold:
             keep.append(index)
     return points[np.asarray(keep, dtype=int)]
 
@@ -101,9 +143,200 @@ def oriented_edge_polyline(
     return points
 
 
-def validate_embedding(graph: nx.MultiGraph) -> list[str]:
-    """Return issues for a normalizable embedded ``MultiGraph(pos/pts)``."""
+def _point_segment_distance(
+    point: np.ndarray,
+    start: np.ndarray,
+    end: np.ndarray,
+) -> float:
+    direction = end - start
+    denom = float(np.dot(direction, direction))
+    if denom <= np.finfo(float).tiny:
+        return float(np.linalg.norm(point - start))
+    t = float(np.clip(np.dot(point - start, direction) / denom, 0.0, 1.0))
+    return float(np.linalg.norm(point - (start + t * direction)))
 
+
+def _segment_segment_closest(
+    a: np.ndarray,
+    b: np.ndarray,
+    c: np.ndarray,
+    d: np.ndarray,
+) -> tuple[float, np.ndarray, np.ndarray]:
+    """Return distance and closest points for two closed 3-D segments."""
+    u = b - a
+    v = d - c
+    w = a - c
+    aa = float(np.dot(u, u))
+    bb = float(np.dot(u, v))
+    cc = float(np.dot(v, v))
+    dd = float(np.dot(u, w))
+    ee = float(np.dot(v, w))
+    tiny = np.finfo(float).tiny
+
+    if aa <= tiny and cc <= tiny:
+        return float(np.linalg.norm(a - c)), a, c
+    if aa <= tiny:
+        t = float(np.clip(ee / cc, 0.0, 1.0))
+        q = c + t * v
+        return float(np.linalg.norm(a - q)), a, q
+    if cc <= tiny:
+        s = float(np.clip(-dd / aa, 0.0, 1.0))
+        p = a + s * u
+        return float(np.linalg.norm(p - c)), p, c
+
+    denom = aa * cc - bb * bb
+    if abs(denom) > _FLOAT_REL_TOL * max(aa * cc, tiny):
+        s = float(np.clip((bb * ee - cc * dd) / denom, 0.0, 1.0))
+    else:
+        s = 0.0
+    t = (bb * s + ee) / cc
+    if t < 0.0:
+        t = 0.0
+        s = float(np.clip(-dd / aa, 0.0, 1.0))
+    elif t > 1.0:
+        t = 1.0
+        s = float(np.clip((bb - dd) / aa, 0.0, 1.0))
+
+    p = a + s * u
+    q = c + t * v
+    return float(np.linalg.norm(p - q)), p, q
+
+
+def _geometric_embedding_issues(
+    graph: nx.MultiGraph,
+    positions: dict[Any, np.ndarray],
+    polylines: dict[tuple[Any, Any, Any], np.ndarray],
+) -> list[str]:
+    """Detect 3-D contacts that are not represented by graph incidence.
+
+    A sweep along the first coordinate provides a cheap broad phase, so strict
+    validation remains practical for densely sampled polylines.
+    """
+    if not polylines:
+        return []
+
+    scale = _point_scale(*positions.values(), *polylines.values())
+    tolerance = max(_FLOAT_REL_TOL * scale, 1e-10 * scale)
+    issues: list[str] = []
+    segments: list[
+        tuple[tuple[Any, Any, Any], int, np.ndarray, np.ndarray]
+    ] = []
+
+    for edge_ref, pts in polylines.items():
+        for index in range(len(pts) - 1):
+            segments.append((edge_ref, index, pts[index], pts[index + 1]))
+
+    if segments:
+        mins = np.asarray(
+            [np.minimum(a, b) for _, _, a, b in segments],
+            dtype=float,
+        )
+        maxs = np.asarray(
+            [np.maximum(a, b) for _, _, a, b in segments],
+            dtype=float,
+        )
+        order = np.argsort(mins[:, 0], kind="stable")
+        active: list[int] = []
+
+        for current_index in order.tolist():
+            current_min_x = mins[current_index, 0]
+            active = [
+                index
+                for index in active
+                if maxs[index, 0] + tolerance >= current_min_x
+            ]
+
+            right_ref, right_seg, c, d = segments[current_index]
+            ru, rv, _ = right_ref
+
+            for left_index in active:
+                if np.any(maxs[left_index, 1:] + tolerance < mins[current_index, 1:]):
+                    continue
+                if np.any(maxs[current_index, 1:] + tolerance < mins[left_index, 1:]):
+                    continue
+
+                left_ref, left_seg, a, b = segments[left_index]
+                lu, lv, _ = left_ref
+                if left_ref == right_ref:
+                    left_pts = polylines[left_ref]
+                    adjacent = abs(left_seg - right_seg) <= 1
+                    closed_adjacent = (
+                        lu == lv
+                        and {left_seg, right_seg} == {0, len(left_pts) - 2}
+                    )
+                    if adjacent or closed_adjacent:
+                        continue
+
+                distance, p, q = _segment_segment_closest(a, b, c, d)
+                if distance > tolerance:
+                    continue
+
+                common_nodes = set((lu, lv)).intersection((ru, rv))
+                permitted = False
+                for node in common_nodes:
+                    node_pos = positions.get(node)
+                    if node_pos is None:
+                        continue
+                    if (
+                        np.linalg.norm(p - node_pos) <= tolerance
+                        and np.linalg.norm(q - node_pos) <= tolerance
+                    ):
+                        left_other = (
+                            b if np.linalg.norm(a - node_pos) <= tolerance else a
+                        )
+                        right_other = (
+                            d if np.linalg.norm(c - node_pos) <= tolerance else c
+                        )
+                        if (
+                            _point_segment_distance(left_other, c, d) > tolerance
+                            and _point_segment_distance(right_other, a, b) > tolerance
+                        ):
+                            permitted = True
+                            break
+
+                if permitted:
+                    continue
+
+                issues.append(
+                    f"edges {left_ref!r} and {right_ref!r} have an unmodeled 3D contact"
+                )
+                if len(issues) >= 20:
+                    return issues
+
+            active.append(current_index)
+
+    # Vectorized broad phase for vertex-edge contacts. Only the very small
+    # candidate set enters the exact point-segment calculation.
+    if segments:
+        expanded_mins = mins - tolerance
+        expanded_maxs = maxs + tolerance
+        for node, point in positions.items():
+            candidates = np.flatnonzero(
+                np.all(point >= expanded_mins, axis=1)
+                & np.all(point <= expanded_maxs, axis=1)
+            )
+            for segment_index in candidates.tolist():
+                edge_ref, _, start, end = segments[segment_index]
+                u, v, _ = edge_ref
+                if node in (u, v):
+                    continue
+                if _point_segment_distance(point, start, end) <= tolerance:
+                    issues.append(
+                        f"edge {edge_ref!r} passes through unincident vertex {node!r}"
+                    )
+                    break
+            if len(issues) >= 20:
+                return issues
+
+    return issues
+
+
+def validate_embedding(
+    graph: nx.MultiGraph,
+    *,
+    check_geometry: bool = True,
+) -> list[str]:
+    """Return issues for an embedded MultiGraph(pos/pts)."""
     issues: list[str] = []
     if not isinstance(graph, nx.MultiGraph):
         return ["graph is not a networkx.MultiGraph"]
@@ -111,35 +344,70 @@ def validate_embedding(graph: nx.MultiGraph) -> list[str]:
         issues.append("graph must be undirected")
     if graph.number_of_nodes() == 0:
         issues.append("graph has no nodes")
-    if graph.number_of_edges() == 0:
-        issues.append("graph has no edges")
+        return issues
 
     valid_positions: dict[Any, np.ndarray] = {}
+    valid_polylines: dict[tuple[Any, Any, Any], np.ndarray] = {}
+
     for node, data in graph.nodes(data=True):
         if "pos" not in data:
             issues.append(f"node {node!r} is missing 'pos'")
             continue
         try:
-            valid_positions[node] = as_point3(data["pos"], f"node {node!r} pos")
+            valid_positions[node] = as_point3(
+                data["pos"], f"node {node!r} pos"
+            )
         except ValueError as exc:
             issues.append(str(exc))
 
     for u, v, key, data in graph.edges(keys=True, data=True):
-        if data.get("pts") is None:
-            continue
-        try:
-            pts = as_polyline(data["pts"], f"edge {(u, v, key)!r} pts")
-        except ValueError as exc:
-            issues.append(str(exc))
-            continue
+        pts: np.ndarray | None = None
+        if data.get("pts") is not None:
+            try:
+                pts = as_polyline(
+                    data["pts"], f"edge {(u, v, key)!r} pts"
+                )
+            except ValueError as exc:
+                issues.append(str(exc))
+                continue
+
         if u not in valid_positions or v not in valid_positions:
             continue
+
+        if pts is None:
+            pts = np.vstack([valid_positions[u], valid_positions[v]])
+
         u_pos = valid_positions[u]
         v_pos = valid_positions[v]
-        direct = np.allclose(pts[0], u_pos) and np.allclose(pts[-1], v_pos)
-        reverse = np.allclose(pts[0], v_pos) and np.allclose(pts[-1], u_pos)
+        scale = _point_scale(pts, u_pos, v_pos)
+        direct = (
+            _points_close(pts[0], u_pos, scale=scale)
+            and _points_close(pts[-1], v_pos, scale=scale)
+        )
+        reverse = (
+            _points_close(pts[0], v_pos, scale=scale)
+            and _points_close(pts[-1], u_pos, scale=scale)
+        )
         if not (direct or reverse):
-            issues.append(f"edge {(u, v, key)!r} endpoints do not match node positions")
+            issues.append(
+                f"edge {(u, v, key)!r} endpoints do not match node positions"
+            )
+            continue
+
+        if len(drop_consecutive_duplicates(pts)) < 2:
+            issues.append(
+                f"edge {(u, v, key)!r} collapsed to fewer than two distinct points"
+            )
+            continue
+
+        valid_polylines[(u, v, key)] = pts
+
+    if check_geometry and not issues:
+        issues.extend(
+            _geometric_embedding_issues(
+                graph, valid_positions, valid_polylines
+            )
+        )
 
     return issues
 
@@ -149,10 +417,12 @@ def ensure_embedding(
     *,
     copy: bool = True,
     normalize: bool = True,
+    check_geometry: bool = False,
 ) -> nx.MultiGraph:
     """Validate and optionally normalize an embedded spatial graph."""
-
-    issues = validate_embedding(graph)
+    issues = validate_embedding(
+        graph, check_geometry=check_geometry
+    )
     if issues:
         raise EmbeddingValidationError(issues)
 
@@ -164,15 +434,16 @@ def ensure_embedding(
         data["pos"] = as_point3(data["pos"], "node 'pos'")
 
     for u, v, key, data in result.edges(keys=True, data=True):
-        data["pts"] = oriented_edge_polyline(result, u, v, key, data)
+        data["pts"] = oriented_edge_polyline(
+            result, u, v, key, data
+        )
 
     return result
 
 
 def is_embedding(graph: nx.MultiGraph) -> bool:
-    """Return whether *graph* satisfies the embedded graph contract."""
-
-    return not validate_embedding(graph)
+    """Return whether graph satisfies the strict embedded-graph contract."""
+    return not validate_embedding(graph, check_geometry=True)
 
 
 def idx_to_coord(
@@ -193,7 +464,12 @@ def get_all_edge_pts(G: nx.MultiGraph) -> NDArray:
     """Get all edge points from the graph as a single array."""
 
     graph = ensure_embedding(G, copy=False, normalize=False)
-    edge_pts_list = [oriented_edge_polyline(graph, u, v, k, data) for u, v, k, data in graph.edges(keys=True, data=True)]
+    edge_pts_list = [
+        oriented_edge_polyline(graph, u, v, k, data)
+        for u, v, k, data in graph.edges(keys=True, data=True)
+    ]
+    if not edge_pts_list:
+        return np.empty((0, 3), dtype=float)
     return np.concatenate(edge_pts_list)
 
 
@@ -208,10 +484,22 @@ def smooth_edges(
     epsilon: float = 0.0,
     copy: bool = True,
 ) -> nx.MultiGraph:
-    """Simplify edge polylines with Ramer-Douglas-Peucker smoothing."""
+    """Simplify edge polylines without changing the embedded topology.
 
-    H = ensure_embedding(G, copy=copy, normalize=True)
-    for u, v, key, pts in H.edges(keys=True, data="pts"):
+    The fast RDP proposal is accepted only when the resulting graph still
+    satisfies the strict 3-D embedding check. If the shortcut would create a
+    self/inter-edge contact, the normalized original geometry is returned.
+    """
+    epsilon = float(epsilon)
+    if not np.isfinite(epsilon) or epsilon < 0.0:
+        raise ValueError("epsilon must be finite and non-negative")
+
+    original = ensure_embedding(G, copy=copy, normalize=True)
+    if epsilon == 0.0 or original.number_of_edges() == 0:
+        return original
+
+    candidate = original.copy()
+    for u, v, key, pts in candidate.edges(keys=True, data="pts"):
         if pts is None:
             continue
         pts_arr = np.asarray(pts, dtype=float)
@@ -219,14 +507,17 @@ def smooth_edges(
             continue
 
         simplified = fastrdp.rdpN(pts_arr, epsilon)
-        H[u][v][key]["pts"] = oriented_edge_polyline(
-            H,
+        candidate.edges[u, v, key]["pts"] = oriented_edge_polyline(
+            candidate,
             u,
             v,
             key,
             {"pts": simplified},
         )
-    return H
+
+    if validate_embedding(candidate, check_geometry=True):
+        return original
+    return candidate
 
 
 def remove_leaf_nodes(G: nx.MultiGraph) -> nx.MultiGraph:
@@ -279,100 +570,125 @@ def contract_short_edges(
     *,
     copy: bool = True,
 ) -> nx.MultiGraph:
-    """Contract edges whose endpoint distance is below ``min_length``.
+    """Contract short non-loop edge occurrences without losing multigraph topology."""
 
-    This is useful after skeletonization, where voxelization can introduce tiny
-    spurious edges between nearby junction nodes.  The operation preserves
-    embedded edge polylines by moving incident edge endpoints onto the merged
-    vertex.
-    """
+    min_length = float(min_length)
+    if not np.isfinite(min_length) or min_length < 0.0:
+        raise ValueError("min_length must be finite and non-negative")
 
     H = ensure_embedding(G, copy=copy, normalize=True)
 
     def endpoint_distance(u: Any, v: Any) -> float:
         return float(np.linalg.norm(H.nodes[u]["pos"] - H.nodes[v]["pos"]))
 
-    def relink_edge_points(
+    def safe_key(u: Any, v: Any, key: Any) -> Any:
+        if not H.has_edge(u, v, key):
+            return key
+        suffix = 1
+        candidate = ("contracted", key, suffix)
+        while H.has_edge(u, v, candidate):
+            suffix += 1
+            candidate = ("contracted", key, suffix)
+        return candidate
+
+    def move_endpoint(
         pts: Any,
         old_endpoint: np.ndarray,
         new_endpoint: np.ndarray,
         other_endpoint: np.ndarray,
     ) -> np.ndarray:
-        arr = np.asarray(pts, dtype=float)
-        if arr.ndim != 2 or arr.shape[1] != 3 or arr.shape[0] == 0:
+        arr = np.asarray(pts, dtype=float).copy()
+        if arr.ndim != 2 or arr.shape[1] != 3 or arr.shape[0] < 2:
             arr = np.vstack([old_endpoint, other_endpoint])
-
         if np.linalg.norm(arr[0] - old_endpoint) <= np.linalg.norm(arr[-1] - old_endpoint):
             arr[0] = new_endpoint
             arr[-1] = other_endpoint
         else:
             arr[-1] = new_endpoint
             arr[0] = other_endpoint
-
         return drop_consecutive_duplicates(arr)
 
+    def move_loop(
+        pts: Any,
+        old_endpoint: np.ndarray,
+        new_endpoint: np.ndarray,
+    ) -> np.ndarray:
+        arr = np.asarray(pts, dtype=float).copy()
+        if arr.ndim != 2 or arr.shape[1] != 3 or arr.shape[0] < 2:
+            arr = np.vstack([old_endpoint, old_endpoint])
+        arr[0] = new_endpoint
+        arr[-1] = new_endpoint
+        arr = drop_consecutive_duplicates(arr)
+        if len(arr) < 2:
+            arr = np.vstack([new_endpoint, new_endpoint])
+        return arr
+
     while True:
-        candidates: list[tuple[float, Any, Any]] = []
-        for u, v in H.edges():
+        candidates: list[tuple[float, str, str, Any, Any, Any]] = []
+        for u, v, key in H.edges(keys=True):
             if u == v:
                 continue
             length = endpoint_distance(u, v)
             if length < min_length:
-                candidates.append((length, u, v))
-
+                candidates.append((length, repr(u), repr(v), u, v, key))
         if not candidates:
             break
 
-        _, u, v = min(candidates, key=lambda item: item[0])
+        _, _, _, u, v, contracted_key = min(candidates)
         degree_u, degree_v = H.degree[u], H.degree[v]
         if degree_u > degree_v:
             keep, kill = u, v
         elif degree_v > degree_u:
             keep, kill = v, u
         else:
-            keep, kill = (u, v) if str(u) <= str(v) else (v, u)
+            keep, kill = (u, v) if repr(u) <= repr(v) else (v, u)
 
         keep_pos = np.asarray(H.nodes[keep]["pos"], dtype=float)
         kill_pos = np.asarray(H.nodes[kill]["pos"], dtype=float)
         merged_pos = 0.5 * (keep_pos + kill_pos)
-        H.nodes[keep]["pos"] = merged_pos
+        incident = list(H.edges(kill, keys=True, data=True))
+        keep_incident = list(H.edges(keep, keys=True, data=True))
 
-        for a, b, key, data in list(H.edges(keep, keys=True, data=True)):
+        H.nodes[keep]["pos"] = merged_pos
+        for a, b, key, data in keep_incident:
             if kill in (a, b):
                 continue
             other = b if a == keep else a
             other_pos = np.asarray(H.nodes[other]["pos"], dtype=float)
-            H[a][b][key]["pts"] = relink_edge_points(
-                data.get("pts", np.vstack([keep_pos, other_pos])),
-                old_endpoint=keep_pos,
-                new_endpoint=merged_pos,
-                other_endpoint=other_pos,
+            H.edges[a, b, key]["pts"] = move_endpoint(
+                data.get("pts"), keep_pos, merged_pos, other_pos
             )
 
-        incident_edges = list(H.edges(kill, keys=True, data=True))
-        for a, b, key, data in incident_edges:
+        contracted_removed = False
+        for a, b, key, data in incident:
             other = b if a == kill else a
             if H.has_edge(a, b, key):
                 H.remove_edge(a, b, key)
 
-            if other == keep:
+            if other == keep and key == contracted_key and not contracted_removed:
+                contracted_removed = True
+                continue
+
+            edge_data = dict(data or {})
+            if other == keep or other == kill:
+                edge_data["pts"] = move_loop(
+                    edge_data.get("pts"), kill_pos, merged_pos
+                )
+                new_key = safe_key(keep, keep, key)
+                H.add_edge(keep, keep, key=new_key, **edge_data)
                 continue
 
             other_pos = np.asarray(H.nodes[other]["pos"], dtype=float)
-            edge_data = dict(data or {})
-            edge_data["pts"] = relink_edge_points(
-                edge_data.get("pts", np.vstack([kill_pos, other_pos])),
-                old_endpoint=kill_pos,
-                new_endpoint=merged_pos,
-                other_endpoint=other_pos,
+            edge_data["pts"] = move_endpoint(
+                edge_data.get("pts"), kill_pos, merged_pos, other_pos
             )
-            H.add_edge(keep, other, **edge_data)
+            new_key = safe_key(keep, other, key)
+            H.add_edge(keep, other, key=new_key, **edge_data)
 
         if kill in H:
             H.remove_node(kill)
 
     return ensure_embedding(H, copy=False, normalize=True)
-
 
 def _append_edge_pts(path: list[np.ndarray], edge_pts: Any) -> None:
     if edge_pts is None or len(edge_pts) == 0:
@@ -393,10 +709,9 @@ def _append_edge_pts(path: list[np.ndarray], edge_pts: Any) -> None:
     )
 
 
-def _edge_tag(u: int, v: int, key: int) -> tuple[int, int, int]:
-    """Return a canonical tag for an undirected multiedge."""
-
-    return (u, v, key) if u <= v else (v, u, key)
+def _edge_tag(u: Any, v: Any, key: Any) -> tuple[Any, Any, Any]:
+    """Return a deterministic tag for an undirected multiedge."""
+    return (u, v, key) if repr(u) <= repr(v) else (v, u, key)
 
 
 def _has_cycles(G: nx.MultiGraph) -> bool:
@@ -460,47 +775,36 @@ def _collapse_component_with_junctions(
 
 def _collapse_cycle_component(
     G: nx.MultiGraph,
-    comp: set[int],
+    comp: set,
     H: nx.MultiGraph,
 ) -> None:
-    """Collapse a component with no junctions to a self-loop."""
+    """Collapse an Eulerian degree-two component to one embedded self-loop."""
 
-    rep = next((node for node in comp if G.degree(node) == 2), None) or next(iter(comp))
+    component = G.subgraph(comp).copy()
+    rep = min(comp, key=repr)
     H.add_node(rep, **G.nodes[rep])
 
-    if G.degree(rep) == 0:
+    if component.number_of_edges() == 0:
+        return
+    if not nx.is_eulerian(component):
+        _copy_component(G, comp, H)
         return
 
-    path_pts: list[np.ndarray] = [G.nodes[rep]["pos"]]
-    seen_edges: set[tuple[int, int, int]] = set()
+    path_pts: list[np.ndarray] = [np.asarray(G.nodes[rep]["pos"], dtype=float)]
+    source_edges: list[tuple[Any, Any, Any]] = []
+    for u, v, key in nx.eulerian_circuit(component, source=rep, keys=True):
+        attrs = G.edges[u, v, key]
+        _append_edge_pts(path_pts, attrs.get("pts", []))
+        source_edges.append((u, v, key))
 
-    previous, current = rep, next(iter(G.neighbors(rep)))
-
-    for key, attrs in G[previous][current].items():
-        tag = _edge_tag(previous, current, key)
-        if tag not in seen_edges:
-            seen_edges.add(tag)
-            _append_edge_pts(path_pts, attrs.get("pts", []))
-            break
-
-    while current != rep:
-        path_pts.append(G.nodes[current]["pos"])
-        next_candidates = [node for node in G.neighbors(current) if node != previous]
-        if not next_candidates:
-            break
-        nxt = next_candidates[0]
-
-        for key2, attrs2 in G[current][nxt].items():
-            tag2 = _edge_tag(current, nxt, key2)
-            if tag2 not in seen_edges:
-                seen_edges.add(tag2)
-                _append_edge_pts(path_pts, attrs2.get("pts", []))
-                break
-        previous, current = current, nxt
-
-    path_pts.append(G.nodes[rep]["pos"])
-    H.add_edge(rep, rep, pts=np.asarray(path_pts))
-
+    if not np.array_equal(path_pts[-1], path_pts[0]):
+        path_pts.append(path_pts[0].copy())
+    H.add_edge(
+        rep,
+        rep,
+        pts=np.asarray(path_pts),
+        source_edges=tuple(source_edges),
+    )
 
 def _copy_component(
     G: nx.MultiGraph,
@@ -542,4 +846,4 @@ def simplify_edges(G: nx.MultiGraph) -> nx.MultiGraph:
         else:
             _collapse_cycle_component(G, comp, H)
 
-    return nx.convert_node_labels_to_integers(H)
+    return H

@@ -50,8 +50,15 @@ def validate_coords(coords, *, min_points: int = 2) -> np.ndarray:
 
 
 def _coords_are_closed(coords: np.ndarray) -> bool:
-    return bool(np.allclose(coords[0], coords[-1]))
-
+    center = coords.mean(axis=0)
+    scale = float(np.max(np.linalg.norm(coords - center, axis=1)))
+    if not np.isfinite(scale) or scale <= 0.0:
+        scale = 1.0
+    tolerance = max(
+        64.0 * np.finfo(float).eps * scale,
+        1e-9 * scale,
+    )
+    return float(np.linalg.norm(coords[0] - coords[-1])) <= tolerance
 
 def _close_coords_direct(coords: np.ndarray) -> np.ndarray:
     if _coords_are_closed(coords):

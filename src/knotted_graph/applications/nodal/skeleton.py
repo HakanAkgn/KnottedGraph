@@ -129,18 +129,35 @@ class NodalSkeleton:
                              "of three coefficients for the Pauli matrices.")
 
         if k_symbols is None:
-            self.k_symbols = sorted(self.h_k.free_symbols, key=lambda s: s.name)
-            self.kx_symbol, self.ky_symbol, self.kz_symbol = self.k_symbols
-        elif len(k_symbols) == 3:
-            self.k_symbols = k_symbols
-            self.kx_symbol, self.ky_symbol, self.kz_symbol = k_symbols
+            inferred = sorted(self.h_k.free_symbols, key=lambda s: s.name)
+            if len(inferred) != 3:
+                raise ValueError(
+                    "Could not infer exactly three momentum symbols. "
+                    "Pass k_symbols=(kx, ky, kz) explicitly and substitute "
+                    "all non-momentum parameters."
+                )
+            self.k_symbols = tuple(inferred)
         else:
-            raise ValueError("`k_symbols` must be a tuple of three sympy"\
-                             " symbols (kx, ky, kz).")
+            if len(k_symbols) != 3:
+                raise ValueError(
+                    "k_symbols must contain exactly three symbols (kx, ky, kz)."
+                )
+            self.k_symbols = tuple(k_symbols)
+            extra = set(self.h_k.free_symbols) - set(self.k_symbols)
+            if extra:
+                raise ValueError(
+                    "Hamiltonian contains free symbols outside k_symbols. "
+                    "Substitute non-momentum parameters first: "
+                    f"{sorted(symbol.name for symbol in extra)}"
+                )
+        self.kx_symbol, self.ky_symbol, self.kz_symbol = self.k_symbols
 
         # check Hamiltonian properties
         self.is_Hermitian = sp.simplify(self.h_k - self.h_k.H) == sp.zeros(2, 2)
-        self.is_PT_symmetric = is_PT_symmetric(self.h_k)
+        self.is_PT_symmetric = is_PT_symmetric(
+            self.h_k,
+            k_symbols=self.k_symbols,
+        )
 
         # lambda functions of the bloch vector components
         self.bloch_vec_funcs = tuple(
@@ -149,18 +166,39 @@ class NodalSkeleton:
         )
 
         # plotting helpers
-        self.span = np.asarray(span)
-        self.dimension = dimension
-        self.spacing = np.diff(self.span, axis=1).squeeze() / (dimension-1)
+        if isinstance(dimension, (bool, np.bool_)) or not isinstance(
+            dimension, (int, np.integer)
+        ):
+            raise TypeError("dimension must be an integer >= 3")
+        self.dimension = int(dimension)
+        if self.dimension < 3:
+            raise ValueError("dimension must be at least 3")
+
+        self.span = np.asarray(span, dtype=float)
+        if self.span.shape != (3, 2) or not np.isfinite(self.span).all():
+            raise ValueError("span must be finite with shape (3, 2)")
+        if np.any(self.span[:, 1] <= self.span[:, 0]):
+            raise ValueError("each span upper bound must exceed its lower bound")
+
         self.axis_scale = np.asarray(axis_scale, dtype=float)
+        if self.axis_scale.shape != (3,) or not np.isfinite(self.axis_scale).all():
+            raise ValueError("axis_scale must contain three finite values")
+        if np.any(self.axis_scale <= 0.0):
+            raise ValueError("axis_scale entries must be strictly positive")
+
+        self.spacing = np.diff(self.span, axis=1).squeeze() / (self.dimension - 1)
         self.origin = self.span[:, 0]
 
         # set k-space spans and coordinates
-        self.kx_span, self.ky_span, self.kz_span = span
-        for axis, (mn, mx) in zip(('x', 'y', 'z'), span):
-            setattr(self, f'k{axis}_min', mn)
-            setattr(self, f'k{axis}_max', mx)
-            setattr(self, f'k{axis}_vals', np.linspace(mn, mx, dimension))
+        self.kx_span, self.ky_span, self.kz_span = tuple(map(tuple, self.span))
+        for axis, (mn, mx) in zip(("x", "y", "z"), self.span):
+            setattr(self, f"k{axis}_min", float(mn))
+            setattr(self, f"k{axis}_max", float(mx))
+            setattr(
+                self,
+                f"k{axis}_vals",
+                np.linspace(float(mn), float(mx), self.dimension),
+            )
 
         # Dense k-space coordinate grids are compatibility attributes and
         # are intentionally not materialized until explicitly accessed.
@@ -335,10 +373,15 @@ class NodalSkeleton:
 
     @property
     def _interior_mask(self) -> NDArray:
-        """The filled interior of the exceptional surface as a binary mask.
-        I.e. the region of *pure* imaginary energy."""
-        # return self.spectrum.imag != 0
-        return self.spectrum.real == 0
+        """Return the numerically resolved pure-imaginary-energy interior."""
+        spectrum = self.spectrum
+        scale = max(1.0, float(np.max(np.abs(spectrum))))
+        tolerance = 64.0 * np.finfo(float).eps * scale
+        return (
+            np.abs(spectrum.real) <= tolerance
+        ) & (
+            np.abs(spectrum.imag) > tolerance
+        )
 
 
     @cached_property
@@ -409,10 +452,14 @@ class NodalSkeleton:
             'pos' (index coordinates), and edge attributes include 'pts'
             (a list of index coordinates along the edge).
         """
-        # Check if the arguments match the cached ones
-        args = (smooth_epsilon, simplify, id(skeleton_image))
-        if self.skeleton_graph_cache is not None and \
-           self.skeleton_graph_cache_args == args:
+        # External arrays are mutable, so only cache internally generated skeletons.
+        args = (smooth_epsilon, simplify, None)
+        use_cache = skeleton_image is None
+        if (
+            use_cache
+            and self.skeleton_graph_cache is not None
+            and self.skeleton_graph_cache_args == args
+        ):
             return self.skeleton_graph_cache
 
         # Compute the graph
@@ -433,9 +480,10 @@ class NodalSkeleton:
         G.graph['is_trivalent'] = is_trivalent(G)
         self.is_graph_trivalent = G.graph['is_trivalent']
 
-        # cache the result
-        self.skeleton_graph_cache = G
-        self.skeleton_graph_cache_args = args
+        # Cache only the internally generated skeleton.
+        if use_cache:
+            self.skeleton_graph_cache = G
+            self.skeleton_graph_cache_args = args
         return G
 
 
@@ -960,11 +1008,11 @@ class NodalSkeleton:
 
         vol = self.fields_pv.copy()
         mask = np.where(vol.point_data['imag'] != 0)[0]
-        if orient_data:
+        if orient_data is not None:
             if not isinstance(orient, str):
                 orient = 'orient'
             vol.point_data[orient] = orient_data
-        if scale_data:
+        if scale_data is not None:
             if not isinstance(scale, str):
                 scale = 'scale'
             vol.point_data[scale] = scale_data
@@ -1219,7 +1267,7 @@ class NodalSkeleton:
         Parameters
         ----------
         rotation_angles : tuple[float], optional
-            The angles for the rotations in radians. Defaults to (0., 0., 0.).
+            The rotation angles in degrees. Defaults to (0., 0., 0.).
             See ``knotted_graph.projection.get_rotation_matrix`` for details.
         rotation_order : str, optional
             The order of rotations to apply. Defaults to 'ZYX'.

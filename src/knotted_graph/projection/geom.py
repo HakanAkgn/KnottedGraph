@@ -77,9 +77,18 @@ class Vertex:
     point: Point
     incident_arcs: List[Tuple[int, float]] = field(default_factory=list)
     
+    _transversality_tolerance: ClassVar[float] = 1e-10
+
     def add_incident_arc(self, arc_id: int, angle: float):
-        """Add an incident arc with its angle."""
-        self.incident_arcs.append((arc_id, angle))
+        """Add an incident arc and reject unresolved cyclic vertex order."""
+        value = float(angle)
+        for _, existing in self.incident_arcs:
+            distance = abs(float(np.arctan2(np.sin(value - existing), np.cos(value - existing))))
+            if distance <= self._transversality_tolerance:
+                raise ValueError(
+                    "Nongeneric projection: vertex incidences are numerically tangent."
+                )
+        self.incident_arcs.append((arc_id, value))
     
     @cached_property
     def ccw_ordered_arcs(self) -> List[int]:
@@ -172,20 +181,21 @@ class Crossing:
 class Arc:
     """An arc segment between vertices/crossings."""
     _id_counter: ClassVar[int] = 0
-    edge_key: str
+    edge_key: Any
     line: LineString
     start_type: str
     start_id: int
     end_type: str
     end_id: int
-    id: int = field(init=False)
+    id: int | None = None
 
     def __post_init__(self):
-        """Assign a unique ID after the object is created."""
-        self.id = Arc._id_counter
-        Arc._id_counter += 1
+        """Assign a compatibility ID only when the caller did not supply one."""
+        if self.id is None:
+            self.id = Arc._id_counter
+            Arc._id_counter += 1
 
     @classmethod
     def reset_counter(cls):
-        """Resets the global counter, useful for multiple independent runs."""
+        """Reset the compatibility counter used by direct Arc construction."""
         cls._id_counter = 0

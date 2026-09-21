@@ -509,6 +509,8 @@ def _validate_axis(values: Sequence[float], name: str) -> np.ndarray:
     arr = np.asarray(values, dtype=float)
     if arr.ndim != 1 or len(arr) == 0:
         raise ValueError(f"{name} must be non-empty and one-dimensional")
+    if not np.isfinite(arr).all():
+        raise ValueError(f"{name} must contain only finite values")
     return arr
 
 
@@ -835,8 +837,14 @@ def _one_vertex_graph() -> nx.MultiGraph:
 
 
 def _isolated_vertex_graph(count: int) -> nx.MultiGraph:
+    """Return exactly ``count`` isolated vertices, including zero."""
+    if isinstance(count, bool) or not isinstance(count, (int, np.integer)):
+        raise TypeError("count must be a non-negative integer")
+    count = int(count)
+    if count < 0:
+        raise ValueError("count must be a non-negative integer")
     graph = nx.MultiGraph()
-    for node in range(max(1, int(count))):
+    for node in range(count):
         graph.add_node(node, pos=(float(node), 0.0, 0.0))
     return graph
 
@@ -1039,11 +1047,17 @@ def _graph_from_skeleton_like(
     *,
     force_genus_zero_vertex: bool,
 ) -> nx.MultiGraph:
-    if force_genus_zero_vertex and hasattr(obj, "_interior_mask"):
+    topology = None
+    if hasattr(obj, "_interior_mask"):
         mask = np.asarray(obj._interior_mask, dtype=bool)
         topology = volume_topology(mask)
-        if topology.is_compact and topology.handle_rank == 0:
+        if (
+            force_genus_zero_vertex
+            and topology.is_compact
+            and topology.handle_rank == 0
+        ):
             return _isolated_vertex_graph(topology.boundary_components)
+
     try:
         graph = obj.skeleton_graph(**graph_options)
     except (EmbeddingValidationError, ValueError) as exc:
@@ -1051,25 +1065,21 @@ def _graph_from_skeleton_like(
         if "collapsed to fewer than two distinct points" in message:
             retry_options = dict(graph_options)
             retry_options["smooth_epsilon"] = 0
-            try:
-                graph = obj.skeleton_graph(**retry_options)
-            except (EmbeddingValidationError, ValueError):
-                return _one_vertex_graph()
-            if graph.number_of_edges() == 0:
-                return _one_vertex_graph()
-            return graph
+            return obj.skeleton_graph(**retry_options)
         if (
             "graph has no edges" in message
             or "skeleton image is empty" in message
             or "does not contain any True voxels" in message
             or "Skeletonization produced no points" in message
         ):
-            return _one_vertex_graph()
+            if topology is not None:
+                return _isolated_vertex_graph(topology.boundary_components)
+            if "graph has no edges" in message:
+                return _one_vertex_graph()
+            return nx.MultiGraph()
         raise
-    if graph.number_of_edges() == 0:
-        return _one_vertex_graph()
-    return graph
 
+    return graph
 
 def _graph_summary(graph: nx.MultiGraph) -> dict[str, Any]:
     nodes = graph.number_of_nodes()
@@ -1096,20 +1106,14 @@ def _compute_yamada(
     variable: sp.Symbol,
     yamada_options: dict[str, Any],
 ) -> sp.Expr:
+    """Compute the requested invariant without silently dropping embedding data."""
     from knotted_graph.invariants.yamada import compute_graph_yamada_polynomial
 
-    if graph.number_of_nodes() == 0:
-        raise ValueError("cannot compute Yamada polynomial for an empty graph")
     if graph.number_of_edges() == 0:
         return compute_graph_yamada_polynomial(graph, variable)
 
     from knotted_graph.projection import compute_yamada_polynomial
-
-    try:
-        return compute_yamada_polynomial(graph, variable, **yamada_options)
-    except Exception:
-        return compute_graph_yamada_polynomial(graph, variable)
-
+    return compute_yamada_polynomial(graph, variable, **yamada_options)
 
 def _phase_signature(
     graph: nx.MultiGraph,

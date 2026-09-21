@@ -43,53 +43,23 @@ def _is_hermitian_symbolic_or_numeric(
     *,
     atol: float = 1e-8,
 ) -> bool:
-    """Return whether ``matrix`` is Hermitian on the sampled real k-domain.
+    """Prove Hermiticity symbolically; never certify it from finitely many samples."""
 
-    The material examples include floating-point square-root/trigonometric
-    expressions.  For those, ``simplify(H-H.H)`` can leave harmless conjugates
-    unresolved or take a very long path through trigonometric simplification.
-    The symbolic check is kept as the first gate, and a deterministic numerical
-    check over the real k-domain handles the remaining Hermitian cases.
-    """
-
+    del span, atol
     diff = matrix - matrix.H
     zero = sp.zeros(matrix.rows, matrix.cols)
     try:
-        if diff.applyfunc(lambda value: sp.simplify(value)) == zero:
-            return True
-    except Exception:
-        pass
-
-    try:
-        funcs = [
-            [
-                sp.lambdify(k_symbols, diff[i, j], "numpy")
-                for j in range(matrix.cols)
-            ]
-            for i in range(matrix.rows)
-        ]
-        spans = np.asarray(span, dtype=float)
-        lo = spans[:, 0]
-        hi = spans[:, 1]
-        samples = np.vstack(
-            [
-                (lo + hi) / 2.0,
-                lo + 0.2113248654051871 * (hi - lo),
-                lo + 0.7886751345948129 * (hi - lo),
-                np.array([lo[0] + 0.37 * (hi[0] - lo[0]), lo[1] + 0.59 * (hi[1] - lo[1]), lo[2] + 0.73 * (hi[2] - lo[2])]),
-                np.array([lo[0] + 0.83 * (hi[0] - lo[0]), lo[1] + 0.31 * (hi[1] - lo[1]), lo[2] + 0.47 * (hi[2] - lo[2])]),
-            ]
+        simplified = diff.applyfunc(
+            lambda value: sp.simplify(sp.expand_complex(value))
         )
-        max_error = 0.0
-        for point in samples:
-            evaluated = np.empty((matrix.rows, matrix.cols), dtype=np.complex128)
-            for i in range(matrix.rows):
-                for j in range(matrix.cols):
-                    evaluated[i, j] = funcs[i][j](*point)
-            if not np.isfinite(evaluated).all():
-                return False
-            max_error = max(max_error, float(np.max(np.abs(evaluated))))
-        return max_error <= atol
+        if simplified == zero:
+            return True
+        decisions = [
+            simplified[i, j].equals(0)
+            for i in range(matrix.rows)
+            for j in range(matrix.cols)
+        ]
+        return all(decision is True for decision in decisions)
     except Exception:
         return False
 
@@ -197,22 +167,45 @@ class MaterialFermiSurface(NodalSkeleton):
             )
 
         band_pair = tuple(band_pair)
-        if len(band_pair) != 2 or band_pair[0] == band_pair[1]:
+        if len(band_pair) != 2:
+            raise ValueError("band_pair must be a tuple (i,j) with i != j.")
+        if any(
+            isinstance(index, (bool, np.bool_))
+            or not isinstance(index, (int, np.integer))
+            for index in band_pair
+        ):
+            raise TypeError("band_pair entries must be integer band indices.")
+        band_pair = tuple(int(index) for index in band_pair)
+        if band_pair[0] == band_pair[1]:
             raise ValueError("band_pair must be a tuple (i,j) with i != j.")
 
         self.band_pair = band_pair
         self.gap_tol = float(gap_tol)
+        if not np.isfinite(self.gap_tol) or self.gap_tol < 0.0:
+            raise ValueError("gap_tol must be finite and non-negative.")
         self.sort_by = str(sort_by)
         self.gap_mode = str(gap_mode)
+        if self.gap_mode not in {"abs", "real", "imag"}:
+            raise ValueError("gap_mode must be one of: abs, real, imag")
+        if isinstance(chunk_size, (bool, np.bool_)) or not isinstance(
+            chunk_size, (int, np.integer)
+        ):
+            raise TypeError("chunk_size must be a positive integer.")
         self.chunk_size = int(chunk_size)
         if self.chunk_size <= 0:
             raise ValueError("chunk_size must be a positive integer.")
 
+        if not isinstance(force_small_edge_contraction, (bool, np.bool_)):
+            raise TypeError("force_small_edge_contraction must be a boolean.")
         self.force_small_edge_contraction = bool(force_small_edge_contraction)
         self.small_edge_limit = float(small_edge_limit)
-        if self.small_edge_limit < 0:
-            raise ValueError("small_edge_limit must be >= 0.")
+        if not np.isfinite(self.small_edge_limit) or self.small_edge_limit < 0:
+            raise ValueError("small_edge_limit must be finite and >= 0.")
 
+        if isinstance(previous_n_edgepoint, (bool, np.bool_)) or not isinstance(
+            previous_n_edgepoint, (int, np.integer)
+        ):
+            raise TypeError("previous_n_edgepoint must be a non-negative integer.")
         self.previous_n_edgepoint = int(previous_n_edgepoint)
         if self.previous_n_edgepoint < 0:
             raise ValueError("previous_n_edgepoint must be >= 0.")
@@ -295,7 +288,7 @@ class MaterialFermiSurface(NodalSkeleton):
                 f"band_pair indices must be in [0,{self.n_bands - 1}]. "
                 f"Got {self.band_pair}."
             )
-        return int(i), int(j)
+        return i, j
 
     def _eval_H_chunk(
         self,
@@ -585,49 +578,68 @@ class MaterialFermiSurface(NodalSkeleton):
         u: Any,
         v: Any,
         *,
+        edge_key: Any | None = None,
         previous_n_edgepoint: int = 20,
     ) -> bool:
-        """Contract one edge using the legacy multiband endpoint treatment."""
+        """Contract one edge occurrence while preserving parallel edges and loops."""
         if u not in graph or v not in graph or u == v:
+            return False
+        keys = list(graph[u][v]) if graph.has_edge(u, v) else []
+        if not keys:
+            return False
+        if edge_key is None:
+            edge_key = min(keys, key=repr)
+        if edge_key not in graph[u][v]:
             return False
 
         du = graph.degree[u]
         dv = graph.degree[v]
-
         if du > dv:
             keep, kill = u, v
         elif dv > du:
             keep, kill = v, u
         else:
-            keep, kill = (
-                (u, v)
-                if str(u) <= str(v)
-                else (v, u)
-            )
+            keep, kill = (u, v) if repr(u) <= repr(v) else (v, u)
 
-        keep_pos = np.asarray(
-            graph.nodes[keep]["pos"],
-            dtype=float,
-        )
-        kill_pos = np.asarray(
-            graph.nodes[kill]["pos"],
-            dtype=float,
-        )
+        keep_pos = np.asarray(graph.nodes[keep]["pos"], dtype=float)
+        kill_pos = np.asarray(graph.nodes[kill]["pos"], dtype=float)
+        incident = list(graph.edges(kill, keys=True, data=True))
 
-        incident = list(
-            graph.edges(kill, keys=True, data=True)
-        )
+        def safe_key(left, right, key):
+            if not graph.has_edge(left, right, key):
+                return key
+            suffix = 1
+            candidate = ("contracted", key, suffix)
+            while graph.has_edge(left, right, candidate):
+                suffix += 1
+                candidate = ("contracted", key, suffix)
+            return candidate
 
+        def loop_points(pts):
+            arr = np.asarray(pts, dtype=float).copy()
+            if arr.ndim != 2 or arr.shape[1] != 3 or arr.shape[0] < 2:
+                arr = np.vstack([kill_pos, kill_pos])
+            arr[0] = keep_pos
+            arr[-1] = keep_pos
+            return arr
+
+        contracted_removed = False
         for a, b, key, data in incident:
             other = b if a == kill else a
-
             if graph.has_edge(a, b, key):
                 graph.remove_edge(a, b, key)
 
-            if other == keep:
+            if other == keep and key == edge_key and not contracted_removed:
+                contracted_removed = True
                 continue
 
             new_data = dict(data) if data is not None else {}
+            if other == keep or other == kill:
+                new_data["pts"] = loop_points(new_data.get("pts"))
+                graph.add_edge(
+                    keep, keep, key=safe_key(keep, keep, key), **new_data
+                )
+                continue
 
             if new_data.get("pts") is not None:
                 new_pts = self._smooth_move_endpoint_in_pts(
@@ -636,21 +648,10 @@ class MaterialFermiSurface(NodalSkeleton):
                     new_pos=keep_pos,
                     n_prev=previous_n_edgepoint,
                 )
-
                 arr = np.asarray(new_pts, dtype=float)
-                if (
-                    arr.ndim == 2
-                    and arr.shape[0] > 0
-                    and arr.shape[1] == 3
-                ):
-                    other_pos = np.asarray(
-                        graph.nodes[other]["pos"],
-                        dtype=float,
-                    )
-                    if (
-                        np.linalg.norm(arr[0] - keep_pos)
-                        <= np.linalg.norm(arr[-1] - keep_pos)
-                    ):
+                if arr.ndim == 2 and arr.shape[0] > 0 and arr.shape[1] == 3:
+                    other_pos = np.asarray(graph.nodes[other]["pos"], dtype=float)
+                    if np.linalg.norm(arr[0] - keep_pos) <= np.linalg.norm(arr[-1] - keep_pos):
                         arr[0] = keep_pos
                         arr[-1] = other_pos
                     else:
@@ -660,12 +661,14 @@ class MaterialFermiSurface(NodalSkeleton):
                 else:
                     new_data["pts"] = new_pts
 
-            graph.add_edge(keep, other, **new_data)
+            graph.add_edge(
+                keep, other, key=safe_key(keep, other, key), **new_data
+            )
 
         if kill in graph:
             graph.remove_node(kill)
-
         return True
+
 
     def _contract_small_edges(
         self,
@@ -687,8 +690,8 @@ class MaterialFermiSurface(NodalSkeleton):
             raise ValueError("previous_n_edgepoint must be >= 0.")
 
         while True:
-            short_edges: list[tuple[float, Any, Any]] = []
-            for u, v in graph.edges():
+            short_edges: list[tuple[float, str, str, Any, Any, Any]] = []
+            for u, v, key in graph.edges(keys=True):
                 if u == v:
                     continue
                 try:
@@ -699,22 +702,23 @@ class MaterialFermiSurface(NodalSkeleton):
 
                 length = float(np.linalg.norm(pu - pv_))
                 if length < small_edge_limit:
-                    short_edges.append((length, u, v))
+                    short_edges.append((length, repr(u), repr(v), u, v, key))
 
             if not short_edges:
                 break
 
-            short_edges.sort(key=lambda item: item[0])
-            _, u, v = short_edges[0]
+            short_edges.sort()
+            _, _, _, u, v, edge_key = short_edges[0]
             changed = self._contract_one_edge(
                 graph,
                 u,
                 v,
+                edge_key=edge_key,
                 previous_n_edgepoint=nprev,
             )
             if not changed:
                 try:
-                    graph.remove_edge(u, v)
+                    graph.remove_edge(u, v, edge_key)
                 except Exception:
                     break
 
@@ -754,13 +758,15 @@ class MaterialFermiSurface(NodalSkeleton):
         args = (
             smooth_epsilon,
             simplify,
-            id(skeleton_image),
+            None,
             force,
             limit,
             nprev,
         )
+        use_cache = skeleton_image is None
         if (
-            self.skeleton_graph_cache is not None
+            use_cache
+            and self.skeleton_graph_cache is not None
             and self.skeleton_graph_cache_args == args
         ):
             return self.skeleton_graph_cache
@@ -798,8 +804,9 @@ class MaterialFermiSurface(NodalSkeleton):
         graph.graph["is_trivalent"] = is_trivalent(graph)
         self.is_graph_trivalent = graph.graph["is_trivalent"]
 
-        self.skeleton_graph_cache = graph
-        self.skeleton_graph_cache_args = args
+        if use_cache:
+            self.skeleton_graph_cache = graph
+            self.skeleton_graph_cache_args = args
         return graph
 
     @property
