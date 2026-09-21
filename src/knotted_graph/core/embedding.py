@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from typing import Any, Sequence
 
-import fastrdp
 import networkx as nx
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
