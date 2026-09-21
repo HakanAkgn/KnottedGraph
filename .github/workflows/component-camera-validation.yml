@@ -44,6 +44,7 @@ jobs:
           import time
           import networkx as nx
           import numpy as np
+          from knotted_graph.core.embedding import remove_leaf_nodes
           from knotted_graph.projection.pd_code import select_projection
           from knotted_graph.projection.rotations import generate_isotopy_angles
 
@@ -85,9 +86,20 @@ jobs:
               warmup=1,
           )
           result = select_projection(graph, num_rotation_samples=13)
+
+          leaf_graph = nx.MultiGraph(nx.balanced_tree(3, 7))
+          for index in range(10):
+              leaf_graph.add_edge(index, (index + 1) % 10)
+          leaf_ms = 1e3 * median_seconds(
+              lambda: remove_leaf_nodes(leaf_graph),
+              repeats=20,
+              warmup=3,
+          )
+
           print(json.dumps({
               "sample_ms": sample_ms,
               "projection_ms": projection_ms,
+              "leaf_ms": leaf_ms,
               "selected_crossings": result.num_crossings,
           }))
           PY
@@ -100,10 +112,16 @@ jobs:
           base = json.load(open("/tmp/base-camera.json"))
           head = json.load(open("/tmp/head-camera.json"))
           projection_ratio = head["projection_ms"] / base["projection_ms"]
+          leaf_ratio = head["leaf_ms"] / base["leaf_ms"]
           print("projection runtime ratio head/base:", projection_ratio)
+          print("leaf cleanup runtime ratio head/base:", leaf_ratio)
           print("angle generation delta ms:", head["sample_ms"] - base["sample_ms"])
           if projection_ratio > 1.20:
               raise SystemExit(
                   f"projection sampling regressed by more than 20%: {projection_ratio:.3f}x"
+              )
+          if leaf_ratio > 1.20:
+              raise SystemExit(
+                  f"leaf cleanup regressed by more than 20%: {leaf_ratio:.3f}x"
               )
           PY
