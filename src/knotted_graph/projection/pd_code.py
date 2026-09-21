@@ -951,7 +951,12 @@ def sample_projections(
         name="num_rotation_samples",
     )
     rotation_order = _validate_rotation_order(rotation_order)
-    skeleton_graph = ensure_embedding(\n        skeleton_graph, copy=True, normalize=True, check_geometry=True\n    )
+    skeleton_graph = ensure_embedding(
+        skeleton_graph,
+        copy=True,
+        normalize=True,
+        check_geometry=True,
+    )
 
     errors: list[str] = []
     projections: list[ProjectionResult] = []
@@ -994,7 +999,12 @@ def select_projection(
     breaks ties deterministically.
     """
     rotation_order = _validate_rotation_order(rotation_order)
-    skeleton_graph = ensure_embedding(\n        skeleton_graph, copy=True, normalize=True, check_geometry=True\n    )
+    skeleton_graph = ensure_embedding(
+        skeleton_graph,
+        copy=True,
+        normalize=True,
+        check_geometry=True,
+    )
     exact_angles = _normalize_rotation_angles(rotation_angles)
     if exact_angles is not None:
         return _compute_projection(skeleton_graph, exact_angles, rotation_order)
