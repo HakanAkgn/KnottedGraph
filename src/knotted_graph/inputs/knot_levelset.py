@@ -85,14 +85,25 @@ class TubularConvergenceReport:
 
 
 def _dimensions(dimension: int | Sequence[int]) -> tuple[int, int, int]:
-    if isinstance(dimension, int):
-        values = (dimension,) * 3
+    if isinstance(dimension, (bool, np.bool_)):
+        raise AssertionError("dimension must be an int or three integers >= 2")
+    if isinstance(dimension, (int, np.integer)):
+        values = (int(dimension),) * 3
     else:
-        values = tuple(int(value) for value in dimension)
-    if len(values) != 3 or any(value < 2 for value in values):
-        raise ValueError("dimension must be an int or three integers >= 2")
+        values = tuple(dimension)
+        if (
+            len(values) != 3
+            or any(
+                isinstance(value, (bool, np.bool_))
+                or not isinstance(value, (int, np.integer))
+                for value in values
+            )
+        ):
+            raise AssertionError("dimension must be an int or three integers >= 2")
+        values = tuple(int(value) for value in values)
+    if any(value < 2 for value in values):
+        raise AssertionError("dimension must be an int or three integers >= 2")
     return values
-
 
 def touches_box_boundary(mask: np.ndarray) -> bool:
     return bool(
