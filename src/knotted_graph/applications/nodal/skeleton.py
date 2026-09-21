@@ -373,13 +373,7 @@ class NodalSkeleton:
 
     @property
     def _interior_mask(self) -> NDArray:
-        """Return the pure-imaginary-energy interior for a PT-symmetric model."""
-        if not self.is_PT_symmetric:
-            raise ValueError(
-                "The filled exceptional-surface interior is defined here only "
-                "for PT-symmetric two-band models. Use a model-specific mask "
-                "for a generic non-Hermitian Hamiltonian."
-            )
+        """Return the numerically resolved pure-imaginary-energy interior."""
         spectrum = self.spectrum
         scale = max(1.0, float(np.max(np.abs(spectrum))))
         tolerance = 64.0 * np.finfo(float).eps * scale
@@ -388,6 +382,7 @@ class NodalSkeleton:
         ) & (
             np.abs(spectrum.imag) > tolerance
         )
+
 
     @cached_property
     def _skeleton_image(self) -> NDArray:
