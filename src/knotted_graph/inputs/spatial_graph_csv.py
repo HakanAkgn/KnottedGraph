@@ -100,13 +100,27 @@ def _parse_points_json(
         payload = json.loads(value)
     except json.JSONDecodeError as exc:
         raise ValueError(f"edge {edge_id!r} has invalid points_json.") from exc
-    pts = as_polyline(payload, label=f"edge {edge_id!r} points_json")
-    if not np.allclose(pts[0], source_pos):
-        raise ValueError(f"edge {edge_id!r} points_json first point does not match source position.")
-    if not np.allclose(pts[-1], target_pos):
-        raise ValueError(f"edge {edge_id!r} points_json last point does not match target position.")
-    return pts
 
+    pts = as_polyline(payload, label=f"edge {edge_id!r} points_json")
+    stacked = np.vstack([pts, source_pos, target_pos])
+    center = stacked.mean(axis=0)
+    scale = float(np.max(np.linalg.norm(stacked - center, axis=1)))
+    if not np.isfinite(scale) or scale <= 0.0:
+        scale = 1.0
+    tolerance = max(
+        64.0 * np.finfo(float).eps * scale,
+        1e-9 * scale,
+    )
+
+    if float(np.linalg.norm(pts[0] - source_pos)) > tolerance:
+        raise ValueError(
+            f"edge {edge_id!r} points_json first point does not match source position."
+        )
+    if float(np.linalg.norm(pts[-1] - target_pos)) > tolerance:
+        raise ValueError(
+            f"edge {edge_id!r} points_json last point does not match target position."
+        )
+    return pts
 
 def validate_spatial_graph(graph: nx.MultiGraph) -> list[str]:
     """Return validation issues for a ``MultiGraph(pos/pts)`` object."""
