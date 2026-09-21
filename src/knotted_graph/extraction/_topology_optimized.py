@@ -52,7 +52,6 @@ def _trace_prepared(
         local = nx.relabel_nodes(local, mapping, copy=True)
         graph = nx.compose(graph, local)
         next_id += local.number_of_nodes()
-    graph.remove_nodes_from([node for node, degree in graph.degree() if degree == 0])
     return graph
 
 
