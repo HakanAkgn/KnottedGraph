@@ -5,6 +5,7 @@ from typing import Any, Sequence
 
 import networkx as nx
 import numpy as np
+import fastrdp
 from numpy.typing import ArrayLike, NDArray
 
 __all__ = [
@@ -206,7 +207,11 @@ def _geometric_embedding_issues(
     positions: dict[Any, np.ndarray],
     polylines: dict[tuple[Any, Any, Any], np.ndarray],
 ) -> list[str]:
-    """Detect 3-D contacts that are not represented by graph incidence."""
+    """Detect 3-D contacts that are not represented by graph incidence.
+
+    A sweep along the first coordinate provides a cheap broad phase, so strict
+    validation remains practical for densely sampled polylines.
+    """
     if not polylines:
         return []
 
@@ -221,68 +226,97 @@ def _geometric_embedding_issues(
         for index in range(len(pts) - 1):
             segments.append((edge_ref, index, pts[index], pts[index + 1]))
 
-    for left_index, (left_ref, left_seg, a, b) in enumerate(segments):
-        lu, lv, _ = left_ref
-        left_pts = polylines[left_ref]
-        for right_ref, right_seg, c, d in segments[left_index + 1 :]:
+    if segments:
+        mins = np.asarray(
+            [np.minimum(a, b) for _, _, a, b in segments],
+            dtype=float,
+        )
+        maxs = np.asarray(
+            [np.maximum(a, b) for _, _, a, b in segments],
+            dtype=float,
+        )
+        order = np.argsort(mins[:, 0], kind="stable")
+        active: list[int] = []
+
+        for current_index in order.tolist():
+            current_min_x = mins[current_index, 0]
+            active = [
+                index
+                for index in active
+                if maxs[index, 0] + tolerance >= current_min_x
+            ]
+
+            right_ref, right_seg, c, d = segments[current_index]
             ru, rv, _ = right_ref
 
-            if left_ref == right_ref:
-                adjacent = abs(left_seg - right_seg) <= 1
-                closed_adjacent = (
-                    lu == lv
-                    and {left_seg, right_seg} == {0, len(left_pts) - 2}
-                )
-                if adjacent or closed_adjacent:
+            for left_index in active:
+                if np.any(maxs[left_index, 1:] + tolerance < mins[current_index, 1:]):
+                    continue
+                if np.any(maxs[current_index, 1:] + tolerance < mins[left_index, 1:]):
                     continue
 
-            if np.any(np.maximum(a, b) + tolerance < np.minimum(c, d)):
-                continue
-            if np.any(np.maximum(c, d) + tolerance < np.minimum(a, b)):
-                continue
+                left_ref, left_seg, a, b = segments[left_index]
+                lu, lv, _ = left_ref
+                if left_ref == right_ref:
+                    left_pts = polylines[left_ref]
+                    adjacent = abs(left_seg - right_seg) <= 1
+                    closed_adjacent = (
+                        lu == lv
+                        and {left_seg, right_seg} == {0, len(left_pts) - 2}
+                    )
+                    if adjacent or closed_adjacent:
+                        continue
 
-            distance, p, q = _segment_segment_closest(a, b, c, d)
-            if distance > tolerance:
-                continue
-
-            common_nodes = set((lu, lv)).intersection((ru, rv))
-            permitted = False
-            for node in common_nodes:
-                node_pos = positions.get(node)
-                if node_pos is None:
+                distance, p, q = _segment_segment_closest(a, b, c, d)
+                if distance > tolerance:
                     continue
-                if (
-                    np.linalg.norm(p - node_pos) <= tolerance
-                    and np.linalg.norm(q - node_pos) <= tolerance
-                ):
-                    left_other = (
-                        b if np.linalg.norm(a - node_pos) <= tolerance else a
-                    )
-                    right_other = (
-                        d if np.linalg.norm(c - node_pos) <= tolerance else c
-                    )
+
+                common_nodes = set((lu, lv)).intersection((ru, rv))
+                permitted = False
+                for node in common_nodes:
+                    node_pos = positions.get(node)
+                    if node_pos is None:
+                        continue
                     if (
-                        _point_segment_distance(left_other, c, d) > tolerance
-                        and _point_segment_distance(right_other, a, b) > tolerance
+                        np.linalg.norm(p - node_pos) <= tolerance
+                        and np.linalg.norm(q - node_pos) <= tolerance
                     ):
-                        permitted = True
-                        break
+                        left_other = (
+                            b if np.linalg.norm(a - node_pos) <= tolerance else a
+                        )
+                        right_other = (
+                            d if np.linalg.norm(c - node_pos) <= tolerance else c
+                        )
+                        if (
+                            _point_segment_distance(left_other, c, d) > tolerance
+                            and _point_segment_distance(right_other, a, b) > tolerance
+                        ):
+                            permitted = True
+                            break
 
-            if permitted:
-                continue
+                if permitted:
+                    continue
 
-            issues.append(
-                f"edges {left_ref!r} and {right_ref!r} have an unmodeled 3D contact"
-            )
-            if len(issues) >= 20:
-                return issues
+                issues.append(
+                    f"edges {left_ref!r} and {right_ref!r} have an unmodeled 3D contact"
+                )
+                if len(issues) >= 20:
+                    return issues
 
+            active.append(current_index)
+
+    # Vertex-edge contacts are usually sparse; use an AABB rejection before the
+    # exact point-segment calculation.
     for node, point in positions.items():
         for edge_ref, pts in polylines.items():
             u, v, _ = edge_ref
             if node in (u, v):
                 continue
             for index in range(len(pts) - 1):
+                lo = np.minimum(pts[index], pts[index + 1]) - tolerance
+                hi = np.maximum(pts[index], pts[index + 1]) + tolerance
+                if np.any(point < lo) or np.any(point > hi):
+                    continue
                 if (
                     _point_segment_distance(
                         point, pts[index], pts[index + 1]
@@ -452,94 +486,42 @@ def smooth_edges(
     epsilon: float = 0.0,
     copy: bool = True,
 ) -> nx.MultiGraph:
-    """Simplify edge polylines without allowing topology-changing shortcuts."""
+    """Simplify edge polylines without returning a geometrically invalid embedding.
+
+    RDP remains the fast candidate simplifier. The complete candidate graph is
+    then checked for unmodeled 3-D contacts. If simplification introduces such
+    a contact, the original normalized geometry is returned unchanged.
+    """
     epsilon = float(epsilon)
     if not np.isfinite(epsilon) or epsilon < 0.0:
         raise ValueError("epsilon must be finite and non-negative")
 
-    H = ensure_embedding(G, copy=copy, normalize=True)
-    if epsilon == 0.0 or H.number_of_edges() == 0:
-        return H
+    original = ensure_embedding(G, copy=copy, normalize=True)
+    if epsilon == 0.0 or original.number_of_edges() == 0:
+        return original
 
-    from knotted_graph.layout.repulsive.decimation import (
-        DecimationOptions,
-        decimate_curve_network,
-    )
-
-    vertices: list[np.ndarray] = []
-    node_indices: dict[Any, int] = {}
-    for node, data in H.nodes(data=True):
-        node_indices[node] = len(vertices)
-        vertices.append(np.asarray(data["pos"], dtype=float))
-
-    edge_indices: dict[str, list[int]] = {}
-    edge_refs: dict[str, tuple[Any, Any, Any]] = {}
-    edge_order: list[str] = []
-
-    for edge_number, (u, v, key, data) in enumerate(
-        H.edges(keys=True, data=True)
-    ):
-        edge_id = f"edge_{edge_number}"
-        points = oriented_edge_polyline(H, u, v, key, data)
-        indices = [node_indices[u]]
-        for point in points[1:-1]:
-            vertices.append(np.asarray(point, dtype=float))
-            indices.append(len(vertices) - 1)
-        indices.append(node_indices[v])
-        edge_indices[edge_id] = indices
-        edge_refs[edge_id] = (u, v, key)
-        edge_order.append(edge_id)
-
-    vertex_array = np.asarray(vertices, dtype=float)
-    scale = _point_scale(vertex_array)
-    clearance = max(
-        _FLOAT_REL_TOL * scale,
-        np.finfo(float).tiny,
-    )
-
-    result = decimate_curve_network(
-        vertex_array,
-        edge_indices,
-        tuple(edge_order),
-        pinned_indices=set(node_indices.values()),
-        options=DecimationOptions(
-            max_passes=max(
-                8,
-                int(
-                    np.ceil(
-                        np.log2(max(2, len(vertex_array)))
-                    )
-                    + 4
-                ),
-            ),
-            min_points_per_edge=2,
-            clearance_fraction=0.0,
-            min_clearance=clearance,
-            max_deviation=epsilon,
-            preserve_pinned_neighbors=True,
-        ),
-    )
-
-    for edge_id in edge_order:
-        u, v, key = edge_refs[edge_id]
-        indices = np.asarray(
-            result.edge_indices[edge_id], dtype=int
+    candidate = original.copy()
+    for u, v, key, data in candidate.edges(keys=True, data=True):
+        points = np.asarray(data["pts"], dtype=float)
+        if len(points) <= 2:
+            continue
+        reduced = np.asarray(
+            fastrdp.rdp(points, epsilon=epsilon),
+            dtype=float,
         )
-        H.edges[u, v, key]["pts"] = oriented_edge_polyline(
-            H,
-            u,
-            v,
-            key,
-            {"pts": result.vertices[indices]},
-        )
+        if len(reduced) < 2:
+            continue
+        reduced[0] = candidate.nodes[u]["pos"]
+        reduced[-1] = candidate.nodes[v]["pos"]
+        data["pts"] = reduced
 
     strict_issues = validate_embedding(
-        H, check_geometry=True
+        candidate,
+        check_geometry=True,
     )
     if strict_issues:
-        raise EmbeddingValidationError(strict_issues)
-
-    return H
+        return original
+    return candidate
 
 
 def remove_leaf_nodes(G: nx.MultiGraph) -> nx.MultiGraph:
