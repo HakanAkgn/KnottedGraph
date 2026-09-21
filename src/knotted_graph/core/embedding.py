@@ -311,6 +311,7 @@ def validate_embedding(
     if graph.is_directed():
         issues.append("graph must be undirected")
     if graph.number_of_nodes() == 0:
+        issues.append("graph has no nodes")
         return issues
 
     valid_positions: dict[Any, np.ndarray] = {}
