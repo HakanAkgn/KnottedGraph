@@ -35,6 +35,36 @@ class EmbeddingValidationError(ValueError):
         super().__init__("; ".join(self.issues))
 
 
+_FLOAT_REL_TOL = 64.0 * np.finfo(float).eps
+_ENDPOINT_REL_TOL = 1e-9
+
+
+def _point_scale(*points: np.ndarray) -> float:
+    """Return a translation-invariant local scale for geometric comparisons."""
+    arrays = [np.asarray(point, dtype=float).reshape(-1, 3) for point in points]
+    stacked = np.vstack(arrays)
+    if len(stacked) <= 1:
+        return 1.0
+    center = stacked.mean(axis=0)
+    scale = float(np.max(np.linalg.norm(stacked - center, axis=1)))
+    return scale if np.isfinite(scale) and scale > 0.0 else 1.0
+
+
+def _points_close(
+    left: np.ndarray,
+    right: np.ndarray,
+    *,
+    scale: float,
+    rel_tol: float = _ENDPOINT_REL_TOL,
+) -> bool:
+    """Compare points using local extent rather than absolute coordinate size."""
+    distance = float(
+        np.linalg.norm(np.asarray(left, dtype=float) - np.asarray(right, dtype=float))
+    )
+    tolerance = max(_FLOAT_REL_TOL * scale, rel_tol * scale)
+    return distance <= tolerance
+
+
 def as_point3(value: Any, label: str) -> np.ndarray:
     """Return *value* as a finite 3D point."""
 
@@ -59,14 +89,26 @@ def as_polyline(value: Any, label: str) -> np.ndarray:
     return points.copy()
 
 
-def drop_consecutive_duplicates(points: np.ndarray, *, atol: float = 1e-10) -> np.ndarray:
-    """Drop adjacent duplicate points from a polyline."""
+def drop_consecutive_duplicates(
+    points: np.ndarray,
+    *,
+    atol: float | None = None,
+) -> np.ndarray:
+    """Drop only numerically unresolved adjacent samples from a polyline."""
 
+    points = np.asarray(points, dtype=float)
     if len(points) == 0:
         return points
+    if atol is None:
+        threshold = _FLOAT_REL_TOL * _point_scale(points)
+    else:
+        threshold = float(atol)
+        if not np.isfinite(threshold) or threshold < 0.0:
+            raise ValueError("atol must be finite and non-negative")
+
     keep = [0]
     for index in range(1, len(points)):
-        if not np.allclose(points[index], points[keep[-1]], atol=atol, rtol=0.0):
+        if float(np.linalg.norm(points[index] - points[keep[-1]])) > threshold:
             keep.append(index)
     return points[np.asarray(keep, dtype=int)]
 
@@ -136,8 +178,15 @@ def validate_embedding(graph: nx.MultiGraph) -> list[str]:
             continue
         u_pos = valid_positions[u]
         v_pos = valid_positions[v]
-        direct = np.allclose(pts[0], u_pos) and np.allclose(pts[-1], v_pos)
-        reverse = np.allclose(pts[0], v_pos) and np.allclose(pts[-1], u_pos)
+        scale = _point_scale(pts, u_pos, v_pos)
+        direct = (
+            _points_close(pts[0], u_pos, scale=scale)
+            and _points_close(pts[-1], v_pos, scale=scale)
+        )
+        reverse = (
+            _points_close(pts[0], v_pos, scale=scale)
+            and _points_close(pts[-1], u_pos, scale=scale)
+        )
         if not (direct or reverse):
             issues.append(f"edge {(u, v, key)!r} endpoints do not match node positions")
 
@@ -193,7 +242,12 @@ def get_all_edge_pts(G: nx.MultiGraph) -> NDArray:
     """Get all edge points from the graph as a single array."""
 
     graph = ensure_embedding(G, copy=False, normalize=False)
-    edge_pts_list = [oriented_edge_polyline(graph, u, v, k, data) for u, v, k, data in graph.edges(keys=True, data=True)]
+    edge_pts_list = [
+        oriented_edge_polyline(graph, u, v, k, data)
+        for u, v, k, data in graph.edges(keys=True, data=True)
+    ]
+    if not edge_pts_list:
+        return np.empty((0, 3), dtype=float)
     return np.concatenate(edge_pts_list)
 
 
