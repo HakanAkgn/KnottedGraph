@@ -33,16 +33,25 @@ def _projected_endpoint_angle(
     if len(coords) < 2:
         raise ValueError("Nongeneric projection: arc has fewer than two samples.")
 
-    projected_length = float(line.length)
-    if not np.isfinite(projected_length) or projected_length <= 0.0:
+    base_x = float(base_point.x)
+    base_y = float(base_point.y)
+    projected_scale_sq = max(
+        (
+            (float(coord[0]) - base_x) ** 2
+            + (float(coord[1]) - base_y) ** 2
+            for coord in coords
+        ),
+        default=0.0,
+    )
+    if not np.isfinite(projected_scale_sq) or projected_scale_sq <= 0.0:
         raise ValueError(
             "Nongeneric projection: arc has no resolvable projected endpoint direction."
         )
 
-    tolerance = _ENDPOINT_DIRECTION_REL_TOL * projected_length
-    tolerance_sq = tolerance * tolerance
-    base_x = float(base_point.x)
-    base_y = float(base_point.y)
+    tolerance_sq = (
+        _ENDPOINT_DIRECTION_REL_TOL * _ENDPOINT_DIRECTION_REL_TOL
+        * projected_scale_sq
+    )
     indices = (
         range(1, len(coords))
         if start
