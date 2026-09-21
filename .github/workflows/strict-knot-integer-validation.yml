@@ -1,0 +1,25 @@
+name: Strict knot integer validation
+
+on:
+  push:
+    branches:
+      - validation/strict-knot-integer-assertions-20260922
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --group dev --all-extras
+      - name: Run analytic knot-field tests
+        run: uv run --no-sync pytest -q tests/inputs/test_analytic_knot_fields.py
+      - name: Run full Python suite
+        run: uv run --no-sync pytest -q
