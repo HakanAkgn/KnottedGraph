@@ -168,7 +168,7 @@ class PDCode:
 
     def _new_arc(self, **kwargs) -> Arc:
         """Create one arc using IDs local to this PDCode instance."""
-        arc = self._new_arc(id=self._next_arc_id, **kwargs)
+        arc = Arc(id=self._next_arc_id, **kwargs)
         self._next_arc_id += 1
         return arc
 
