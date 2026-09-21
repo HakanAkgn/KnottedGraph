@@ -329,12 +329,8 @@ def validate_embedding(
             issues.append(str(exc))
 
     for u, v, key, data in graph.edges(keys=True, data=True):
-        if u not in valid_positions or v not in valid_positions:
-            continue
-
-        if data.get("pts") is None:
-            pts = np.vstack([valid_positions[u], valid_positions[v]])
-        else:
+        pts: np.ndarray | None = None
+        if data.get("pts") is not None:
             try:
                 pts = as_polyline(
                     data["pts"], f"edge {(u, v, key)!r} pts"
@@ -342,6 +338,12 @@ def validate_embedding(
             except ValueError as exc:
                 issues.append(str(exc))
                 continue
+
+        if u not in valid_positions or v not in valid_positions:
+            continue
+
+        if pts is None:
+            pts = np.vstack([valid_positions[u], valid_positions[v]])
 
         u_pos = valid_positions[u]
         v_pos = valid_positions[v]
