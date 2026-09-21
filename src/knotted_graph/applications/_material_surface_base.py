@@ -691,7 +691,7 @@ class MaterialFermiSurface(NodalSkeleton):
 
         while True:
             short_edges: list[tuple[float, Any, Any]] = []
-            for u, v in graph.edges():
+            for u, v, key in graph.edges(keys=True):
                 if u == v:
                     continue
                 try:
