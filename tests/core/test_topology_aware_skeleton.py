@@ -289,3 +289,32 @@ def test_production_extractor_uses_native_persistence_above_crossover(monkeypatc
     )
 
     assert optimized.extract(large) is expected
+
+
+def test_extractor_preserves_small_disconnected_components():
+    image = np.zeros((25, 25, 25), dtype=bool)
+
+    image[2:7, 2, 2] = True
+    image[10, 10, 10] = True
+    image[11, 10, 10] = True
+    image[20, 20, 20] = True
+
+    graph = skeleton_image_to_graph(image)
+
+    assert nx.number_connected_components(graph) == 3
+    component_sizes = sorted(
+        len(component)
+        for component in nx.connected_components(graph)
+    )
+    assert component_sizes == [1, 1, 2]
+    assert graph.number_of_edges() == 1
+
+
+def test_extractor_preserves_isolated_voxel_component_beside_cycle():
+    image = _diamond_ring(size=25)
+    image[2, 2, 2] = True
+
+    graph = skeleton_image_to_graph(image)
+
+    assert nx.number_connected_components(graph) == 2
+    assert sorted(dict(graph.degree()).values()) == [0, 2]
