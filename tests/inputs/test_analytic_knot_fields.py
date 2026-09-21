@@ -140,3 +140,41 @@ def test_spatial_graph_voxel_coordinates_are_rescaled(monkeypatch):
     graph = field.to_spatial_graph(0.3, sample=sample)
     np.testing.assert_allclose(graph.nodes[0]["pos"], [-1.5, -1.0, -0.5])
     assert graph.edges[0, 1, 0]["weight"] == pytest.approx(0.5)
+
+
+@pytest.mark.parametrize("p,q", [(2.9, 3), (2, 3.9), (True, 3), (2, False)])
+def test_torus_constructor_rejects_non_integer_parameters(p, q):
+    with pytest.raises(AssertionError, match="positive integers"):
+        KnotFunction.torus(p, q)
+
+
+def test_torus_constructor_accepts_numpy_integer_parameters():
+    knot = KnotFunction.torus(np.int64(2), np.int64(3))
+    assert knot.metadata["p"] == 2
+    assert knot.metadata["q"] == 3
+
+
+@pytest.mark.parametrize(
+    "dimension",
+    [
+        (8.9, 9, 10),
+        (8, 9.9, 10),
+        (8, 9, 10.9),
+        (True, 9, 10),
+        8.9,
+        True,
+    ],
+)
+def test_knot_field_sampling_rejects_non_integer_dimensions(dimension):
+    field = KnotFunction.torus(2, 3)
+    with pytest.raises(AssertionError, match="dimension"):
+        field.sample(span=((-4.0, 4.0),) * 3, dimension=dimension)
+
+
+def test_knot_field_sampling_accepts_numpy_integer_dimensions():
+    field = KnotFunction.torus(2, 3)
+    sample = field.sample(
+        span=((-4.0, 4.0),) * 3,
+        dimension=(np.int64(8), np.int64(9), np.int64(10)),
+    )
+    assert sample.values.shape == (8, 9, 10)
