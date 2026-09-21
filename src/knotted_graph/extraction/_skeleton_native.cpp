@@ -477,17 +477,11 @@ GraphData trace_all(const SparseSkeleton& sparse, int hops) {
     int next_id = 0;
     for (const auto& component : sparse.components) {
         LocalGraph local = trace_component(sparse, component, hops);
-        std::vector<char> active(local.node_positions.size(), 0);
-        for (const auto& edge : local.edges) {
-            active[static_cast<std::size_t>(edge.u)] = 1;
-            active[static_cast<std::size_t>(edge.v)] = 1;
-        }
         for (int local_id = 0; local_id < static_cast<int>(local.node_positions.size()); ++local_id)
-            if (active[static_cast<std::size_t>(local_id)])
-                out.nodes.emplace_back(
-                    next_id + local_id,
-                    local.node_positions[static_cast<std::size_t>(local_id)]
-                );
+            out.nodes.emplace_back(
+                next_id + local_id,
+                local.node_positions[static_cast<std::size_t>(local_id)]
+            );
         for (auto edge : local.edges) {
             edge.u += next_id;
             edge.v += next_id;
