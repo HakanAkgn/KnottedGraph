@@ -1,0 +1,109 @@
+name: Component camera validation
+
+on:
+  push:
+    branches:
+      - validation/component-camera-robustness-20260921
+
+permissions:
+  contents: read
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install validation environment
+        run: uv sync --group dev --all-extras
+      - name: Run focused component and camera regressions
+        run: >
+          uv run --no-sync pytest -q
+          tests/core/test_embedding.py
+          tests/core/test_topology_aware_skeleton.py
+          tests/core/test_topology_persistence_selection.py
+          tests/projection/test_public_api_validation.py
+      - name: Compare projection-sampling overhead with branch base
+        env:
+          PYTHONNOUSERSITE: "1"
+          OMP_NUM_THREADS: "1"
+          OPENBLAS_NUM_THREADS: "1"
+        run: |
+          git worktree add --detach /tmp/kg-component-camera-base 552353d7b9e4c81476253a1b4a6679e55c971238
+          python -m venv /tmp/kg-component-camera-base-venv
+          /tmp/kg-component-camera-base-venv/bin/python -m pip install -q /tmp/kg-component-camera-base
+          cat > /tmp/camera_benchmark.py <<'PY'
+          import json
+          import statistics
+          import time
+          import networkx as nx
+          import numpy as np
+          from knotted_graph.projection.pd_code import select_projection
+          from knotted_graph.projection.rotations import generate_isotopy_angles
+
+          def median_seconds(fn, repeats=7, warmup=2):
+              for _ in range(warmup):
+                  fn()
+              values = []
+              for _ in range(repeats):
+                  start = time.perf_counter()
+                  fn()
+                  values.append(time.perf_counter() - start)
+              return statistics.median(values)
+
+          graph = nx.MultiGraph()
+          x = np.linspace(-1.0, 1.0, 81)
+          for index, (slope, intercept) in enumerate(
+              zip(
+                  (-1.18, -0.74, -0.31, 0.17, 0.61, 1.03),
+                  (-0.21, 0.18, -0.07, 0.25, -0.16, 0.09),
+                  strict=True,
+              )
+          ):
+              y = slope * x + intercept + 0.015 * np.sin((index + 2) * np.pi * x)
+              z = -0.55 + 0.22 * index + 0.01 * x
+              points = np.c_[x, y, z]
+              u, v = f"u{index}", f"v{index}"
+              graph.add_node(u, pos=points[0].copy())
+              graph.add_node(v, pos=points[-1].copy())
+              graph.add_edge(u, v, pts=points)
+
+          sample_ms = 1e3 * median_seconds(
+              lambda: generate_isotopy_angles(13, order="ZYX"),
+              repeats=50,
+              warmup=5,
+          )
+          projection_ms = 1e3 * median_seconds(
+              lambda: select_projection(graph, num_rotation_samples=13),
+              repeats=5,
+              warmup=1,
+          )
+          result = select_projection(graph, num_rotation_samples=13)
+          print(json.dumps({
+              "sample_ms": sample_ms,
+              "projection_ms": projection_ms,
+              "selected_crossings": result.num_crossings,
+          }))
+          PY
+          /tmp/kg-component-camera-base-venv/bin/python /tmp/camera_benchmark.py > /tmp/base-camera.json
+          uv run --no-sync python /tmp/camera_benchmark.py > /tmp/head-camera.json
+          echo "base: $(cat /tmp/base-camera.json)"
+          echo "head: $(cat /tmp/head-camera.json)"
+          uv run --no-sync python - <<'PY'
+          import json
+          base = json.load(open("/tmp/base-camera.json"))
+          head = json.load(open("/tmp/head-camera.json"))
+          projection_ratio = head["projection_ms"] / base["projection_ms"]
+          print("projection runtime ratio head/base:", projection_ratio)
+          print("angle generation delta ms:", head["sample_ms"] - base["sample_ms"])
+          if projection_ratio > 1.20:
+              raise SystemExit(
+                  f"projection sampling regressed by more than 20%: {projection_ratio:.3f}x"
+              )
+          PY
