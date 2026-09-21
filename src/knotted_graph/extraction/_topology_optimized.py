@@ -197,8 +197,12 @@ def _diagnostic_summary(
     )
     anomaly_count = _anomaly_from_reduced(reduced, anomaly_ratio)
     valence_ok = max_degree is None or max_observed_degree <= max_degree
+    # Edge-less traced components are retained in the returned graph, but they
+    # are not persistence evidence for choosing a coarser junction scale.
+    # Otherwise a short path can collapse to one isolated vertex at a coarse
+    # scale and incorrectly displace the edge-bearing zero-radius trace.
     clean = (
-        graph.number_of_nodes() > 0
+        graph.number_of_edges() > 0
         and valence_ok
         and anomaly_count == 0
         and _embedded_geometry_safe(graph)
