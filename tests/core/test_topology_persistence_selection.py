@@ -312,3 +312,34 @@ def test_clean_unsafe_coarser_scale_can_witness_earlier_safe_persistence(monkeyp
     )
 
     assert selected is stable_left
+
+
+def test_native_and_python_preserve_edge_less_components_identically():
+    if not native_skeleton_available():
+        return
+
+    image = np.zeros((25, 25, 25), dtype=bool)
+    image[2:7, 2, 2] = True
+    image[10, 10, 10] = True
+    image[11, 10, 10] = True
+    image[20, 20, 20] = True
+
+    coords, adjacency = _sparse_adjacency_python(image)
+    expected = persistent_extract(
+        coords,
+        adjacency,
+        max_degree=None,
+        max_hops=4,
+        anomaly_ratio=0.15,
+    )
+    actual = native_persistent_extract(
+        image,
+        max_degree=None,
+        max_hops=4,
+        anomaly_ratio=0.15,
+    )
+
+    assert nx.number_connected_components(expected) == 3
+    assert nx.number_connected_components(actual) == 3
+    assert sorted(dict(expected.degree()).values()) == [0, 0, 1, 1]
+    assert sorted(dict(actual.degree()).values()) == [0, 0, 1, 1]
