@@ -373,11 +373,21 @@ class NodalSkeleton:
 
     @property
     def _interior_mask(self) -> NDArray:
-        """The filled interior of the exceptional surface as a binary mask.
-        I.e. the region of *pure* imaginary energy."""
-        # return self.spectrum.imag != 0
-        return self.spectrum.real == 0
-
+        """Return the pure-imaginary-energy interior for a PT-symmetric model."""
+        if not self.is_PT_symmetric:
+            raise ValueError(
+                "The filled exceptional-surface interior is defined here only "
+                "for PT-symmetric two-band models. Use a model-specific mask "
+                "for a generic non-Hermitian Hamiltonian."
+            )
+        spectrum = self.spectrum
+        scale = max(1.0, float(np.max(np.abs(spectrum))))
+        tolerance = 64.0 * np.finfo(float).eps * scale
+        return (
+            np.abs(spectrum.real) <= tolerance
+        ) & (
+            np.abs(spectrum.imag) > tolerance
+        )
 
     @cached_property
     def _skeleton_image(self) -> NDArray:
@@ -447,10 +457,14 @@ class NodalSkeleton:
             'pos' (index coordinates), and edge attributes include 'pts'
             (a list of index coordinates along the edge).
         """
-        # Check if the arguments match the cached ones
-        args = (smooth_epsilon, simplify, id(skeleton_image))
-        if self.skeleton_graph_cache is not None and \
-           self.skeleton_graph_cache_args == args:
+        # External arrays are mutable, so only cache internally generated skeletons.
+        args = (smooth_epsilon, simplify, None)
+        use_cache = skeleton_image is None
+        if (
+            use_cache
+            and self.skeleton_graph_cache is not None
+            and self.skeleton_graph_cache_args == args
+        ):
             return self.skeleton_graph_cache
 
         # Compute the graph
@@ -471,9 +485,10 @@ class NodalSkeleton:
         G.graph['is_trivalent'] = is_trivalent(G)
         self.is_graph_trivalent = G.graph['is_trivalent']
 
-        # cache the result
-        self.skeleton_graph_cache = G
-        self.skeleton_graph_cache_args = args
+        # Cache only the internally generated skeleton.
+        if use_cache:
+            self.skeleton_graph_cache = G
+            self.skeleton_graph_cache_args = args
         return G
 
 
@@ -998,11 +1013,11 @@ class NodalSkeleton:
 
         vol = self.fields_pv.copy()
         mask = np.where(vol.point_data['imag'] != 0)[0]
-        if orient_data:
+        if orient_data is not None:
             if not isinstance(orient, str):
                 orient = 'orient'
             vol.point_data[orient] = orient_data
-        if scale_data:
+        if scale_data is not None:
             if not isinstance(scale, str):
                 scale = 'scale'
             vol.point_data[scale] = scale_data
@@ -1257,7 +1272,7 @@ class NodalSkeleton:
         Parameters
         ----------
         rotation_angles : tuple[float], optional
-            The angles for the rotations in radians. Defaults to (0., 0., 0.).
+            The rotation angles in degrees. Defaults to (0., 0., 0.).
             See ``knotted_graph.projection.get_rotation_matrix`` for details.
         rotation_order : str, optional
             The order of rotations to apply. Defaults to 'ZYX'.
