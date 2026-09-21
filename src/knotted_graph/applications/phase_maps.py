@@ -1047,10 +1047,15 @@ def _graph_from_skeleton_like(
     *,
     force_genus_zero_vertex: bool,
 ) -> nx.MultiGraph:
-    if force_genus_zero_vertex and hasattr(obj, "_interior_mask"):
+    topology = None
+    if hasattr(obj, "_interior_mask"):
         mask = np.asarray(obj._interior_mask, dtype=bool)
         topology = volume_topology(mask)
-        if topology.is_compact and topology.handle_rank == 0:
+        if (
+            force_genus_zero_vertex
+            and topology.is_compact
+            and topology.handle_rank == 0
+        ):
             return _isolated_vertex_graph(topology.boundary_components)
 
     try:
@@ -1060,15 +1065,20 @@ def _graph_from_skeleton_like(
         if "collapsed to fewer than two distinct points" in message:
             retry_options = dict(graph_options)
             retry_options["smooth_epsilon"] = 0
-            graph = obj.skeleton_graph(**retry_options)
-            return graph
+            return obj.skeleton_graph(**retry_options)
         if (
-            "skeleton image is empty" in message
+            "graph has no edges" in message
+            or "skeleton image is empty" in message
             or "does not contain any True voxels" in message
             or "Skeletonization produced no points" in message
         ):
+            if topology is not None:
+                return _isolated_vertex_graph(topology.boundary_components)
+            if "graph has no edges" in message:
+                return _one_vertex_graph()
             return nx.MultiGraph()
         raise
+
     return graph
 
 def _graph_summary(graph: nx.MultiGraph) -> dict[str, Any]:
