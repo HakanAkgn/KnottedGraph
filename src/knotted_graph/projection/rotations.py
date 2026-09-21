@@ -20,6 +20,101 @@ __all__ = [
 ]
 
 
+_NEXT_AXIS = (1, 2, 0, 1)
+_EULER_AXES = {
+    "sxyz": (0, 0, 0, 0),
+    "sxyx": (0, 0, 1, 0),
+    "sxzy": (0, 1, 0, 0),
+    "sxzx": (0, 1, 1, 0),
+    "syzx": (1, 0, 0, 0),
+    "syzy": (1, 0, 1, 0),
+    "syxz": (1, 1, 0, 0),
+    "syxy": (1, 1, 1, 0),
+    "szxy": (2, 0, 0, 0),
+    "szxz": (2, 0, 1, 0),
+    "szyx": (2, 1, 0, 0),
+    "szyz": (2, 1, 1, 0),
+    "rzyx": (0, 0, 0, 1),
+    "rxyx": (0, 0, 1, 1),
+    "ryzx": (0, 1, 0, 1),
+    "rxzx": (0, 1, 1, 1),
+    "rxzy": (1, 0, 0, 1),
+    "ryzy": (1, 0, 1, 1),
+    "rzxy": (1, 1, 0, 1),
+    "ryxy": (1, 1, 1, 1),
+    "ryxz": (2, 0, 0, 1),
+    "rzxz": (2, 0, 1, 1),
+    "rxyz": (2, 1, 0, 1),
+    "rzyz": (2, 1, 1, 1),
+}
+
+
+def _rotation_for_view_direction(direction: Sequence[float]) -> NDArray:
+    """Return a proper rotation whose third row is the requested view direction."""
+
+    view = np.asarray(direction, dtype=float)
+    norm = float(np.linalg.norm(view))
+    if not np.isfinite(norm) or norm <= 0.0:
+        raise ValueError("view direction must be finite and nonzero")
+    view = view / norm
+
+    helper = (
+        np.array([0.0, 0.0, 1.0])
+        if abs(float(view[2])) < 0.9
+        else np.array([1.0, 0.0, 0.0])
+    )
+    row0 = np.cross(helper, view)
+    row0 /= np.linalg.norm(row0)
+    row1 = np.cross(view, row0)
+    return np.vstack((row0, row1, view))
+
+
+def _matrix_to_euler(matrix: NDArray, order: str) -> NDArray:
+    """Invert get_rotation_matrix for a proper Euler-axis sequence."""
+
+    axes = ("r" if order.isupper() else "s") + order.lower()
+    try:
+        first_axis, parity, repetition, frame = _EULER_AXES[axes]
+    except KeyError as exc:
+        raise ValueError(
+            "rotation_order for sampling must be a proper Euler sequence with "
+            "adjacent axes distinct"
+        ) from exc
+
+    i = first_axis
+    j = _NEXT_AXIS[i + parity]
+    k = _NEXT_AXIS[i - parity + 1]
+    matrix = np.asarray(matrix, dtype=float)
+    eps = 4.0 * np.finfo(float).eps
+
+    if repetition:
+        sy = float(np.hypot(matrix[i, j], matrix[i, k]))
+        if sy > eps:
+            ax = np.arctan2(matrix[i, j], matrix[i, k])
+            ay = np.arctan2(sy, matrix[i, i])
+            az = np.arctan2(matrix[j, i], -matrix[k, i])
+        else:
+            ax = np.arctan2(-matrix[j, k], matrix[j, j])
+            ay = np.arctan2(sy, matrix[i, i])
+            az = 0.0
+    else:
+        cy = float(np.hypot(matrix[i, i], matrix[j, i]))
+        if cy > eps:
+            ax = np.arctan2(matrix[k, j], matrix[k, k])
+            ay = np.arctan2(-matrix[k, i], cy)
+            az = np.arctan2(matrix[j, i], matrix[i, i])
+        else:
+            ax = np.arctan2(-matrix[j, k], matrix[j, j])
+            ay = np.arctan2(-matrix[k, i], cy)
+            az = 0.0
+
+    if parity:
+        ax, ay, az = -ax, -ay, -az
+    if frame:
+        ax, az = az, ax
+    return np.asarray((ax, ay, az), dtype=float)
+
+
 def _validate_rotation_order(order: str) -> str:
     """Return a validated Euler-axis order used by projection helpers."""
 
@@ -131,60 +226,54 @@ def generate_isotopy_angles(
     use_radians: bool = False,
 ) -> NDArray:
     r"""
-    Return *N* Euler‑angle triples that are (approximately) uniformly
-    distributed over SO(3) / ~, where the equivalence ~ removes
-    
-        • the sign of the view direction  (v and −v give isotopic diagrams)  
-        • rotations about the view axis   (in‑plane diagram spin)
+    Return N Euler-angle triples with approximately uniform view directions.
+
+    The sampled directions cover one hemisphere because opposite viewing
+    directions are redundant for projection search. For each direction, this
+    routine first builds the actual rotation matrix whose third row is that
+    viewing direction, then converts that matrix into the requested convention
+    used by get_rotation_matrix.
 
     Parameters
     ----------
     N : int
         Number of representative rotations desired.
     order : str, default "ZYX"
-        Three‑letter Euler sequence, upper‑case = extrinsic, lower‑case = intrinsic.
-        Must match the `rotation_matrix` helper you already have.
+        Proper three-letter Euler sequence, upper-case or lower-case according
+        to the convention accepted by get_rotation_matrix.
     use_radians : bool, default False
-        If False the function returns angles in **degrees** (handy when driving 
-        Matplotlib, PyVista, etc.); otherwise in radians.
+        If False, return angles in degrees; otherwise return radians.
 
     Returns
     -------
-    angles : (N, 3) ndarray
-        Each row is *(α, β, γ)* in the requested `order`.
-        γ (roll) is always 0 because in‑plane rotation is isotopic.
+    angles : (N, 3) ndarray
+        Euler-angle triples in the requested convention.
     """
     N = _validate_positive_integer(N, name="N")
     order = _validate_rotation_order(order)
 
-    GOLDEN_ANGLE = np.pi * (3 - np.sqrt(5))      # ~2.399963..., offsets points nicely
-    # --- 1. Fibonacci spiral sampling on the upper hemisphere -----------------
-    i = np.arange(N)
-    phi = i * GOLDEN_ANGLE                       # azimuth ∈ [0, 2π)
-    z   = (i + 0.5) / N                          # uniform height in (0, 1]
-    r   = np.sqrt(1.0 - z**2)                    # radius in XY‑plane
-    x, y = r * np.cos(phi), r * np.sin(phi)
+    golden_angle = np.pi * (3.0 - np.sqrt(5.0))
+    indices = np.arange(N, dtype=float)
+    phi = indices * golden_angle
+    z = (indices + 0.5) / N
+    radius = np.sqrt(1.0 - z * z)
+    directions = np.column_stack(
+        (radius * np.cos(phi), radius * np.sin(phi), z)
+    )
 
-    # --- 2. Convert each direction to Euler yaw–pitch (roll = 0) --------------
-    # For extrinsic ZYX:
-    #   yaw   = atan2(y, x)
-    #   pitch = atan2(√(x²+y²), z)
-    yaw   = np.arctan2(y, x)
-    pitch = np.arctan2(np.sqrt(x**2 + y**2), z)
-    roll  = np.zeros_like(yaw)
-
-    euler_ZYX = np.vstack((yaw, pitch, roll)).T  # shape (N, 3)
-
-    # --- 3. Re‑order angles if caller wants a different convention ------------
-    idx = {axis.lower(): k for k, axis in enumerate("zyx")}
-    perm = [idx[a.lower()] for a in order]       # where to pick yaw/pitch/roll
-    angles = euler_ZYX[:, perm]
+    angles = np.vstack(
+        [
+            _matrix_to_euler(
+                _rotation_for_view_direction(direction),
+                order,
+            )
+            for direction in directions
+        ]
+    )
 
     if not use_radians:
         angles = np.degrees(angles)
-
     return angles
-
 
 def cut_line_string(line, distances, *, tol=1e-12):
     """
