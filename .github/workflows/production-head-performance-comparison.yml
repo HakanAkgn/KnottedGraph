@@ -25,7 +25,8 @@ jobs:
 
       - name: Build isolated production and candidate environments
         run: |
-          git worktree add --detach /tmp/kg-prod 90301e38dac82d3bf036df0b40fada7543931bd2
+          git fetch --depth=1 origin perf/incremental-yamada-frontier-order
+          git worktree add --detach /tmp/kg-prod FETCH_HEAD
           python -m venv /tmp/kg-prod-venv
           /tmp/kg-prod-venv/bin/python -m pip install -q '/tmp/kg-prod[nodal]'
           python -m venv /tmp/kg-head-venv
