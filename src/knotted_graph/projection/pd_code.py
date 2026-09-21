@@ -70,13 +70,32 @@ class YamadaComputationResult:
     projection: ProjectionResult
 
 
+def _graph_spatial_scale(graph: nx.MultiGraph) -> float:
+    """Return a rotation/translation-invariant size for the embedded graph."""
+    points: list[np.ndarray] = []
+    for _, data in graph.nodes(data=True):
+        points.append(np.asarray(data["pos"], dtype=float).reshape(1, 3))
+    for _, _, _, data in graph.edges(keys=True, data=True):
+        if data.get("pts") is not None:
+            points.append(np.asarray(data["pts"], dtype=float).reshape(-1, 3))
+    if not points:
+        return 1.0
+    stacked = np.vstack(points)
+    if len(stacked) <= 1:
+        return 1.0
+    center = stacked.mean(axis=0)
+    radius = float(np.max(np.linalg.norm(stacked - center, axis=1)))
+    scale = 2.0 * radius
+    return scale if np.isfinite(scale) and scale > 0.0 else 1.0
+
+
 class PDCode:
     """Process an embedded spatial graph into a planar-diagram representation."""
 
     def __init__(
         self,
         skeleton_graph: nx.MultiGraph,
-        tolerance: float = 1e-8,
+        tolerance: float | None = None,
         *,
         _already_normalized: bool = False,
     ):
@@ -88,7 +107,13 @@ class PDCode:
                 copy=True,
                 normalize=True,
             )
-        self.tolerance = float(tolerance)
+        if tolerance is None:
+            self.tolerance = 1e-8 * _graph_spatial_scale(self.skeleton_graph)
+        else:
+            self.tolerance = float(tolerance)
+            if not np.isfinite(self.tolerance) or self.tolerance <= 0.0:
+                raise ValueError("tolerance must be finite and strictly positive")
+        self._next_arc_id = 0
         self.vertices: Dict[int, Vertex] = {}
         self.crossings: Dict[int, Crossing] = {}
         self.arcs: Dict[int, Arc] = {}
@@ -111,7 +136,7 @@ class PDCode:
         self.arcs = {}
         self.node_key_to_vertex_id = {}
         self.edge_key_to_index = {}
-        Arc.reset_counter()
+        self._next_arc_id = 0
 
         node_points = MultiPoint(
             [Point(node_data["pos"]) for node_data in self.skeleton_graph.nodes.values()]
@@ -141,6 +166,12 @@ class PDCode:
         self._cache[args] = self._generate_pd_code()
         return self._cache[args]
 
+    def _new_arc(self, **kwargs) -> Arc:
+        """Create one arc using IDs local to this PDCode instance."""
+        arc = self._new_arc(id=self._next_arc_id, **kwargs)
+        self._next_arc_id += 1
+        return arc
+
     def _initialize_vertices(self, node_points: MultiPoint) -> None:
         for i, (node_key, _node_data) in enumerate(self.skeleton_graph.nodes.items()):
             vertex = Vertex(id=i, key=node_key, point=node_points.geoms[i])
@@ -159,8 +190,13 @@ class PDCode:
         p1 = coords[-1]
         dxy = p1[:2] - p0[:2]
         denom = float(np.dot(dxy, dxy))
-        if denom <= np.finfo(float).eps:
-            raise ValueError("Projection contains a segment with zero XY extent")
+        full = p1 - p0
+        scale_sq = float(np.dot(full, full))
+        xy_tol_sq = (64.0 * np.finfo(float).eps) ** 2 * max(
+            scale_sq, np.finfo(float).tiny
+        )
+        if denom <= xy_tol_sq:
+            raise ValueError("Projection contains a segment with unresolved XY extent")
         target = np.asarray((point.x, point.y), dtype=float)
         t = float(np.dot(target - p0[:2], dxy) / denom)
         t = min(1.0, max(0.0, t))
@@ -321,8 +357,13 @@ class PDCode:
     ) -> float:
         dxy = p1[:2] - p0[:2]
         denom = float(np.dot(dxy, dxy))
-        if denom <= np.finfo(float).eps:
-            raise ValueError("Projection contains a segment with zero XY extent")
+        full = p1 - p0
+        scale_sq = float(np.dot(full, full))
+        xy_tol_sq = (64.0 * np.finfo(float).eps) ** 2 * max(
+            scale_sq, np.finfo(float).tiny
+        )
+        if denom <= xy_tol_sq:
+            raise ValueError("Projection contains a segment with unresolved XY extent")
         target = np.asarray((point.x, point.y), dtype=float)
         value = float(np.dot(target - p0[:2], dxy) / denom)
         return min(1.0, max(0.0, value))
@@ -622,7 +663,7 @@ class PDCode:
                 )
 
             if not intersections:
-                arc = Arc(
+                arc = self._new_arc(
                     edge_key=edge_key,
                     line=edge_line,
                     start_type="v",
@@ -670,7 +711,7 @@ class PDCode:
             else:
                 end_type, end_id = "x", crossing_ids[i + 1]
 
-            arc = Arc(
+            arc = self._new_arc(
                 edge_key=edge_key,
                 line=arc_line,
                 start_type=start_type,
