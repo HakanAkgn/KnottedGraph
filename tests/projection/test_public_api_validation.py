@@ -210,3 +210,50 @@ def test_public_yamada_rejects_invalid_warning_threshold_before_projection(
             sp.Symbol("Y"),
             crossing_warning_threshold=threshold,
         )
+
+
+def _expected_fibonacci_view_directions(count: int) -> np.ndarray:
+    golden_angle = np.pi * (3.0 - np.sqrt(5.0))
+    indices = np.arange(count, dtype=float)
+    phi = indices * golden_angle
+    z = (indices + 0.5) / count
+    radius = np.sqrt(1.0 - z * z)
+    return np.column_stack(
+        (radius * np.cos(phi), radius * np.sin(phi), z)
+    )
+
+
+def test_default_rotation_samples_span_three_dimensional_view_directions():
+    angles = generate_isotopy_angles(13, order="ZYX")
+    views = np.asarray(
+        [get_rotation_matrix(angle, order="ZYX")[2] for angle in angles],
+        dtype=float,
+    )
+
+    assert np.linalg.matrix_rank(views, tol=1e-12) == 3
+    assert not np.allclose(views[:, 1], 0.0, atol=1e-12)
+
+
+@pytest.mark.parametrize(
+    "order",
+    [
+        "XYZ", "XZY", "YXZ", "YZX", "ZXY", "ZYX",
+        "XYX", "XZX", "YXY", "YZY", "ZXZ", "ZYZ",
+        "xyz", "xzy", "yxz", "yzx", "zxy", "zyx",
+        "xyx", "xzx", "yxy", "yzy", "zxz", "zyz",
+    ],
+)
+def test_rotation_samples_produce_requested_view_directions_for_supported_orders(order):
+    expected = _expected_fibonacci_view_directions(7)
+    angles = generate_isotopy_angles(7, order=order)
+    actual = np.asarray(
+        [get_rotation_matrix(angle, order=order)[2] for angle in angles],
+        dtype=float,
+    )
+
+    np.testing.assert_allclose(actual, expected, atol=2e-12, rtol=0.0)
+
+
+def test_rotation_sampling_rejects_non_euler_axis_sequence():
+    with pytest.raises(ValueError, match="proper Euler sequence"):
+        generate_isotopy_angles(5, order="XXY")
