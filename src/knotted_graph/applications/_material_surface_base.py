@@ -690,7 +690,7 @@ class MaterialFermiSurface(NodalSkeleton):
             raise ValueError("previous_n_edgepoint must be >= 0.")
 
         while True:
-            short_edges: list[tuple[float, Any, Any]] = []
+            short_edges: list[tuple[float, str, str, Any, Any, Any]] = []
             for u, v, key in graph.edges(keys=True):
                 if u == v:
                     continue
@@ -707,17 +707,18 @@ class MaterialFermiSurface(NodalSkeleton):
             if not short_edges:
                 break
 
-            short_edges.sort(key=lambda item: item[0])
-            _, u, v = short_edges[0]
+            short_edges.sort()
+            _, _, _, u, v, edge_key = short_edges[0]
             changed = self._contract_one_edge(
                 graph,
                 u,
                 v,
+                edge_key=edge_key,
                 previous_n_edgepoint=nprev,
             )
             if not changed:
                 try:
-                    graph.remove_edge(u, v)
+                    graph.remove_edge(u, v, edge_key)
                 except Exception:
                     break
 
