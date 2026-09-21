@@ -230,21 +230,35 @@ def smooth_edges(
 
 
 def remove_leaf_nodes(G: nx.MultiGraph) -> nx.MultiGraph:
-    """Remove degree-1 leaves from a copy of an embedded graph."""
+    """Remove degree-1 leaves without deleting connected components.
+
+    Each connected component is reduced independently. If iterative leaf
+    removal would erase a tree component entirely, one deterministic
+    representative vertex is retained so the component's homotopy type and
+    connected-component count are preserved.
+    """
 
     H = G.copy()
-    while True:
-        leaf_nodes = [node for node, degree in H.degree() if degree == 1]
-        if not leaf_nodes:
-            break
-        if len(leaf_nodes) == H.number_of_nodes():
-            random_node = leaf_nodes[0]
-            result = nx.MultiGraph()
-            result.add_node(random_node, **H.nodes[random_node])
-            return result
-        for node in leaf_nodes:
-            H.remove_node(node)
-    return H
+    result = nx.MultiGraph()
+    result.graph.update(H.graph)
+
+    for component_nodes in nx.connected_components(H):
+        component = H.subgraph(component_nodes).copy()
+        while True:
+            leaves = [node for node, degree in component.degree() if degree == 1]
+            if not leaves:
+                break
+            if len(leaves) == component.number_of_nodes():
+                keep = min(component.nodes(), key=repr)
+                attrs = dict(component.nodes[keep])
+                component.clear()
+                component.add_node(keep, **attrs)
+                break
+            component.remove_nodes_from(leaves)
+
+        result = nx.compose(result, component)
+
+    return result
 
 
 def contract_short_edges(
