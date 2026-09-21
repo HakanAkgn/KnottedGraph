@@ -7,6 +7,7 @@ from knotted_graph.core.embedding import (
     contract_short_edges,
     ensure_embedding,
     is_embedding,
+    remove_leaf_nodes,
     simplify_edges,
     validate_embedding,
 )
@@ -179,3 +180,42 @@ def test_simplify_edges_preserves_acyclic_component_beside_cycle():
     assert path_edges[0]["sample"] == "keep-me"
     np.testing.assert_allclose(path_edges[0]["pts"], [[3.0, 0.0, 0.0], [4.0, 0.0, 0.0]])
     assert validate_embedding(simplified) == []
+
+
+def test_remove_leaf_nodes_preserves_each_connected_component():
+    graph = nx.MultiGraph()
+
+    for node, pos in {
+        "c0": [0.0, 0.0, 0.0],
+        "c1": [1.0, 0.0, 0.0],
+        "c2": [0.5, 1.0, 0.0],
+        "t0": [3.0, 0.0, 0.0],
+        "t1": [4.0, 0.0, 0.0],
+        "iso": [6.0, 0.0, 0.0],
+    }.items():
+        graph.add_node(node, pos=pos)
+
+    graph.add_edges_from([("c0", "c1"), ("c1", "c2"), ("c2", "c0")])
+    graph.add_edge("t0", "t1")
+
+    reduced = remove_leaf_nodes(graph)
+
+    assert nx.number_connected_components(reduced) == 3
+    assert set(("c0", "c1", "c2")).issubset(reduced.nodes())
+    assert "iso" in reduced
+    tree_survivors = {"t0", "t1"}.intersection(reduced.nodes())
+    assert len(tree_survivors) == 1
+
+
+def test_remove_leaf_nodes_keeps_one_representative_per_disjoint_edge():
+    graph = nx.MultiGraph()
+    for node, x in (("a0", 0.0), ("a1", 1.0), ("b0", 3.0), ("b1", 4.0)):
+        graph.add_node(node, pos=[x, 0.0, 0.0])
+    graph.add_edge("a0", "a1")
+    graph.add_edge("b0", "b1")
+
+    reduced = remove_leaf_nodes(graph)
+
+    assert reduced.number_of_nodes() == 2
+    assert reduced.number_of_edges() == 0
+    assert nx.number_connected_components(reduced) == 2
