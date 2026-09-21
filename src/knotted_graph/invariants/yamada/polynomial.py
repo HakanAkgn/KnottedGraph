@@ -17,7 +17,12 @@ from typing import Any, Iterable, Sequence
 import sympy as sp
 from joblib import Parallel, delayed
 
-from knotted_graph.projection.geom import Arc, Crossing, Vertex
+from knotted_graph.projection.geom import (
+    Arc,
+    Crossing,
+    Vertex,
+    _projected_endpoint_angle,
+)
 
 from .diagram_unified import compute_unified_laurent
 from .fast import (
@@ -156,12 +161,10 @@ def _candidate_ports(arc: Arc, crossing: Crossing) -> list[tuple[Port, float]]:
     candidates: list[tuple[Port, float]] = []
     base = crossing.point
     if arc.start_type == "x" and arc.start_id == crossing.id:
-        coords = arc.line.coords[1]
-        angle = math.atan2(coords[1] - base.y, coords[0] - base.x)
+        angle = _projected_endpoint_angle(arc.line, base, start=True)
         candidates.append(((arc.id, "s"), angle))
     if arc.end_type == "x" and arc.end_id == crossing.id:
-        coords = arc.line.coords[-2]
-        angle = math.atan2(coords[1] - base.y, coords[0] - base.x)
+        angle = _projected_endpoint_angle(arc.line, base, start=False)
         candidates.append(((arc.id, "e"), angle))
     return candidates
 

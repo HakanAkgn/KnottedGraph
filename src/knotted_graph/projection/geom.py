@@ -12,6 +12,54 @@ __all__ = [
 ]
 
 
+_ENDPOINT_DIRECTION_REL_TOL = 64.0 * np.finfo(float).eps
+
+
+def _projected_endpoint_angle(
+    line: LineString,
+    base_point: Point,
+    *,
+    start: bool,
+) -> float:
+    """Return a stable one-sided projected direction without moving geometry.
+
+    The nearest stored polyline sample may be numerically negligible compared
+    with the projected arc. Search outward until the displacement from the
+    endpoint exceeds a scale-aware floating-point threshold. The threshold is
+    relative to the arc's projected length, so uniform coordinate rescaling
+    leaves the selected direction unchanged.
+    """
+    coords = line.coords
+    if len(coords) < 2:
+        raise ValueError("Nongeneric projection: arc has fewer than two samples.")
+
+    projected_length = float(line.length)
+    if not np.isfinite(projected_length) or projected_length <= 0.0:
+        raise ValueError(
+            "Nongeneric projection: arc has no resolvable projected endpoint direction."
+        )
+
+    tolerance = _ENDPOINT_DIRECTION_REL_TOL * projected_length
+    tolerance_sq = tolerance * tolerance
+    base_x = float(base_point.x)
+    base_y = float(base_point.y)
+    indices = (
+        range(1, len(coords))
+        if start
+        else range(len(coords) - 2, -1, -1)
+    )
+
+    for index in indices:
+        dx = float(coords[index][0]) - base_x
+        dy = float(coords[index][1]) - base_y
+        if dx * dx + dy * dy > tolerance_sq:
+            return float(np.arctan2(dy, dx))
+
+    raise ValueError(
+        "Nongeneric projection: arc has no resolvable projected endpoint direction."
+    )
+
+
 @dataclass
 class Vertex:
     """A vertex in the knot diagram."""

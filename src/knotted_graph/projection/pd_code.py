@@ -16,7 +16,7 @@ from shapely.strtree import STRtree
 from knotted_graph.core.embedding import ensure_embedding
 from knotted_graph.invariants.yamada.polynomial import Yamada, _validate_n_jobs
 
-from .geom import Arc, Crossing, Vertex
+from .geom import Arc, Crossing, Vertex, _projected_endpoint_angle
 from .rotations import (
     _validate_positive_integer,
     _validate_rotation_order,
@@ -682,35 +682,30 @@ class PDCode:
             self._update_incidences(arc)
 
     def _update_incidences(self, arc: Arc) -> None:
-        def angle_from(base_point, other_coords):
-            dx = other_coords[0] - base_point.x
-            dy = other_coords[1] - base_point.y
-            return float(np.arctan2(dy, dx))
-
         if arc.start_type == "v":
             vertex_pt = self.vertices[arc.start_id].point
             self.vertices[arc.start_id].add_incident_arc(
                 arc.id,
-                angle_from(vertex_pt, arc.line.coords[1]),
+                _projected_endpoint_angle(arc.line, vertex_pt, start=True),
             )
         else:
             crossing_pt = self.crossings[arc.start_id].point
             self.crossings[arc.start_id].add_incident_arc(
                 arc.id,
-                angle_from(crossing_pt, arc.line.coords[1]),
+                _projected_endpoint_angle(arc.line, crossing_pt, start=True),
             )
 
         if arc.end_type == "v":
             vertex_pt = self.vertices[arc.end_id].point
             self.vertices[arc.end_id].add_incident_arc(
                 arc.id,
-                angle_from(vertex_pt, arc.line.coords[-2]),
+                _projected_endpoint_angle(arc.line, vertex_pt, start=False),
             )
         else:
             crossing_pt = self.crossings[arc.end_id].point
             self.crossings[arc.end_id].add_incident_arc(
                 arc.id,
-                angle_from(crossing_pt, arc.line.coords[-2]),
+                _projected_endpoint_angle(arc.line, crossing_pt, start=False),
             )
 
     @staticmethod
@@ -729,21 +724,19 @@ class PDCode:
 
         if arc.start_type == "x" and arc.start_id == xid:
             coords = arc.line.coords
-            angle = float(
-                np.arctan2(
-                    coords[1][1] - crossing_pt.y,
-                    coords[1][0] - crossing_pt.x,
-                )
+            angle = _projected_endpoint_angle(
+                arc.line,
+                crossing_pt,
+                start=True,
             )
             candidates.append((angle, float(coords[0][2])))
 
         if arc.end_type == "x" and arc.end_id == xid:
             coords = arc.line.coords
-            angle = float(
-                np.arctan2(
-                    coords[-2][1] - crossing_pt.y,
-                    coords[-2][0] - crossing_pt.x,
-                )
+            angle = _projected_endpoint_angle(
+                arc.line,
+                crossing_pt,
+                start=False,
             )
             candidates.append((angle, float(coords[-1][2])))
 
