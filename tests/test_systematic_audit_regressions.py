@@ -391,3 +391,16 @@ def test_tiny_embedding_remains_normalizable():
 
 def test_simple_graph_wl_hash_is_supported():
     assert isinstance(weisfeiler_lehman_multigraph_hash(nx.path_graph(3)), str)
+
+
+def test_material_quick_scan_has_no_hidden_spatial_error(tmp_path):
+    pytest.importorskip("pyvista")
+    pytest.importorskip("skimage")
+    from knotted_graph.applications.phase_map_examples import load_phase_map
+    from knotted_graph.applications.phase_map_examples.cli import main
+
+    output = tmp_path / "materials"
+    main(["scan", "materials", "--output-dir", str(output)])
+    data = load_phase_map(output / "material_parameter_phase_map_records.csv")
+    errors = [record["error"] for record in data.records if record["error"]]
+    assert errors == []
