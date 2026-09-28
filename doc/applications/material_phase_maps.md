@@ -11,7 +11,7 @@ formats or a replacement for the [phase-map API](../api/applications.md).
 | --- | --- | --- |
 | Understand the published examples | previews and interactive links below | browser; Plotly needs access to its pinned CDN |
 | Inspect or replot saved cells | `phase_map_examples inspect` / `plot` | base installation; reads CSV/JSON, no extraction |
-| Learn the computation | `phase_map_examples scan --profile quick` | optional `nodal` and `viz`; coarse grid on a compute node |
+| Learn the computation | `phase_map_examples scan --profile quick` | optional `nodal` and `viz`; small optional calculation |
 | Reproduce high-resolution research plots | source scripts and reference data | advanced; expensive scans, explicit display processing and validation |
 
 Follow the [source-install instructions](../installation.md) for `main`. The legacy PyPI release does not contain these commands. Commands below
@@ -113,7 +113,7 @@ core edges. That cap does not guarantee a fixed runtime: projection complexity
 also matters. A low-resolution result is a smoke example, not a converged
 topological measurement or a substitute for the saved high-resolution figures.
 
-On a compute node, remove `--dry-run`:
+To execute the optional scan, remove `--dry-run`:
 
 ```bash
 uv run --no-sync python -m knotted_graph.applications.phase_map_examples scan materials \
