@@ -99,6 +99,42 @@ def test_optional_dependency_classifier_covers_python_and_native_extras() -> Non
     assert not _missing_optional_dependency(ModuleNotFoundError("typo", name="typo"))
 
 
+def test_titled_toctree_entries_resolve_the_target_not_the_label(tmp_path, monkeypatch):
+    monkeypatch.setattr(repository_consistency, "ROOT", tmp_path)
+    source = tmp_path / "doc" / "index.md"
+    source.parent.mkdir()
+    (source.parent / "paper_results.md").write_text("# Figures\n")
+    failures = []
+    repository_consistency.check_toctrees(
+        source,
+        "```{toctree}\nPaper & data <paper_results>\nMissing page <absent>\n```",
+        failures,
+    )
+    assert failures == ["missing toctree target: doc/index.md -> absent"]
+
+
+def test_source_audit_resolves_only_declared_generated_assets(tmp_path, monkeypatch):
+    monkeypatch.setattr(repository_consistency, "ROOT", tmp_path)
+    source = tmp_path / "doc" / "applications" / "material_phase_maps.md"
+    reference = tmp_path / "reference.html"
+    reference.write_text("<html>saved research output</html>")
+    generated = tmp_path / "doc/assets/demos/new_phase_maps/materials/index.html"
+    monkeypatch.setattr(
+        repository_consistency, "generated_demo_sources", lambda: {generated: reference}
+    )
+    failures = []
+    text = '<a href="../demos/new_phase_maps/materials/index.html">view</a>'
+    repository_consistency.check_links(source, text, failures)
+    assert not failures
+    assert not generated.exists()  # Source validation does not run the builder.
+
+    repository_consistency.check_links(source, text.replace("index.html", "typo.html"), failures)
+    assert len(failures) == 1 and "typo.html" in failures[0]
+    reference.unlink()
+    repository_consistency.check_links(source, text, failures)
+    assert len(failures) == 2  # Missing source data still fails the audit.
+
+
 def test_protected_notebook_comparison_excludes_only_allowlisted_cell() -> None:
     notebook = {
         "cells": [
