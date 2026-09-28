@@ -72,14 +72,11 @@ the saved projection caches referenced by the scaling rows; these Python
 pickle caches are method intermediates, whereas CSVs are the portable first
 entry point for inspecting reported results.
 
-## Formula-discovery data availability
+## Figure 4 and Supplementary Figure 10 data
 
+The [figure-data guide](../../applications/results/figure4_suppfig10/README.md)
+provides 459 mixed-family comparisons, 324 short pure-braid records, selected
+examples and two completed length-101 comparisons, with direct CSV/JSON links.
+It also links the complete data/source ZIP and describes the source versions.
 The [formula-discovery notebook](../../applications/05_yamada_formula_discovery.ipynb)
-contains the constructors and procedures for Figure 4 and Supplementary
-Figure 10. Its generated `05a_*`, `05b_*` and `05c_*` CSV/JSON records are **not
-included in this snapshot**, and the notebook contains no saved execution
-outputs. Their intended location is
-`User_guide/applications/results/05_yamada_formula_discovery/`.
-The separate 87-row structured-graph demonstration CSV is not a substitute
-for these held-out validation records. The paper guide labels this gap
-explicitly; no replacement data have been generated.
+contains the associated constructors and computation procedures.

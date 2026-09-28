@@ -1,0 +1,14 @@
+{
+  "all_completed": false,
+  "all_completed_raw_comparisons_pass": true,
+  "all_family_identity_proved": false,
+  "completed_cases": 2,
+  "historical_freeze_verified": false,
+  "planned_cases": 20,
+  "status": "time_budget_exhausted",
+  "unfinished_word": {
+    "design": "A_heavy",
+    "length": 101,
+    "word": "AAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABAAABA"
+  }
+}

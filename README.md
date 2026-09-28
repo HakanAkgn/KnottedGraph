@@ -10,6 +10,10 @@ polynomials.** It separates the reusable graph/projection/invariant core from
 optional scientific applications such as nodal skeletons, analytic knot
 fields, material surfaces, and repulsive layouts.
 
+**[Website](https://hakanakgn.github.io/KnottedGraph/)** ·
+**[Paper figures and downloadable data](https://hakanakgn.github.io/KnottedGraph/paper_results.html)** ·
+**[Quick Start](https://hakanakgn.github.io/KnottedGraph/quickstart.html)**
+
 ## Please cite our work
 
 If you use KnottedGraph, please cite **[KnottedGraph: Scalable knotted-graph topology
@@ -20,24 +24,57 @@ For scientific applications to handlebody topology, Fermi-surface dispersions,
 Lifshitz transitions and topological phase maps, please also cite
 **[Topological classification through knotted graphs: Fermi surface dispersions
 and Lifshitz transitions](https://arxiv.org/abs/2609.13390)**
-(Akgün, Yan and Lee, 2026). [Copy the BibTeX entries](CITATION.bib).
+(Akgün, Yan and Lee, 2026).
+
+Copy the entries below, or [download the BibTeX file](CITATION.bib).
+
+```bibtex
+@misc{akgun2026knottedgraph,
+  title={KnottedGraph: Scalable knotted-graph topology for scientific
+         and mathematical discovery},
+  author={Hakan Akgün and Xianquan Yan and Kehan Liu
+          and Zhaoyun Chen and Ching Hua Lee},
+  year={2026},
+  eprint={2609.31152},
+  archivePrefix={arXiv},
+  primaryClass={cs.MS},
+  url={https://arxiv.org/abs/2609.31152}
+}
+
+@misc{akgun2026topologicalclassificationknottedgraphs,
+  title={Topological classification through knotted graphs:
+         Fermi surface dispersions and Lifshitz transitions},
+  author={Hakan Akgün and Xianquan Yan and Ching Hua Lee},
+  year={2026},
+  eprint={2609.13390},
+  archivePrefix={arXiv},
+  primaryClass={cond-mat.mes-hall},
+  url={https://arxiv.org/abs/2609.13390}
+}
+```
 
 ## Explore the paper and its data
 
-**[Figures and results](doc/paper_results.md)** ·
-**[Benchmark CSVs and interpretation](doc/benchmarks.md)** ·
-**[Sanity checks](doc/sanity_checks.md)** ·
-**[Online documentation](https://hakanakgn.github.io/KnottedGraph/)**
+**[Open the online figure and data gallery](https://hakanakgn.github.io/KnottedGraph/paper_results.html)**
+to view the paper's figures and download their supporting records directly
+below each figure. No notebook execution is needed to browse the data.
 
-The paper guide links each figure to its data, methods and notebook. Read the
-saved benchmark records without rerunning a calculation:
+| Explore | Direct entry point |
+| --- | --- |
+| All four main figures and eleven supplementary figures | [Online gallery](https://hakanakgn.github.io/KnottedGraph/paper_results.html) · [Repository guide](doc/paper_results.md) |
+| Figure 4 and Supplementary Figure 10: 459 mixed-family cases, 324 short braid words and two length-101 checks | [Browse CSV/JSON data](User_guide/applications/results/figure4_suppfig10/README.md) · [Download complete data and source ZIP](doc/assets/data/figure4-suppfig10-source-data.zip) |
+| Runtime comparisons and 4,400 handlebody cases | [Benchmark CSVs and interpretation](https://hakanakgn.github.io/KnottedGraph/benchmarks.html) |
+| Small correctness checks with commands and expected results | [Sanity checks](https://hakanakgn.github.io/KnottedGraph/sanity_checks.html) |
+
+Check the saved records without rerunning a scientific calculation:
 
 ```bash
 uv run --no-project python scripts/inspect_paper_data.py
 ```
 
 This standard-library command verifies file hashes and case alignment, then
-summarizes the **112 saved scaling cases** and **4,400 handlebody cases**.
+summarizes the **112 saved scaling cases**, **4,400 handlebody cases**, and
+the **Figure 4 / Supplementary Figure 10 data**.
 See the [data inventory](User_guide/benchmarks/results/README.md) for direct CSV
 links, timing definitions and the availability of the formula-discovery records.
 
@@ -48,6 +85,7 @@ links, timing definitions and the availability of the formula-discovery records.
 | Exact published-polynomial checks through 500 crossings; 112 saved cases | [Scaling CSV](User_guide/benchmarks/results/03_knottedgraph_vs_topoly_scaling_rows.csv) | [Figure 3 and timing protocol](doc/benchmarks.md) |
 | Normalized Yamada preserved in 4,400 accepted handlebody cases | [Preservation CSV](User_guide/benchmarks/results/handlebody_ground_truth/synthetic_ground_truth_yamada_preservation.csv) | [Supplementary Figures 6–7](doc/paper_results.md) |
 | Per-stage timings with completed/timeout/error status retained | [Timing-figure CSV](User_guide/benchmarks/results/04_thick_handlebody_time_distribution_plot_source.csv) | [CSV columns and comparison rules](doc/benchmarks.md) |
+| Formula and coefficient comparisons for mixed families and ordered braid words | [Figure 4 / Supplementary Figure 10 data](User_guide/applications/results/figure4_suppfig10/README.md) | [Figure panels and downloads](https://hakanakgn.github.io/KnottedGraph/paper_results.html#figure-4-discovering-and-testing-family-laws) |
 
 [![Published Figure 3: reference families and invariant-evaluation scaling](doc/assets/paper_figures/figure-3.png)](https://hakanakgn.github.io/KnottedGraph/paper_results.html#figure-3-exact-evaluation-through-500-crossings)
 
@@ -89,8 +127,11 @@ coarse compute examples and the boundary to full research reproduction.
 ## The core mental model
 
 <p align="center">
-  <img src="assets/paper/architecture.svg" width="780" alt="KnottedGraph architecture from geometric input to graph, projection, and invariant">
+  <img src="doc/assets/site_figures/architecture.png" width="1000" alt="KnottedGraph architecture: Input Adapters, Skeletonization and Extraction, Embedded Graph Core, Projection and PD Encoding, and Yamada Evaluation">
 </p>
+
+*Current architecture from the Overleaf manuscript (Supplementary Figure 11).
+[Open the vector PDF](assets/paper/architecture.pdf).*
 
 Most graph-returning routes meet at one data contract:
 

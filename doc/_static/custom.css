@@ -119,6 +119,27 @@ html[data-theme="dark"] .bd-article img {
   font-weight: 600;
 }
 
+/* Keep data tables readable while allowing narrow displays to scroll locally. */
+.bd-article .table-wrapper {
+  margin: 1rem 0 1.5rem;
+}
+
+.bd-article table td,
+.bd-article table th {
+  vertical-align: top;
+  padding: 0.65rem 0.75rem;
+}
+
+.bd-article figure {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.bd-article .highlight-bibtex pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .kg-interactive-demo {
   display: block;
   width: 100%;

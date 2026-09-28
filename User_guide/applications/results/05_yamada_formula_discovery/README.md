@@ -1,12 +1,10 @@
-# Formula-discovery result archive
+# Formula-discovery notebook output directory
 
-This is the output location used by
-[application notebook 05](../../05_yamada_formula_discovery.ipynb).
-The current source snapshot includes the constructors and computation/verification
-procedures, but does not include their generated `05a_*`, `05b_*` and `05c_*`
-CSV/JSON results. The notebook's execution outputs are also empty.
+For the published Figure 4 and Supplementary Figure 10 records, open the
+[data and source guide](../figure4_suppfig10/README.md).
 
-The [paper-figure guide](../../../../doc/paper_results.md) identifies this
-availability gap for Figure 4 and Supplementary Figure 10. Existing saved
-records should be added here with their original provenance when available;
-no replacement calculations were run for the documentation update.
+This directory is reserved for the `05a_*`, `05b_*` and `05c_*` outputs generated
+by [application notebook 05](../../05_yamada_formula_discovery.ipynb). The supplied
+figure-data package is stored separately because its CSV/JSON schemas differ
+from those notebook outputs. The figure-data guide provides direct downloads
+and a command to inspect the existing records without rerunning the notebook.

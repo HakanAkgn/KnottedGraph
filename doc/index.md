@@ -25,9 +25,14 @@
 The {doc}`paper_results` guide places the published figures beside their source
 data and notebooks. The {doc}`benchmarks` page explains the 500-crossing scaling
 measurements and 4,400-case construction benchmark, with direct CSV downloads.
+Figure 4 and Supplementary Figure 10 now also have downloadable coefficient
+tables, exact matrices and a complete data/source archive beside their figures.
 Use {doc}`sanity_checks` for the small correctness checks and their expected
 outcomes. Please {doc}`cite the software and application papers <citing>` when
 using this work.
+
+**{download}`Download Figure 4 / Supplementary Figure 10 data and sources <assets/data/figure4-suppfig10-source-data.zip>`** ·
+[Browse figure panels and individual files](paper_results.md#figure-4-discovering-and-testing-family-laws)
 
 ## New here?
 

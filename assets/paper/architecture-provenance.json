@@ -1,0 +1,10 @@
+{
+  "source": "Overleaf: GeneralVersion/Figures/Architecture.pdf",
+  "retrieved_date": "2026-09-29",
+  "pdf": "architecture.pdf",
+  "pdf_sha256": "1fdda1105d24812bb02a8878e9923242fec273238705e831ea8916df96a5cb1c",
+  "preview": "../../doc/assets/site_figures/architecture.png",
+  "preview_sha256": "226ab4dd7076f4284320fd3f8bcc7b7e9fe1a7e09c91c7856c1e0f3f8f82d41d",
+  "render": "pdftoppm page 1, PNG, 2000 pixels maximum dimension",
+  "note": "The current Overleaf artwork and arXiv v1 Supplementary Figure 11 render identically. The README and website now share this preview."
+}

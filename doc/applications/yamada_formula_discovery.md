@@ -5,9 +5,10 @@ to learn the Yamada API. Start with {doc}`../quickstart` and
 {doc}`../user_guide/projection_yamada` if you want to compute one invariant.
 
 <div class="kg-hero">
-  <p class="kg-lead">The formula-discovery notebook generates exact Laurent-polynomial data, separates discovery from held-out verification, and tests homogeneous, Abelian mixed-word, and non-Abelian ordered-word families. Browsing is branch-independent; strict regeneration is an explicit opt-in.</p>
+  <p class="kg-lead">Explore exact Laurent-polynomial data for homogeneous families, commuting mixed words and order-sensitive braid words. Start with the saved CSV/JSON records, then follow the notebook to inspect the construction and formula procedures.</p>
   <div class="kg-link-row">
     <a href="https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/applications/05_yamada_formula_discovery.ipynb">Open the notebook</a>
+    <a href="../paper_results.html#figure-4-discovering-and-testing-family-laws">Figures and data downloads</a>
     <a href="../user_guide/projection_yamada.html">Review projection and Yamada concepts</a>
   </div>
 </div>
@@ -30,16 +31,31 @@ tested families. They are not, by themselves, an all-parameter mathematical
 proof; an analytic proof must still derive the transfer identities from the
 Yamada skein algebra.
 
-## Saved-data availability
+## Browse the saved data
 
-The {doc}`../paper_results` page shows the published Figure 4 and Supplementary
-Figure 10. The generated `05a_*`, `05b_*` and `05c_*` CSV/JSON records are not
-included in the current source snapshot, and the notebook has no saved
-execution outputs. Its intended output directory is
-`User_guide/applications/results/05_yamada_formula_discovery/`.
-Reading the notebook therefore exposes the procedure, not a downloadable
-archive of its held-out results. The older structured-graph gallery CSV is a
-different dataset. No new scientific calculations are run by the website build.
+The {doc}`../paper_results` page places Figure 4 and Supplementary Figure 10
+beside their CSV/JSON downloads. The supplied dataset includes **459 mixed-family
+comparisons**, **324 short pure-braid words**, the **AAABA worked example** and
+**two completed length-101 comparisons**.
+
+{download}`Download all data and source files (ZIP) <../assets/data/figure4-suppfig10-source-data.zip>`
+or open the [dataset guide](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/applications/results/figure4_suppfig10/README.md)
+for column definitions, panel mappings, certificates and provenance.
+
+Columns ending in `_coefficients_json` store exact integer coefficients keyed
+by Laurent exponent. `master_formula_pass` records the mixed-family comparison;
+the long-word JSON uses `raw_coefficient_identity`. The example CSVs are subsets
+of the larger tables, so they should not be added to the total case count.
+
+Verify the saved hashes and table/JSON agreement from a source checkout:
+
+```bash
+uv run --no-project python scripts/inspect_paper_data.py
+```
+
+This command and the website build read the archived records without starting
+new scientific calculations. Source versions and the distinction between these
+records and the notebook's own output schemas are documented in the dataset guide.
 
 ## Browse versus regenerate
 

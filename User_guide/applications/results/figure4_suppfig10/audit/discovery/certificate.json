@@ -1,0 +1,36 @@
+{
+  "H_TA_equals_HA": true,
+  "H_TB_equals_HB": true,
+  "H_inverse_identity": true,
+  "H_rank_over_QY": 15,
+  "H_shape": [
+    15,
+    15
+  ],
+  "all_raw_reversals_match": true,
+  "all_short_transfer_contractions_match": true,
+  "all_word_realization_proved": false,
+  "commutator_nonzero": true,
+  "commutator_witness": [
+    0,
+    4,
+    "(-Y**7 + Y**6 + Y**5 - 2*Y**4 + Y**3 + Y**2 - Y + 1)/(Y**7 - Y**5 + Y**4)"
+  ],
+  "cubic_A_zero": true,
+  "cubic_B_zero": true,
+  "exhaustive_words_through_length_7": 255,
+  "formula_sha256": "72ac75fe0ca14632e888207d7c39ec71b05dac0c7e5a44eafb37a27c246e63a3",
+  "hankel_training_words": 255,
+  "historical_discovery_provenance_verified": false,
+  "maximum_short_word_length": 9,
+  "new_long_word_checks": 0,
+  "new_long_word_checks_all_pass": null,
+  "rank_certificate": {
+    "determinant": "2316229704812097955722372843592560015646984158183708827511386954216255306363140665523348383857309818267822265625/1897137590064188545819787018382342682267975428761855001222473056385648716020711424",
+    "method": "nonzero exact determinant at Y=2",
+    "specialization": "2"
+  },
+  "raw_same_count_collisions_only_reversal": true,
+  "short_exact_words": 324,
+  "symbolic_transfer_checked": true
+}

@@ -1,1 +1,5 @@
 User_guide/benchmarks/results/handlebody_ground_truth/certified_thick_handlebody_embeddings.json.gz filter=lfs diff=lfs merge=lfs -text
+
+# Preserve the supplied figure-data hashes on every checkout platform.
+User_guide/applications/results/figure4_suppfig10/** -text
+User_guide/applications/results/figure4_suppfig10/data/*.csv whitespace=cr-at-eol

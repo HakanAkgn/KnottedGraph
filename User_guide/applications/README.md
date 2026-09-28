@@ -10,7 +10,7 @@ states its inputs, dependencies and interpretation limits.
 | [Mathematics](02_mathematics_applications.ipynb) | Mathematical graph families and invariants | Early graph examples are small; later galleries sample 200³/300³ grids and write results |
 | [Proteins](03_protein_applications.ipynb) | Inspect an ordered protein backbone and its input contract | Base installation; creates a temporary offline PDB example; does not infer a protein interaction graph |
 | [Analytic knot fields](04_analytic_knot_fields.ipynb) | Knot functions, level sets and deformations | Needs the extraction stack; the saved configuration enables paper mode and extensive scans |
-| [Formula discovery](05_yamada_formula_discovery.ipynb) | Research searches for graph-family formulas | Large searches are reproduction workloads; preserve the stated branch restrictions |
+| [Formula discovery](05_yamada_formula_discovery.ipynb) | Research searches for graph-family formulas | Start with the [Figure 4 / Supplementary Figure 10 data](results/figure4_suppfig10/README.md); notebook generation is an optional research workload |
 | [Hamiltonian/Yamada phase maps](06_hamiltonian_yamada_phase_maps.ipynb) | Unified finite-grid phase-map workflows | Scan cost depends on resolution and graph/projection complexity |
 
 For a first material exercise, use the

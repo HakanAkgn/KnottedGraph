@@ -122,7 +122,7 @@ Candidate search/generation is outside the measured recovery workload.
 
 - {doc}`sanity_checks`: independent algebraic checks and projection-invariance procedures.
 - {doc}`paper_results`: all main/supplementary figure originals and their method links.
-- {doc}`applications/yamada_formula_discovery`: formula-discovery procedures and the explicitly identified gap in saved `05a/05b/05c` results.
+- {doc}`applications/yamada_formula_discovery`: saved Figure 4 / Supplementary Figure 10 data, exact coefficients and formula-discovery procedures.
 - {doc}`applications/material_phase_maps`: existing material data and viewers, with raw classifications distinguished from adaptive fills and display processing.
 
 The documentation build only packages saved records and figures. It does not

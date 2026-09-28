@@ -65,23 +65,47 @@ The high-crossing endpoints are not completed paired Topoly comparisons.
 ```{figure} assets/paper_figures/figure-4.png
 :alt: Paper Figure 4 showing homogeneous motifs, commuting mixed words and noncommuting ordered braid words
 
-The workflow separates formula discovery from held-out testing and distinguishes
-commuting motif counts from order-sensitive words.
+Homogeneous motifs, mixed families and ordered braid words connect exact
+polynomial calculations with candidate family formulas.
 {download}`Open the original PDF <assets/paper_figures/figure-4.pdf>`.
 ```
 
 **Procedure:** [application notebook 05](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/applications/05_yamada_formula_discovery.ipynb),
 with the three parts explained in {doc}`applications/yamada_formula_discovery`.
 
-**Saved-data availability:** the notebook contains the constructors and
-generation/verification procedures, but its `05a_*`, `05b_*` and `05c_*`
-CSV/JSON outputs are not included in this repository snapshot. The notebook
-also has no saved execution outputs. Readers can inspect the paper and
-procedure, but cannot independently inspect its full held-out records from
-this checkout. This gap is separate from the complete benchmark CSVs above.
-The older {download}`87-row structured-graph example dataset <assets/data/structured_graph_yamada_dataset.csv>`
-supports {doc}`applications/mathematical_investigations`; it is not the
-Figure 4 held-out dataset.
+**Download the data:**
+{download}`Complete data and source ZIP <assets/data/figure4-suppfig10-source-data.zip>` ·
+[Dataset guide and provenance](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/applications/results/figure4_suppfig10/README.md).
+The supplied exact-check records can be browsed directly, without running a notebook.
+
+| Figure panels | Included records | Download |
+| --- | --- | --- |
+| 4b,c,e,f,h,i: homogeneous examples | 6 examples across three families, m = 1 and 2 | {download}`CSV <../User_guide/applications/results/figure4_suppfig10/data/figure4_homogeneous_m1_m2.csv>` |
+| 4k: mixed families | 459 coefficient comparisons | {download}`CSV <../User_guide/applications/results/figure4_suppfig10/data/figure4_mixed_family_459.csv>` |
+| 4l: ordered braid words | 324 short-word records | {download}`CSV <../User_guide/applications/results/figure4_suppfig10/data/figure4_pure_braid_324.csv>` |
+| 4l: order-sensitive examples | AAB, ABA and BAA | {download}`CSV <../User_guide/applications/results/figure4_suppfig10/data/figure4_order_sensitive_AAB_ABA_BAA.csv>` |
+| Additional long-word comparisons | Two completed length-101 cases | {download}`JSON <../User_guide/applications/results/figure4_suppfig10/audit/discovery_long_words/records.json>` |
+
+Each coefficient table links through the dataset guide to its JSON records,
+verification certificate and source information. The small example tables are
+subsets of the larger tables. The {doc}`formula-discovery guide <applications/yamada_formula_discovery>`
+explains how to read them.
+
+## Supplementary Figure 10: an ordered-word worked example
+
+```{figure} assets/paper_figures/supp-10.png
+:alt: Supplementary Figure 10 working through the AAABA ordered-braid example
+
+The AAABA = A³BA example connects the graph, ordered transfer product and
+Yamada coefficients. {download}`Open the original PDF <assets/paper_figures/supp-10.pdf>`.
+```
+
+**Data:** {download}`AAABA coefficient record (JSON) <../User_guide/applications/results/figure4_suppfig10/data/suppfig10_AAABA.json>` ·
+{download}`Exact transfer matrices (JSON) <../User_guide/applications/results/figure4_suppfig10/audit/discovery/exact_transfer_matrices.json>` ·
+{download}`Verification certificate (JSON) <../User_guide/applications/results/figure4_suppfig10/audit/discovery/certificate.json>`.
+
+This worked example is included in the 324-word dataset above. Its JSON entry
+identifies the graph and the corresponding Hankel matrix input.
 
 ## Supplementary Figures 6–7: construction and runtime evidence
 
@@ -122,7 +146,7 @@ completed calls only.
 | S7: Timing distributions | {download}`PDF <assets/paper_figures/supp-7.pdf>` | {doc}`benchmarks`: stage-by-stage CSV column map |
 | S8: Parameter sweeps | {download}`PDF <assets/paper_figures/supp-8.pdf>` | {doc}`applications/hamiltonian_yamada_phase_maps`: saved interactive view and notebook |
 | S9: Repulsive layout | {download}`PDF <assets/paper_figures/supp-9.pdf>` | {doc}`user_guide/repulsive_layout`; {doc}`applications/analytic_knot_fields` |
-| S10: Non-Abelian worked example | {download}`PDF <assets/paper_figures/supp-10.pdf>` | Notebook 05, Part III; saved-record gap described above |
+| S10: Non-Abelian worked example | {download}`PDF <assets/paper_figures/supp-10.pdf>` | [Worked example and data](#supplementary-figure-10-an-ordered-word-worked-example); notebook 05, Part III |
 | S11: Software architecture | {download}`PDF <assets/paper_figures/supp-11.pdf>` | {doc}`user_guide/workflow_overview`; {doc}`api/index`; {doc}`installation` |
 
 The archived PDFs show the submitted presentation. The notebooks expose

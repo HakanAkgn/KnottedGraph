@@ -3,7 +3,7 @@
   "record_snapshot_commit": "9607c1c8a35affdc0dbe90e507c2612b7e464c7d",
   "note": "These files were already present in the source snapshot. This commit identifies the archived records, not a new execution or a common generation environment. See per-row metadata and the paper timing protocol.",
   "availability_notes": [
-    "Formula-discovery notebook 05 is present but the generated 05a/05b/05c CSV and JSON records are not included in this source snapshot.",
+    "Figure 4 and Supplementary Figure 10 data are included in User_guide/applications/results/figure4_suppfig10/; see its README for downloads and source records.",
     "The certified input geometry archive uses Git LFS (108611015 bytes); CSV inspection does not require downloading it."
   ],
   "files": [

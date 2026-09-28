@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "published_date": "2026-09-29",
+  "source": "student_handoff_figure4_suppfig10",
+  "records_date": "2026-09-18",
+  "record_kind": "retrospective exact checks",
+  "files": [
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/REGENERATE_EXTRACTS.py",
+      "sha256": "9adfa7ff2855789dbf0cd7fe1c0f7ee76228a00f18749c7a9a418de0bb746af4"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery/certificate.json",
+      "sha256": "71ac1cedbdf455df8cafc66557e06f9f29e8f71d0abc20e64f1335cfef9b96c3"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery/exact_transfer_matrices.json",
+      "sha256": "d3a92a43057f6df5ed50a49a32ed9eb4bc042275cef26e388e5920705df8e2e2"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery/exhaustive_short_word_checks.json",
+      "sha256": "2e877d97d7d50cfeff3c8ffe457ae565adc3f0193e5a2e3d18bc66cd0fb612bf"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery/hankel_input_matrices.json",
+      "sha256": "40252ce0f88e95396494fb9c704ef2e4444774fe694e465034e99f7c2dcfdb87"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery/new_audit_freeze.json",
+      "sha256": "d59a283a6f02b2bd022623fde0b76a8aff90a4671b7820e4ea6d80c2eca7a9fe"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery/provenance.json",
+      "sha256": "6b69a8b8c9051e40de9489eae269d58b263c93e2ecfd554c6c39c4f95941b9f2"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery/short_exact_records.json",
+      "sha256": "011715477a0703de8534baad4f30d92d38c06b4a29792a13bd7ca2b42e4c36cf"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery/word_plans.json",
+      "sha256": "d89de3ef2bb44ffdee8ea9778123b22d0dd959fe0033c1180936ae2e1ad0b0d8"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery_long_words/certificate.json",
+      "sha256": "2644e7fe4186b2ee7e3c33963a5bda6ecbce8887303e3e0201f2dc3f4b9acc6a"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery_long_words/prediction_01.json",
+      "sha256": "c9870d9ea0c292140a4be4a4e7fa4682c156d3bd331d19b0ba8ed1fba9107e24"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery_long_words/prediction_02.json",
+      "sha256": "8b6c5b2cf22ed977950400ab50336a4566cd6467de4dd00d6923dc0e35c4b7b5"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery_long_words/provenance.json",
+      "sha256": "3338ac59e241b18506cb901b7313d4e718278a99acbbab85c5f932208d50e1bf"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery_long_words/records.json",
+      "sha256": "f007d81023ab2c565f727ff70f06f7bbff5a5eed80ebed22486b1941134da618"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery_long_words/word_plan.json",
+      "sha256": "69bff85be839147034d6201e685298628ee8f6cd017387b8dcdfc4f092726417"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/mixed_family/certificate.json",
+      "sha256": "ace43189981b1cb9189b4953074dd2e82743ce5b8b3e5d32d99b7534f697d8d5"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/mixed_family/provenance.json",
+      "sha256": "9b83b093b596156ae2c5a8612695a7c5b930d81d02b330e62560bd8c4524cd17"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/mixed_family/records.json",
+      "sha256": "c8925e4858e2727fdf0c9cb21d03f6bcb6c91fc6ecd12d21aff1551822cb3679"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/mixed_family/word_plan.json",
+      "sha256": "1afe1adc5e214855936fba47ce6c9166e802eabc5479337927d5ade69cc0909e"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/audit/reproducibility_inventory.json",
+      "sha256": "4ad076b575d4948f87b36e1cb841d2322dd515eebd59ae57a52b1f7b93b8b358"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/data/figure4_homogeneous_m1_m2.csv",
+      "sha256": "dded01e47058da27a85870db897676137fbaeb4155c25cb35133bdff5270bb55"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/data/figure4_mixed_family_459.csv",
+      "sha256": "8b4e0c8db6a1bda448ec2f0ef7a92c2f20d685d3400c23035178dbd82c308788"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/data/figure4_order_sensitive_AAB_ABA_BAA.csv",
+      "sha256": "60f1a3b3a0d720c96a42018250ecdb34679ddceebd3e42e97a0f349580d3f30f"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/data/figure4_pure_braid_324.csv",
+      "sha256": "4008a62e7c9b1c9546c3be37560fcf3d4730456368b5822cee25e15b7b66511d"
+    },
+    {
+      "path": "User_guide/applications/results/figure4_suppfig10/data/suppfig10_AAABA.json",
+      "sha256": "a5593b5715d6a5097ae42e0bd31677aa4786a8c92a55c36f7839cdfd07ce0d14"
+    },
+    {
+      "path": "doc/assets/data/figure4-suppfig10-source-data.zip",
+      "sha256": "3c8c4a083d752baf8a20df4bb026c7a1ff2b823acdc7a6e4122b639c4fb33f72"
+    }
+  ]
+}
