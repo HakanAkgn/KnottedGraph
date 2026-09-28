@@ -13,8 +13,8 @@ states its inputs, dependencies and interpretation limits.
 | [Formula discovery](05_yamada_formula_discovery.ipynb) | Research searches for graph-family formulas | Large searches are reproduction workloads; preserve the stated branch restrictions |
 | [Hamiltonian/Yamada phase maps](06_hamiltonian_yamada_phase_maps.ipynb) | Unified finite-grid phase-map workflows | Scan cost depends on resolution and graph/projection complexity |
 
-For a first material or compact-TPMS exercise, use the
-[saved-result walkthrough](../../doc/applications/material_and_tpms_phase_maps.md)
+For a first material exercise, use the
+[saved-result walkthrough](../../doc/applications/material_phase_maps.md)
 and [research directory map](NewPhaseMapPlots/README.md). Reading or replotting
 saved records uses the base installation; a small new scan needs `nodal` and
 `viz`. The source checkout supplies the reference assets, which are not bundled

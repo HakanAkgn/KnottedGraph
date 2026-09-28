@@ -31,7 +31,7 @@ def _classification_status(record: dict[str, Any]) -> str:
 
 
 def read_phase_map_records(path: str | Path) -> tuple[dict[str, Any], ...]:
-    """Load a material/TPMS CSV or JSON record list and validate coordinates.
+    """Load a saved phase-map CSV or JSON record list and validate coordinates.
 
     Polynomial and signature fields remain text: no ``eval`` or ``sympify`` is
     used on files. CSV is preferable for browsing the large reference scans.
@@ -133,7 +133,7 @@ class PhaseMapData:
         )
         fields = {"energy" if "material" in r else "threshold_c" for r in subset}
         if len(fields) != 1:
-            raise ValueError(f"Family {family!r} mixes material and TPMS schemas.")
+            raise ValueError(f"Family {family!r} mixes energy and threshold schemas.")
         return cls(family, fields.pop(), subset)
 
     def summary(self) -> dict[str, Any]:

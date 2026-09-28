@@ -10,7 +10,6 @@ from .records import PhaseMapData, load_phase_map, read_phase_map_records
 
 FAMILIES = {
     "materials": ("tib2_d6_F", "co2mnga_t8", "ti3al_M2", "yh3_m1"),
-    "tpms": ("gyroid_to_diamond", "gyroid_to_schwarz_p", "schwarz_p_to_diamond"),
 }
 
 
@@ -54,13 +53,13 @@ def parser() -> argparse.ArgumentParser:
     scan.add_argument(
         "--level-count",
         type=_positive,
-        help="energy (materials) or threshold (TPMS) sample count",
+        help="energy sample count",
     )
     scan.add_argument(
         "--workers",
         type=_positive,
         default=1,
-        help="material processes; default 1; TPMS is serial",
+        help="material processes; default 1",
     )
     scan.add_argument("--max-exact-yamada-edges", type=_positive)
     scan.add_argument(
@@ -86,19 +85,11 @@ def scan_plan(args: argparse.Namespace) -> dict:
         raise ValueError(
             f"Unknown {args.kind} families {sorted(unknown)}; choose from {FAMILIES[args.kind]}."
         )
-    dimension = args.dimension or (
-        24 if quick else (140 if args.kind == "materials" else 64)
-    )
-    lambdas = args.lambda_count or (
-        3 if quick else (60 if args.kind == "materials" else 21)
-    )
-    levels = args.level_count or (
-        3 if quick else (0 if args.kind == "materials" else 21)
-    )
+    dimension = args.dimension or (24 if quick else 140)
+    lambdas = args.lambda_count or (3 if quick else 60)
+    levels = args.level_count or (3 if quick else 0)
     if dimension < 8 or lambdas < 2 or levels == 1:
         raise ValueError("Use dimension >= 8 and at least 2 samples on each scan axis.")
-    if args.kind == "tpms" and args.workers != 1:
-        raise ValueError("TPMS currently runs serially; use --workers 1.")
     return {
         "kind": args.kind,
         "profile": args.profile,
@@ -169,34 +160,19 @@ def main(argv: list[str] | None = None) -> None:
             with plt.rc_context(
                 {"font.family": "serif", "mathtext.fontset": "cm", "pdf.fonttype": 42}
             ):
-                if args.kind == "materials":
-                    from . import _materials
+                from . import _materials
 
-                    _materials.main(
-                        common
-                        + [
-                            "--energy-count",
-                            str(plan["level_count"]),
-                            "--workers",
-                            str(plan["workers"]),
-                            "--adaptive-energy-step",
-                            "0",
-                        ]
-                    )
-                else:
-                    from . import _tpms
-
-                    _tpms.main(
-                        common
-                        + [
-                            "--threshold-count",
-                            str(plan["level_count"]),
-                            "--threshold-min",
-                            "0",
-                            "--threshold-max",
-                            "0.3",
-                        ]
-                    )
+                _materials.main(
+                    common
+                    + [
+                        "--energy-count",
+                        str(plan["level_count"]),
+                        "--workers",
+                        str(plan["workers"]),
+                        "--adaptive-energy-step",
+                        "0",
+                    ]
+                )
             (args.output_dir / "run_plan.json").write_text(
                 json.dumps(plan, indent=2) + "\n", encoding="utf-8"
             )

@@ -2,7 +2,7 @@
 
 These examples scan a Hamiltonian coefficient with lambda and an energy/gap
 threshold for TiB2 and Co2MnGa. Start with the
-[complete walkthrough](../../../../doc/applications/material_and_tpms_phase_maps.md).
+[complete walkthrough](../../../../doc/applications/material_phase_maps.md).
 Commands below run from the repository root after installing this development
 checkout.
 

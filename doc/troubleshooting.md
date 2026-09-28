@@ -166,7 +166,7 @@ the required libraries and reproducibility checks.
 
 ## Report a reproducible issue
 
-Include the following when opening a [GitHub issue](https://github.com/sarinstein-yan/KnottedGraph/issues):
+Include the following when opening a [GitHub issue](https://github.com/HakanAkgn/KnottedGraph/issues):
 
 - the output of the environment/version commands at the top of this page;
 - the smallest input or graph that reproduces the problem;

@@ -164,6 +164,6 @@ backend. Without strict mode, the notebook emits explicit warnings instead of
 failing solely because the branch was renamed.
 
 Start with {doc}`../quickstart`, then use the
-[Advanced and Reproduction notebook](https://github.com/sarinstein-yan/KnottedGraph/blob/codex/arbitrary-knot-user-integration/User_guide/03_advanced_and_reproduction.ipynb).
+[Advanced and Reproduction notebook](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/03_advanced_and_reproduction.ipynb).
 Open formula discovery only when you need the held-out reconstruction/audit
 workflow and understand its native-backend and cache requirements.

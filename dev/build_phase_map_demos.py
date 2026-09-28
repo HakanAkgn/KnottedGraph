@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Publish preserved research demos with on-demand, content-addressed geometry.
 
-Run on a compute node: the upstream TPMS HTML alone is about 82 MB. This does
-not regenerate phase labels, smooth a grid, simplify a mesh or run extraction.
+This packages saved material results; it does not regenerate phase labels,
+smooth a grid, simplify a mesh or run extraction.
 It separates each original region object into an unchanged JSON asset and
 changes only the HTML loading controller. Source hashes are deliberately pinned.
 """
@@ -22,11 +22,6 @@ SOURCES = {
         "RealMaterials/html/07_hamiltonian_yamada_plotly_region_geometry_with_materials.html",
         "955603c79a70e9fc4890c21d1c6ead5a9a030367891902f510ce069be18496a0",
         "RealMaterials/figures/07_hamiltonian_yamada_material_phase_maps_3panel_like_porous.png",
-    ),
-    "tpms": (
-        "TPMS/html/tpms_compact_c0_03_dense_stable_yamada_plotly_region_geometry.html",
-        "07c256cf9ab2d47d27b31c41b5d0d256e4089356ff110a5f203c79cbeee2ebe2",
-        "TPMS/figures/tpms_compact_scaffold_phase_maps_overview.png",
     ),
 }
 
@@ -161,7 +156,7 @@ def split_demo(source: Path, destination: Path, *, expected_hash: str) -> dict:
         "<strong>Saved research result.</strong> Colors include Yamada values and structural signatures; "
         "display smoothing/merges and contraction grouping are not proofs of polynomial equality. "
         "A representative geometry is loaded on selection. "
-        '<a href="../../../applications/material_and_tpms_phase_maps.html">Read scope, provenance and usage</a>.'
+        '<a href="../../../applications/material_phase_maps.html">Read scope, provenance and usage</a>.'
         "</aside>"
     )
     prefix = prefix.replace("<body>", "<body>\n" + notice, 1)
@@ -198,7 +193,7 @@ def main(argv: list[str] | None = None) -> None:
     )
     args = parser.parse_args(argv)
     manifest = {
-        "upstream_commits": {"materials": "56bfbab", "tpms": "2b2ae6d"},
+        "upstream_commits": {"materials": "56bfbab"},
         "material_core_commit": "643fef8",
         "processing": "lossless JSON separation; no scientific recalculation",
         "demos": {},

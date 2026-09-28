@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "Please cite the KnottedGraph software paper when using this library. For scientific applications to handlebodies, Fermi surfaces and topological phase maps, please also cite the application paper in CITATION.bib."
+type: software
+title: KnottedGraph
+authors:
+  - family-names: Akgün
+    given-names: Hakan
+  - family-names: Yan
+    given-names: Xianquan
+  - family-names: Liu
+    given-names: Kehan
+  - family-names: Chen
+    given-names: Zhaoyun
+  - family-names: Lee
+    given-names: Ching Hua
+repository-code: https://github.com/HakanAkgn/KnottedGraph
+url: https://hakanakgn.github.io/KnottedGraph/
+preferred-citation:
+  type: article
+  title: "KnottedGraph: Scalable knotted-graph topology for scientific and mathematical discovery"
+  authors:
+    - family-names: Akgün
+      given-names: Hakan
+    - family-names: Yan
+      given-names: Xianquan
+    - family-names: Liu
+      given-names: Kehan
+    - family-names: Chen
+      given-names: Zhaoyun
+    - family-names: Lee
+      given-names: Ching Hua
+  year: 2026
+  journal: arXiv
+  url: https://arxiv.org/abs/2609.31152
+  identifiers:
+    - type: other
+      value: arXiv:2609.31152

@@ -4,10 +4,10 @@
   <p class="kg-lead">Start with a small tested route, then move from input handling to graph inspection, projection, invariant evaluation, and only then to application or publication workflows.</p>
   <div class="kg-link-row">
     <a href="../feature_status.html">Choose A Supported Route</a>
-    <a href="https://github.com/sarinstein-yan/KnottedGraph/blob/codex/arbitrary-knot-user-integration/User_guide/00_user_guide.ipynb">Open the notebook map</a>
-    <a href="https://github.com/sarinstein-yan/KnottedGraph/blob/codex/arbitrary-knot-user-integration/User_guide/01_getting_started.ipynb">Getting Started</a>
-    <a href="https://github.com/sarinstein-yan/KnottedGraph/blob/codex/arbitrary-knot-user-integration/User_guide/02_core_workflows.ipynb">Core Workflows</a>
-    <a href="https://github.com/sarinstein-yan/KnottedGraph/blob/codex/arbitrary-knot-user-integration/User_guide/03_advanced_and_reproduction.ipynb">Advanced And Reproduction</a>
+    <a href="https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/00_user_guide.ipynb">Open the notebook map</a>
+    <a href="https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/01_getting_started.ipynb">Getting Started</a>
+    <a href="https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/02_core_workflows.ipynb">Core Workflows</a>
+    <a href="https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/03_advanced_and_reproduction.ipynb">Advanced And Reproduction</a>
   </div>
 </div>
 

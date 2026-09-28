@@ -3,7 +3,7 @@
 <div class="kg-hero">
   <p class="kg-lead">Construct a named knot, torus knot/link, or Artin-braid closure as an analytic complex field; diagnose a sampled tubular level set; convert the accepted volume to a spatial graph; and optionally scan a deformation between two fields.</p>
   <div class="kg-link-row">
-    <a href="https://github.com/sarinstein-yan/KnottedGraph/blob/codex/arbitrary-knot-user-integration/User_guide/applications/04_analytic_knot_fields.ipynb">Open the application notebook</a>
+    <a href="https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/applications/04_analytic_knot_fields.ipynb">Open the application notebook</a>
     <a href="../feature_status.html">Check extras and scaling</a>
   </div>
 </div>

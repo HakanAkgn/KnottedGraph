@@ -208,7 +208,6 @@ jobs:
           src tests examples/quickstart.py dev/check_repository_consistency.py
           dev/build_phase_map_demos.py
           User_guide/applications/NewPhaseMapPlots/RealMaterials/scripts
-          User_guide/applications/NewPhaseMapPlots/TPMS/scripts
 
       - name: Run incremental Pyright checks
         run: uv run --no-sync pyright

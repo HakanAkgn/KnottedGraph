@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 project = "KnottedGraph"
-author = "Xianquan (Sarinstein) Yan, Hakan Akgün"
+author = "KnottedGraph contributors"
 copyright = "2026, KnottedGraph contributors"
 release = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))[
     "project"
@@ -37,12 +37,14 @@ html_title = "KnottedGraph"
 html_static_path = ["_static"]
 html_extra_path = ["assets"]
 html_css_files = ["custom.css"]
+# Standalone guides have no child sections; reserve width for figures and tables.
+html_sidebars = {name: [] for name in ("index", "paper_results", "benchmarks", "sanity_checks", "citing")}
 html_theme_options = {
     "announcement": (
         "Pre-alpha 0.2 development documentation. The indexed PyPI 0.1.2 "
         "package uses the legacy API; follow the version-aware Installation page."
     ),
-    "github_url": "https://github.com/sarinstein-yan/KnottedGraph",
+    "github_url": "https://github.com/HakanAkgn/KnottedGraph",
     "navigation_depth": 3,
     "show_nav_level": 2,
     "show_toc_level": 2,

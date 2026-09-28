@@ -6,7 +6,7 @@ It is not a Hamiltonian-file parser and it is not a proof of a continuum phase
 boundary.
 
 For the additional material-parameter and compact-scaffold plots, continue to
-{doc}`material_and_tpms_phase_maps`. That guide starts from saved records and
+{doc}`material_phase_maps`. That guide starts from saved records and
 provides a separate bounded compute example; the accepted nodal viewer below is
 unchanged.
 
@@ -14,7 +14,7 @@ unchanged.
   <p class="kg-lead">Use the interactive result to select a transition and a phase region, then inspect a representative exceptional surface and its simplified spatial-graph skeleton. Use the notebook when you need to regenerate the grid, caches, audits, or figures.</p>
   <div class="kg-link-row">
     <a href="../demos/hamiltonian_yamada_phase_map.html">Open the interactive result full screen</a>
-    <a href="https://github.com/sarinstein-yan/KnottedGraph/blob/codex/arbitrary-knot-user-integration/User_guide/applications/06_hamiltonian_yamada_phase_maps.ipynb">Open the reproduction notebook</a>
+    <a href="https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/applications/06_hamiltonian_yamada_phase_maps.ipynb">Open the reproduction notebook</a>
     <a href="../api/applications.html">Phase-map API</a>
   </div>
 </div>

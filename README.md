@@ -2,7 +2,7 @@
 
 ![pre-alpha](https://img.shields.io/badge/status-pre--alpha-red?style=flat-square)
 [![PyPI](https://img.shields.io/pypi/v/knotted_graph)](https://pypi.org/project/knotted_graph/)
-[![Docs](https://img.shields.io/badge/docs-published%20snapshot-blue)](https://sarinstein-yan.github.io/KnottedGraph/)
+[![Docs](https://img.shields.io/badge/docs-online-blue)](https://hakanakgn.github.io/KnottedGraph/)
 
 **KnottedGraph turns geometric, graph, knot-field, and Hamiltonian-derived
 objects into inspectable spatial graphs, planar diagrams, and Yamada
@@ -10,24 +10,57 @@ polynomials.** It separates the reusable graph/projection/invariant core from
 optional scientific applications such as nodal skeletons, analytic knot
 fields, material surfaces, and repulsive layouts.
 
-<p align="center">
-  <img src="assets/paper/architecture.svg" width="780" alt="KnottedGraph architecture from geometric input to graph, projection, and invariant">
-</p>
+## Please cite our work
 
-## Read this version note first
+If you use KnottedGraph, please cite **[KnottedGraph: Scalable knotted-graph topology
+for scientific and mathematical discovery](https://arxiv.org/abs/2609.31152)**
+(Akgün, Yan, Liu, Chen and Lee, 2026).
 
-KnottedGraph is pre-alpha and the public distribution channels are not yet
-synchronized:
+For scientific applications to handlebody topology, Fermi-surface dispersions,
+Lifshitz transitions and topological phase maps, please also cite
+**[Topological classification through knotted graphs: Fermi surface dispersions
+and Lifshitz transitions](https://arxiv.org/abs/2609.13390)**
+(Akgün, Yan and Lee, 2026). [Copy the BibTeX entries](CITATION.bib).
 
-| Channel | Current state |
-| --- | --- |
-| This review branch | 0.2.0 development API on `codex/arbitrary-knot-user-integration` |
-| PyPI | legacy 0.1.2 nodal-only layout; incompatible with the examples below |
-| Published website | an earlier documentation snapshot; some pages from this branch are not deployed yet |
+## Explore the paper and its data
 
-Until 0.2 is released and the documentation branch is merged, reviewers and
-contributors should use the source checkout below. Do not use an unpinned
-`pip install knotted_graph` for these examples.
+**[Figures and results](doc/paper_results.md)** ·
+**[Benchmark CSVs and interpretation](doc/benchmarks.md)** ·
+**[Sanity checks](doc/sanity_checks.md)** ·
+**[Online documentation](https://hakanakgn.github.io/KnottedGraph/)**
+
+The paper guide links each figure to its data, methods and notebook. Read the
+saved benchmark records without rerunning a calculation:
+
+```bash
+uv run --no-project python scripts/inspect_paper_data.py
+```
+
+This standard-library command verifies file hashes and case alignment, then
+summarizes the **112 saved scaling cases** and **4,400 handlebody cases**.
+See the [data inventory](User_guide/benchmarks/results/README.md) for direct CSV
+links, timing definitions and the availability of the formula-discovery records.
+
+### Published results at a glance
+
+| Paper result | Saved evidence | Read the figure |
+| --- | --- | --- |
+| Exact published-polynomial checks through 500 crossings; 112 saved cases | [Scaling CSV](User_guide/benchmarks/results/03_knottedgraph_vs_topoly_scaling_rows.csv) | [Figure 3 and timing protocol](doc/benchmarks.md) |
+| Normalized Yamada preserved in 4,400 accepted handlebody cases | [Preservation CSV](User_guide/benchmarks/results/handlebody_ground_truth/synthetic_ground_truth_yamada_preservation.csv) | [Supplementary Figures 6–7](doc/paper_results.md) |
+| Per-stage timings with completed/timeout/error status retained | [Timing-figure CSV](User_guide/benchmarks/results/04_thick_handlebody_time_distribution_plot_source.csv) | [CSV columns and comparison rules](doc/benchmarks.md) |
+
+[![Published Figure 3: reference families and invariant-evaluation scaling](doc/assets/paper_figures/figure-3.png)](https://hakanakgn.github.io/KnottedGraph/paper_results.html#figure-3-exact-evaluation-through-500-crossings)
+
+*Figure 3 from [arXiv:2609.31152v1](https://arxiv.org/abs/2609.31152v1).
+Open the [figure guide](doc/paper_results.md) for all 15 original PDFs, method
+links and the availability of each result dataset.*
+
+## Version and installation
+
+This repository provides the **0.2.0 development API** on `main`.
+The legacy 0.1.2 PyPI release uses a different, nodal-only API; install from
+source for the examples below. The website is built from `main`; see the
+[installation guide](doc/installation.md) for dependencies and version checks.
 
 ## Start here
 
@@ -48,12 +81,16 @@ Choose the row that matches the object you already have:
 The complete availability, extra, return-type, and scaling matrix is in
 [`doc/feature_status.md`](doc/feature_status.md).
 
-For the newly added material/TPMS plots, start with the
-[phase-map walkthrough](doc/applications/material_and_tpms_phase_maps.md), not
+For material plots, start with the
+[phase-map walkthrough](doc/applications/material_phase_maps.md), not
 the raw research scripts. It covers saved-result inspection, raw replotting,
 coarse compute examples and the boundary to full research reproduction.
 
 ## The core mental model
+
+<p align="center">
+  <img src="assets/paper/architecture.svg" width="780" alt="KnottedGraph architecture from geometric input to graph, projection, and invariant">
+</p>
 
 Most graph-returning routes meet at one data contract:
 
@@ -76,14 +113,14 @@ source data
 - Closure, chain/model selection, coordinate units, and projection choice are
   scientific decisions and should be recorded explicitly.
 
-## Install the current review build
+## Install from source
 
 KnottedGraph requires Python 3.11 or newer. The recommended environment uses
 [uv](https://docs.astral.sh/uv/):
 
 ```bash
-git clone --branch codex/arbitrary-knot-user-integration --single-branch \
-  https://github.com/sarinstein-yan/KnottedGraph.git
+git clone --branch main --single-branch \
+  https://github.com/HakanAkgn/KnottedGraph.git
 cd KnottedGraph
 uv sync --group dev
 uv run python examples/quickstart.py
@@ -163,6 +200,10 @@ running large calculations.
 
 ## Documentation map
 
+- [Paper figures and results](doc/paper_results.md): figure, claim, data and method links.
+- [Benchmarks](doc/benchmarks.md): recorded results and downloadable CSVs.
+- [Sanity checks](doc/sanity_checks.md): small correctness checks and expected outcomes.
+
 - [Installation](doc/installation.md): versions, environments, extras, native boundaries.
 - [Quick Start](doc/quickstart.md): copyable graph-to-invariant example with expected output.
 - [Input handling](doc/user_guide/input_adapters.md): supported formats, result objects, closure, units, and errors.
@@ -186,6 +227,6 @@ uv run --group docs python -m sphinx -b html -W --keep-going doc doc/_build/html
 ```
 
 For questions or reproducible bug reports, use the
-[GitHub issue tracker](https://github.com/sarinstein-yan/KnottedGraph/issues)
+[GitHub issue tracker](https://github.com/HakanAkgn/KnottedGraph/issues)
 and include the package version, commit, Python version, optional extras, and
 native-backend status.

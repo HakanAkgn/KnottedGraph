@@ -19,7 +19,7 @@ from knotted_graph.applications.phase_map_examples.cli import main, parser, scan
 
 def row(**updates):
     result = {
-        "family": "gyroid_to_diamond",
+        "family": "example_family",
         "lam": 0,
         "threshold_c": 0,
         "source": "yamada",
@@ -176,7 +176,7 @@ def test_inspect_and_plot_cli(tmp_path, capsys):
     assert (tmp_path / "cli.pdf").exists()
 
 
-@pytest.mark.parametrize("kind", ["materials", "tpms"])
+@pytest.mark.parametrize("kind", ["materials"])
 def test_dry_run_is_bounded_and_has_no_side_effects(tmp_path, capsys, kind):
     output = tmp_path / "unused"
     main(["scan", kind, "--output-dir", str(output), "--dry-run"])
@@ -194,11 +194,10 @@ def test_dry_run_is_bounded_and_has_no_side_effects(tmp_path, capsys, kind):
         (["--dimension", "7"], "dimension"),
         (["--lambda-count", "1"], "samples"),
         (["--level-count", "1"], "samples"),
-        (["--workers", "2"], "serial"),
     ],
 )
 def test_scan_plan_rejects_invalid_configuration(arguments, message):
-    args = parser().parse_args(["scan", "tpms", "--output-dir", "unused", *arguments])
+    args = parser().parse_args(["scan", "materials", "--output-dir", "unused", *arguments])
     with pytest.raises(ValueError, match=message):
         scan_plan(args)
 
@@ -207,7 +206,7 @@ def test_scan_refuses_existing_results_before_optional_imports(tmp_path):
     path = write_records(tmp_path, [row()])
     original = path.read_bytes()
     with pytest.raises(SystemExit) as exc:
-        main(["scan", "tpms", "--output-dir", str(tmp_path)])
+        main(["scan", "materials", "--output-dir", str(tmp_path)])
     assert exc.value.code == 2
     assert path.read_bytes() == original
 
@@ -260,14 +259,11 @@ def test_cli_families_match_engines():
     pytest.importorskip("pyvista")
     pytest.importorskip("poly2graph")
     pytest.importorskip("plotly")
-    from knotted_graph.applications.phase_map_examples import _materials, _tpms
+    from knotted_graph.applications.phase_map_examples import _materials
     from knotted_graph.applications.phase_map_examples.cli import FAMILIES
 
     assert set(FAMILIES["materials"]) == {
         f.key for f in _materials.material_families(8)
-    }
-    assert set(FAMILIES["tpms"]) == {
-        f.key for f in _tpms.tpms_families(dimension=8, thresholds=(0.0, 0.3))
     }
     defaults = _materials.parse_args([])
     assert defaults.adaptive_energy_step == 0
@@ -281,7 +277,6 @@ def test_cli_families_match_engines():
     "kind, stem",
     [
         ("materials", "material_parameter_phase_map"),
-        ("tpms", "tpms_parameter_phase_map"),
     ],
 )
 def test_quick_scan_round_trip_on_optional_stack(tmp_path, kind, stem):
@@ -299,28 +294,23 @@ def test_quick_scan_round_trip_on_optional_stack(tmp_path, kind, stem):
     summary = json.loads((output / (stem + "_summary.json")).read_text())
     assert summary["families"][0]["dimension"] == 24
     assert str(output) in str(summary)
-    if kind == "tpms":
-        assert len(list((output / "geometry").glob("*.json.gz"))) == 9
-        assert all(r["surface_is_closed"] == "True" for r in data.records)
-        assert summary["scan_parameters"]["domain_kind"] == "sphere"
-    else:
-        assert all(r["classification_computed"] is True for r in data.records)
-        assert data.summary()["resolution_calibration_records"] == 0
-        from knotted_graph.applications.phase_map_examples import _materials
+    assert all(r["classification_computed"] is True for r in data.records)
+    assert data.summary()["resolution_calibration_records"] == 0
+    from knotted_graph.applications.phase_map_examples import _materials
 
-        records_path = output / (stem + "_records.json")
-        before = json.loads(records_path.read_text())
-        _materials.main(["--output-dir", str(output), "--reuse-records"])
-        assert json.loads(records_path.read_text()) == before
-        reused = json.loads((output / (stem + "_summary.json")).read_text())
-        assert (
-            reused["map_info"][data.family][
-                "classification_resolution_calibration_cells"
-            ]
-            == 0
-        )
-        assert reused["map_info"][data.family]["c6_symmetry_merges"] == []
-        assert reused["map_info"]["reprocessed_from_existing_records"] is True
+    records_path = output / (stem + "_records.json")
+    before = json.loads(records_path.read_text())
+    _materials.main(["--output-dir", str(output), "--reuse-records"])
+    assert json.loads(records_path.read_text()) == before
+    reused = json.loads((output / (stem + "_summary.json")).read_text())
+    assert (
+        reused["map_info"][data.family][
+            "classification_resolution_calibration_cells"
+        ]
+        == 0
+    )
+    assert reused["map_info"][data.family]["c6_symmetry_merges"] == []
+    assert reused["map_info"]["reprocessed_from_existing_records"] is True
 
 
 def test_c6_display_grouping_requires_explicit_research_option():
@@ -396,40 +386,6 @@ def test_energy_sampling_preserves_results_until_explicit_calibration(
     assert calibrated[0].classification_computed is False
     assert calibrated[0].resolution_calibration_energy == 0.75
     assert records[0].phase_signature == "thin"
-
-
-def test_tpms_viewer_reconstructs_exact_recorded_domain():
-    for dependency in ("pyvista", "poly2graph", "skimage"):
-        pytest.importorskip(dependency)
-    from knotted_graph.applications.phase_map_examples import _tpms
-
-    script = (
-        Path(__file__).resolve().parents[2]
-        / "User_guide/applications/NewPhaseMapPlots"
-        / "TPMS/scripts/tpms_plotly_region_geometry.py"
-    )
-    spec = importlib.util.spec_from_file_location("tpms_viewer", script)
-    assert spec and spec.loader
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    options = {
-        "domain_kind": "cylinder",
-        "span_half_width": 5.0,
-        "domain_radius_fraction": 0.6,
-    }
-    family = _tpms.tpms_families(dimension=12, thresholds=(0.0, 0.3), **options)[0]
-    saved = {
-        "dimension": 12,
-        "thresholds": [0.0, 0.3],
-        "key": family.key,
-        "span": family.span,
-        "compact_domain": {"key": family.domain.key, "formula": family.domain.formula},
-    }
-    restored = module.family_from_summary(_tpms, saved, options)
-    assert restored.domain.formula == family.domain.formula
-    assert restored.span == family.span
-    with pytest.raises(ValueError, match="differs"):
-        module.family_from_summary(_tpms, saved, {})
 
 
 def test_demo_separation_is_lossless_and_hash_guarded(tmp_path):

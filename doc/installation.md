@@ -2,24 +2,20 @@
 
 ## Choose the API version first
 
-KnottedGraph requires Python 3.11 or newer. This review documentation describes
-the 0.2.0 development API on `codex/arbitrary-knot-user-integration`. The
-published website is still an earlier snapshot and is not the source of truth
-for this review.
+KnottedGraph requires Python 3.11 or newer. This documentation describes the
+0.2.0 development API on `main`. The website is built from that branch.
 
-[PyPI](https://pypi.org/project/knotted_graph/) was checked on 2026-09-11 and
-provides version 0.1.2. That release contains the legacy,
-nodal-only package layout and is not compatible with the imports or examples in
-these 0.2.0 development documents. Until 0.2.0 is published, install the current
-API from GitHub rather than running an unpinned `pip install knotted_graph`.
+The [PyPI release](https://pypi.org/project/knotted_graph/) uses the legacy
+0.1.2 nodal-only API. Install this source checkout for the examples in these
+documents. The software and application papers are listed in {doc}`citing`.
 
 ## Recommended source setup with uv
 
 Install [uv](https://docs.astral.sh/uv/), then clone the documented branch:
 
 ```bash
-git clone --branch codex/arbitrary-knot-user-integration --single-branch \
-  https://github.com/sarinstein-yan/KnottedGraph.git
+git clone --branch main --single-branch \
+  https://github.com/HakanAkgn/KnottedGraph.git
 cd KnottedGraph
 ```
 
@@ -60,7 +56,7 @@ uv run pytest
 ## Source setup with pip
 
 If uv is unavailable, create and activate a Python 3.11-or-newer virtual
-environment, clone the review branch as above, and install the checkout:
+environment, clone `main` as above, and install the checkout:
 
 ```bash
 python -m pip install --upgrade pip

@@ -49,12 +49,12 @@ diagnostics; `boundary_filling_groups` returns outer and nested fillings.
    :members: YamadaPhaseRecord, YamadaPhaseMapResult, VolumeTopology, MaterialBandEnergySurface, align_material_hamiltonians, pad_material_hamiltonian, make_yamada_phase_map, enclosed_void_masks, resolve_volume_mask, volume_topology, boundary_filling_groups
 ```
 
-## Saved material and compact-TPMS examples
+## Saved material examples
 
 These pre-alpha application helpers read record tables; they do not parse
-general Hamiltonian or TPMS files. Reading and raw plotting use the base stack.
+general Hamiltonian files. Reading and raw plotting use the base stack.
 New scans need the optional scientific dependencies and explicit compute
-resources described in {doc}`../applications/material_and_tpms_phase_maps`.
+resources described in {doc}`../applications/material_phase_maps`.
 The detailed research engines (underscore-prefixed modules) are implementation
 details, not a new stable mathematical API.
 

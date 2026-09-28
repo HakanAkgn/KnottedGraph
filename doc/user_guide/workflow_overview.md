@@ -7,7 +7,7 @@ object. The common part begins once an embedded spatial graph is available.
   <a href="../feature_status.html">Choose by starting object</a>
   <a href="input_adapters.html">Load external data</a>
   <a href="projection_yamada.html">Projection and Yamada</a>
-  <a href="https://github.com/sarinstein-yan/KnottedGraph/blob/codex/arbitrary-knot-user-integration/User_guide/02_core_workflows.ipynb">Open Core Workflows notebook</a>
+  <a href="https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/02_core_workflows.ipynb">Open Core Workflows notebook</a>
 </div>
 
 <div class="kg-wide-figure">
@@ -168,5 +168,5 @@ For a result intended for comparison or publication, save:
 9. runtime environment and relevant optional/native dependency versions.
 
 Continue with {doc}`projection_yamada` for diagram/invariant details or open the
-[Core Workflows notebook](https://github.com/sarinstein-yan/KnottedGraph/blob/codex/arbitrary-knot-user-integration/User_guide/02_core_workflows.ipynb)
+[Core Workflows notebook](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/02_core_workflows.ipynb)
 for a staged executable example.

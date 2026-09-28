@@ -11,7 +11,9 @@ crossing-free spatial embedding.
 | Run the first examples | [Getting started](01_getting_started.ipynb) | Installation checks and a small graph workflow |
 | Work with your own data | [Core workflows](02_core_workflows.ipynb) and [Input Handling](../doc/user_guide/input_adapters.md) | Supported input calls, graph checks and projection |
 | Understand advanced options | [Advanced and reproduction](03_advanced_and_reproduction.ipynb) | Optional workflows and reproduction boundaries |
-| Choose a scientific example | [Applications](applications/README.md) | Six application notebooks and material/TPMS saved results |
+| Choose a scientific example | [Applications](applications/README.md) | Six application notebooks and material saved results |
+| Inspect paper figures and saved data | [Paper guide](../doc/paper_results.md) and [CSV inventory](benchmarks/results/README.md) | Existing results, no rerun needed |
+| Run a small sanity check | [Commands and expected outcomes](../doc/sanity_checks.md) | Algebraic and public-API checks |
 | Check correctness evidence | [Yamada sanity checks](benchmarks/01_yamada_sanity_checks.ipynb) and [application regressions](benchmarks/02_application_regression_checks.ipynb) | Focused checks; publication benchmarks have separate resource needs |
 
 Read notebooks on GitHub to inspect their saved content. To execute locally,

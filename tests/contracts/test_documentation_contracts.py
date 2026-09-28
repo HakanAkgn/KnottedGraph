@@ -19,8 +19,8 @@ ROOT = Path(__file__).resolve().parents[2]
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 GITHUB_FILE_URL = re.compile(
     r"https://(?:"
-    r"github\.com/sarinstein-yan/KnottedGraph/(?:blob|raw)/"
-    r"|raw\.githubusercontent\.com/sarinstein-yan/KnottedGraph/"
+    r"github\.com/HakanAkgn/KnottedGraph/(?:blob|raw)/"
+    r"|raw\.githubusercontent\.com/HakanAkgn/KnottedGraph/"
     r")([^\s)\"'>]+)"
 )
 
@@ -61,7 +61,7 @@ def test_fixed_github_file_links_share_one_ref_and_resolve_locally():
                 raise AssertionError(f"GitHub file URL has no local target: {target}")
 
     assert matches
-    assert {ref for ref, _ in matches} == {"codex/arbitrary-knot-user-integration"}
+    assert {ref for ref, _ in matches} == {"main"}
     for _, relative_path in matches:
         local_path = ROOT / unquote(relative_path.split("#", 1)[0])
         assert local_path.exists(), local_path

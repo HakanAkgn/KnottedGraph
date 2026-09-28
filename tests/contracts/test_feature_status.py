@@ -144,7 +144,7 @@ EXPECTED_ROUTE_FIELDS = {
         "`knotted_graph.applications.make_yamada_phase_map`",
         "`YamadaPhaseMapResult`",
     ),
-    "Saved material or compact-TPMS phase-map records": (
+    "Saved material phase-map records": (
         "Application API · base",
         "none",
         "`knotted_graph.applications.phase_map_examples.load_phase_map`",

@@ -3,6 +3,10 @@
 <div class="kg-hero">
   <p class="kg-lead"><strong>KnottedGraph</strong> organizes geometric input, graph extraction, projection, PD encoding, layout, visualization, and Yamada-polynomial computation into a reusable research library. Start with the version-aware installation guide and tested Quick Start, then continue to the workflow pages and notebooks.</p>
   <div class="kg-link-row">
+    <a href="paper_results.html">Paper Figures &amp; Data</a>
+    <a href="benchmarks.html">Benchmarks</a>
+    <a href="sanity_checks.html">Sanity Checks</a>
+    <a href="citing.html">Cite Our Work</a>
     <a href="installation.html">Install</a>
     <a href="quickstart.html">Quick Start</a>
     <a href="feature_status.html">Choose A Workflow</a>
@@ -16,9 +20,18 @@
   <img src="site_figures/architecture.png" alt="KnottedGraph package architecture">
 </div>
 
+## Read the paper, inspect the evidence
+
+The {doc}`paper_results` guide places the published figures beside their source
+data and notebooks. The {doc}`benchmarks` page explains the 500-crossing scaling
+measurements and 4,400-case construction benchmark, with direct CSV downloads.
+Use {doc}`sanity_checks` for the small correctness checks and their expected
+outcomes. Please {doc}`cite the software and application papers <citing>` when
+using this work.
+
 ## New here?
 
-1. Read {doc}`installation` so the 0.2 review API is not confused with the
+1. Read {doc}`installation` so the 0.2 development API is not confused with the
    legacy PyPI package.
 2. Run {doc}`quickstart` and compare the printed polynomial with the expected
    result.
@@ -44,6 +57,10 @@ using **Run All**.
 :hidden:
 :maxdepth: 2
 
+Paper & data <paper_results>
+Benchmarks <benchmarks>
+Sanity checks <sanity_checks>
+Cite our work <citing>
 installation
 quickstart
 feature_status

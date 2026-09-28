@@ -14,7 +14,7 @@ application-level representations shown in research figures.
   <a href="../feature_status.html">Feature-status matrix</a>
   <a href="workflow_overview.html">Continue through the workflow</a>
   <a href="../api/inputs.html">Inputs API</a>
-  <a href="https://github.com/sarinstein-yan/KnottedGraph/blob/codex/arbitrary-knot-user-integration/User_guide/01_getting_started.ipynb">Open Getting Started</a>
+  <a href="https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/01_getting_started.ipynb">Open Getting Started</a>
 </div>
 
 ## Supported public routes

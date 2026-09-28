@@ -1,4 +1,4 @@
-"""Guided material and compact-TPMS phase-map applications.
+"""Guided material phase-map applications.
 
 Read and plot saved records without the surface-extraction extras. Computing
 new records is an optional, resource-intensive application workflow; see

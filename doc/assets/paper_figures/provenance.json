@@ -1,0 +1,113 @@
+{
+  "source": "https://arxiv.org/src/2609.31152v1",
+  "paper": "https://arxiv.org/abs/2609.31152v1",
+  "source_archive_sha256": "8a5c4ec2f2c67bf55eefc8bf9c7b3258bea52a1ed49568c15054e1b1f6cfa00f",
+  "note": "Original author PDF figures copied without modification. PNGs are previews rendered from page 1 at 1500 pixels wide; no scientific calculations were run. Figure numbering refers to arXiv v1.",
+  "figures": [
+    {
+      "figure": "Figure 1",
+      "pdf": "figure-1.pdf",
+      "preview": "figure-1.png",
+      "source_path": "GeneralVersion/Figures/InputFormatsOverview_Pipeline.pdf",
+      "sha256": "882d2ecaa5341d41d48d36627386c6011917a332b2160c54d5985a350a3d139c"
+    },
+    {
+      "figure": "Figure 2",
+      "pdf": "figure-2.pdf",
+      "preview": "figure-2.png",
+      "source_path": "GeneralVersion/Figures/Provided_Functionalities.pdf",
+      "sha256": "6927b983c6332cfba55935643c3ba7289c2b3cbd99221517ebe8b8ac89698377"
+    },
+    {
+      "figure": "Figure 3",
+      "pdf": "figure-3.pdf",
+      "preview": "figure-3.png",
+      "source_path": "GeneralVersion/Figures/KnottedGraphVsTopoly.pdf",
+      "sha256": "368cf68ae6c71747a82a79be9e85e794fd9422b7cf4d7429f12c0fc55d885e99"
+    },
+    {
+      "figure": "Figure 4",
+      "pdf": "figure-4.pdf",
+      "preview": "figure-4.png",
+      "source_path": "GeneralVersion/Figures/MathematicalGraphPatterns/LLMBasedFormulaDiscovery_Yamada.pdf",
+      "sha256": "ceaddd853f896df287b1a24c37383ef48d08642a887b68fa9b06a6fe961b677d"
+    },
+    {
+      "figure": "Supplementary Figure 1",
+      "pdf": "supp-1.pdf",
+      "preview": "supp-1.png",
+      "source_path": "GeneralVersion/Figures/InputYamadaExamples.pdf",
+      "sha256": "dbbfea367c966c615f355e20f76317983b456e069b0b6cecf83251df6b574048"
+    },
+    {
+      "figure": "Supplementary Figure 2",
+      "pdf": "supp-2.pdf",
+      "preview": "supp-2.png",
+      "source_path": "GeneralVersion/Figures/SkeletonizationSteps.pdf",
+      "sha256": "a35765b88bf88284ce8912650cf23f4b4c0cd5cff51a82540858e83a58f7873b"
+    },
+    {
+      "figure": "Supplementary Figure 3",
+      "pdf": "supp-3.pdf",
+      "preview": "supp-3.png",
+      "source_path": "GeneralVersion/Figures/PDCodeGeneration.pdf",
+      "sha256": "cc918af545e50a63e40b1a618836c6f455033b339d4d551c4dd832821818881e"
+    },
+    {
+      "figure": "Supplementary Figure 4",
+      "pdf": "supp-4.pdf",
+      "preview": "supp-4.png",
+      "source_path": "GeneralVersion/Figures/PDcode_to_yamada.pdf",
+      "sha256": "2de793f35945162852f229bfc950b564ee1f3414a6f6ef6c28e5f83a2a66016e"
+    },
+    {
+      "figure": "Supplementary Figure 5",
+      "pdf": "supp-5.pdf",
+      "preview": "supp-5.png",
+      "source_path": "GeneralVersion/Figures/YamadaResolutions.pdf",
+      "sha256": "b9b8e77f1bfe8f4bcecc2cb18a51347301840addb176d5e875732e02565eea1e"
+    },
+    {
+      "figure": "Supplementary Figure 6",
+      "pdf": "supp-6.pdf",
+      "preview": "supp-6.png",
+      "source_path": "GeneralVersion/Figures/HandleBody_YamadaFramework_Stresstest.pdf",
+      "sha256": "2c9f33b4fcb39a1f6de2f23ed51468b195a22d32763249f7e445d3de4b428f10"
+    },
+    {
+      "figure": "Supplementary Figure 7",
+      "pdf": "supp-7.pdf",
+      "preview": "supp-7.png",
+      "source_path": "GeneralVersion/Figures/Time_distributions.pdf",
+      "sha256": "29e4c47f7320a97fefa54cf2b85f56d8f56680e06b4689128387bc25b0aa8288"
+    },
+    {
+      "figure": "Supplementary Figure 8",
+      "pdf": "supp-8.pdf",
+      "preview": "supp-8.png",
+      "source_path": "GeneralVersion/Figures/PhaseDIagrams.pdf",
+      "sha256": "d27a61f0c13924a3dd3f134da616cfbb7c79cb8233136f001c4329ec1179af13"
+    },
+    {
+      "figure": "Supplementary Figure 9",
+      "pdf": "supp-9.pdf",
+      "preview": "supp-9.png",
+      "source_path": "GeneralVersion/Figures/Repulsive_curves.pdf",
+      "sha256": "74cde48ffe3618a5c3710cb80ac0484d9da4a3e45b72417b553b0240827f19df"
+    },
+    {
+      "figure": "Supplementary Figure 10",
+      "pdf": "supp-10.pdf",
+      "preview": "supp-10.png",
+      "source_path": "GeneralVersion/Figures/MathematicalGraphPatterns/NonAbelianWorkedExample.pdf",
+      "sha256": "6a82908d7276af33a5a9e4f9a53e45cd41734fdbdc49bbb26c9ba4a95afca305"
+    },
+    {
+      "figure": "Supplementary Figure 11",
+      "pdf": "supp-11.pdf",
+      "preview": "supp-11.png",
+      "source_path": "GeneralVersion/Figures/Architecture.pdf",
+      "sha256": "40391e2958502ffd4e490cbaadbf42ef759fa75f86136b5ec389722720aea58e"
+    }
+  ]
+}

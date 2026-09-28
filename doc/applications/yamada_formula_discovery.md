@@ -7,7 +7,7 @@ to learn the Yamada API. Start with {doc}`../quickstart` and
 <div class="kg-hero">
   <p class="kg-lead">The formula-discovery notebook generates exact Laurent-polynomial data, separates discovery from held-out verification, and tests homogeneous, Abelian mixed-word, and non-Abelian ordered-word families. Browsing is branch-independent; strict regeneration is an explicit opt-in.</p>
   <div class="kg-link-row">
-    <a href="https://github.com/sarinstein-yan/KnottedGraph/blob/codex/arbitrary-knot-user-integration/User_guide/applications/05_yamada_formula_discovery.ipynb">Open the notebook</a>
+    <a href="https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/applications/05_yamada_formula_discovery.ipynb">Open the notebook</a>
     <a href="../user_guide/projection_yamada.html">Review projection and Yamada concepts</a>
   </div>
 </div>
@@ -29,6 +29,17 @@ The held-out calculations are evidence for the displayed identities over the
 tested families. They are not, by themselves, an all-parameter mathematical
 proof; an analytic proof must still derive the transfer identities from the
 Yamada skein algebra.
+
+## Saved-data availability
+
+The {doc}`../paper_results` page shows the published Figure 4 and Supplementary
+Figure 10. The generated `05a_*`, `05b_*` and `05c_*` CSV/JSON records are not
+included in the current source snapshot, and the notebook has no saved
+execution outputs. Its intended output directory is
+`User_guide/applications/results/05_yamada_formula_discovery/`.
+Reading the notebook therefore exposes the procedure, not a downloadable
+archive of its held-out results. The older structured-graph gallery CSV is a
+different dataset. No new scientific calculations are run by the website build.
 
 ## Browse versus regenerate
 
