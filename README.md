@@ -225,19 +225,20 @@ uv run python examples/quickstart.py
 The example deliberately uses `n_jobs=1`, reports the selected crossing count,
 and verifies that the abstract and embedded calculations agree.
 
-## What the package currently does not claim
+## Supported inputs and practical notes
 
-The presence of a format in a research figure does not imply a public parser.
-There is currently no generic public adapter for GraphML, SWC, arbitrary graph
-JSON, NPZ scalar/vector volumes, Hamiltonian files, or general edge lists.
-Hamiltonian and field workflows presently start from in-memory objects or
-application-specific conversion code. Surface loading returns a
-`PyVista.PolyData`; it does not automatically choose a scientifically valid
-skeletonization route.
+Choose a reader from the [input guide](doc/user_guide/input_adapters.md) for
+coordinates, molecular structures, node–edge tables or surface meshes. For
+other graph formats, such as GraphML or SWC, first convert the network and its
+coordinates to the documented node–edge CSV format.
 
-Yamada state evaluation can grow exponentially with projected crossing count.
-Inspect the selected projection and use explicit worker/resource settings before
-running large calculations.
+The [application tutorials](doc/applications/index.md) cover Hamiltonian and
+field models, while the [workflow overview](doc/user_guide/workflow_overview.md)
+explains the steps from a surface mesh to a graph.
+
+For larger calculations, inspect the projection and set the worker count to
+suit your machine. The [projection and Yamada guide](doc/user_guide/projection_yamada.md)
+explains how the graph's crossing structure affects runtime.
 
 ## Documentation map
 
