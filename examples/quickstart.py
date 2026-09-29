@@ -1,79 +1,51 @@
-"""Deterministic smoke test for the core and embedded-graph APIs."""
+"""Build a 3D trefoil, project it and compute its normalized Yamada polynomial.
 
-import networkx as nx
+Run with ``uv run python examples/quickstart.py`` from the source checkout.
+Only the base installation is needed.
+"""
+
 import numpy as np
 import sympy as sp
 
-from knotted_graph.core import ThetaGraph
-from knotted_graph.invariants.yamada import compute_graph_yamada_polynomial
+from knotted_graph.inputs import from_coordinate_chain
 from knotted_graph.projection import compute_yamada_polynomial
 
 
-def build_planar_theta() -> nx.MultiGraph:
-    """Return a planar 3D embedding of the three-edge theta graph."""
-    graph = nx.MultiGraph()
-    graph.add_node("u", pos=np.array([-2.0, 0.0, 0.0]))
-    graph.add_node("v", pos=np.array([2.0, 0.0, 0.0]))
-
-    curves = [
-        np.array([
-            [-2.0, 0.0, 0.0],
-            [-1.0, 1.0, 0.0],
-            [1.0, 1.0, 0.0],
-            [2.0, 0.0, 0.0],
-        ]),
-        np.array([
-            [-2.0, 0.0, 0.0],
-            [-1.0, 0.0, 0.0],
-            [1.0, 0.0, 0.0],
-            [2.0, 0.0, 0.0],
-        ]),
-        np.array([
-            [-2.0, 0.0, 0.0],
-            [-1.0, -1.0, 0.0],
-            [1.0, -1.0, 0.0],
-            [2.0, 0.0, 0.0],
-        ]),
-    ]
-    for points in curves:
-        graph.add_edge("u", "v", pts=points)
-    return graph
+def build_trefoil():
+    """Return a trefoil sampled as a closed curve in three dimensions."""
+    t = np.linspace(0, 2 * np.pi, 120, endpoint=False)
+    points = np.column_stack([
+        (2 + np.cos(3 * t)) * np.cos(2 * t),
+        (2 + np.cos(3 * t)) * np.sin(2 * t),
+        np.sin(3 * t),
+    ])
+    # Close this known periodic curve with its final last-to-first segment.
+    # The input adapter stores it as a graph with one node and one loop edge.
+    return from_coordinate_chain(points, closure="direct").graph
 
 
 def compute_quickstart():
-    """Compute matching nonzero values through the two public entry points."""
+    """Return the embedded graph and its polynomial/projection result."""
+    graph = build_trefoil()
     Y = sp.Symbol("Y")
-    abstract = sp.expand(compute_graph_yamada_polynomial(ThetaGraph(3), Y))
-    embedded = compute_yamada_polynomial(
-        build_planar_theta(),
+    result = compute_yamada_polynomial(
+        graph,
         Y,
-        rotation_angles=(0.0, 0.0, 0.0),
-        normalize=False,
+        # Euler angles are in degrees; this fixed view has three crossings.
+        rotation_angles=(10, 20, 30),
+        normalize=True,
+        # One worker is sufficient for this small introductory example.
         n_jobs=1,
-        method="recursive",
         return_result=True,
     )
-
-    expected = -Y**2 - Y - 2 - Y**-1 - Y**-2
-    if sp.simplify(abstract - expected) != 0:
-        raise RuntimeError("The abstract quick-start result changed unexpectedly.")
-    if sp.simplify(embedded.polynomial - expected) != 0:
-        raise RuntimeError("The embedded quick-start result changed unexpectedly.")
-    if embedded.projection.num_crossings != 0:
-        raise RuntimeError("The quick-start projection should be crossing-free.")
-
-    return abstract, embedded
+    return graph, result
 
 
 def main() -> None:
-    """Print the stable output used in the README and installation guide."""
-    abstract, embedded = compute_quickstart()
-    print(f"Abstract Upsilon(Theta_3; Y) = {abstract}")
-    print(f"Embedded Upsilon(Theta_3; Y) = {embedded.polynomial}")
-    print(
-        "Selected projection crossings = "
-        f"{embedded.projection.num_crossings}"
-    )
+    """Print the result shown in the README and online Quick Start."""
+    _, result = compute_quickstart()
+    print("Projection crossings:", result.projection.num_crossings)
+    print("Normalized Yamada:", result.polynomial)
 
 
 if __name__ == "__main__":

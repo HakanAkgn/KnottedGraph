@@ -210,6 +210,8 @@ def _load_csv_coords(
 
 
 def _load_json_coords(path: Path) -> np.ndarray:
+    # JSON here represents one ordered coordinate chain (an array, points or
+    # coords). Map general graph JSON to node/edge CSV or MultiGraph(pos/pts).
     data = json.loads(path.read_text())
     if isinstance(data, dict):
         if "points" in data:

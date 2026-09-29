@@ -127,6 +127,11 @@ def validate_spatial_graph(graph: nx.MultiGraph) -> list[str]:
     return validate_embedding(graph)
 
 
+# Import GraphML, SWC or graph-JSON data by mapping its fields to the node/edge
+# CSV schema below, or construct a MultiGraph with node pos and edge pts arrays.
+# This reader handles CSV; parsing those source formats belongs in the caller's
+# conversion step. Preserve 3D coordinates and any sampled edge curves there:
+# connectivity alone does not specify the spatial embedding being analysed.
 def from_spatial_graph_csv(
     nodes_csv,
     edges_csv,

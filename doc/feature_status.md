@@ -1,8 +1,7 @@
 # Feature Status And Workflow Routes
 
-KnottedGraph is currently **pre-alpha**. The status labels on this page describe
-where a capability is available and how it is installed; they are not a
-semantic-versioning or long-term API-stability guarantee.
+Use this reference to find the reader or workflow for your data, its required
+dependencies and the next processing step. The package is currently **pre-alpha**.
 
 Use this page to choose a supported starting point before opening an application
 notebook or API page. Quantitative runtimes are stated only where they have been
@@ -43,42 +42,31 @@ Status legend:
 | Embedded graph needing repulsive relaxation | External backend | none for the direct graph call; separately installed native Repulsor solver | `knotted_graph.layout.repulsive.relax_spatial_graph` | `GraphLayoutResult` | Validate `result.graph` before projection. | Depends on native build and solver options; native runtime has not been independently audited. |
 | Embedded graph needing an interactive 3-D view | Public · optional | `viz` | `knotted_graph.visualization.plot_3D_graph_plotly` | `plotly.graph_objects.Figure` | Display or export the returned figure. | Depends on graph/polyline size and the renderer. |
 
-## Format and workflow boundaries
+## Preparing data from other formats
 
-The table is a support matrix; input-gallery figures are not. The following
-families are **not currently generic public file adapters**:
+The direct readers in the table use documented schemas. These additional
+formats first need a conversion step using a reader for their source format:
 
-- GraphML;
-- generic edge lists;
-- SWC;
-- spatial-graph JSON;
-- NPZ scalar/vector fields or volumes;
-- Hamiltonian files; and
-- oriented-flow files.
+| Source | Preparation |
+| --- | --- |
+| GraphML, SWC, spatial-graph JSON or generic edge lists | Map node IDs, 3D coordinates, connections and sampled edge curves to the paired CSV schema or `MultiGraph(pos, pts)`. |
+| NPZ scalar/vector fields or volumes, or oriented-flow files | Load the arrays, define the coordinate grid and select a tracing or extraction workflow. |
+| Hamiltonian files | Prepare the in-memory model expected by the material or nodal application API. |
 
-JSON and NPY in the first table row mean ordered coordinate-chain data, not an
-arbitrary serialized graph. The LAMMPS adapter reads the first frame and expects
-unscaled `x/y/z` coordinates. The mmCIF adapter supports the documented
-RCSB-style `_atom_site` subset with one complete data row per physical line.
-Hamiltonian application workflows accept in-memory symbolic objects rather
-than files. Named knots, torus types, and Artin braid words are public analytic
-constructors; this does not imply a generic serialized-knot or braid-file
-reader.
+See {doc}`user_guide/input_adapters` for the CSV columns, coordinate formats,
+molecular selections and polymer preprocessing steps. Named knots, torus types
+and Artin braid words can be generated directly with `KnotFunction`.
 
-The surface loader returns `PyVista.PolyData`; it does not perform a generic
-mesh-to-graph conversion. Likewise, application examples may contain GraphML,
-SWC, NPZ, or Hamiltonian-derived objects after an external or
-application-specific conversion step. Their presence in a figure does not add a
-public parser to `knotted_graph.inputs`.
+For mesh-to-graph conversion, load the surface as `PyVista.PolyData`, inspect
+its geometry and choose the extraction workflow described in
+{doc}`user_guide/workflow_overview`.
 
 ## Continue from here
 
-The {doc}`applications/material_phase_maps` guide distinguishes saved
-record reading from new optional-dependency scans. Its application-specific
-CSV/JSON schema is not a generic graph or Hamiltonian-file adapter. New scans
-use the package's `phase_map_examples scan` command, require `nodal` and `viz`,
-and should begin with the coarse profile and `--dry-run` on an appropriate
-compute allocation.
+The {doc}`applications/material_phase_maps` guide starts with saved records
+and raw plots. To explore a new material scan, install `nodal` and `viz`, use
+`phase_map_examples scan` and begin with the coarse profile and `--dry-run`
+to inspect the requested work.
 
 - Follow the {doc}`installation` guide to install the required extra.
 - Run the deterministic {doc}`quickstart` for a base-install smoke test.

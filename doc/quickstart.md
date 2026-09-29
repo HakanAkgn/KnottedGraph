@@ -1,143 +1,120 @@
 # Quick Start
 
-This page follows the shortest reproducible path from an abstract graph to an
-embedded spatial graph and its Yamada polynomial. It uses only the base
-installation; see {doc}`installation` if the current 0.2.0 development API is
-not installed yet.
+Follow a small trefoil from **3D coordinates to a planar diagram and its
+Yamada polynomial**. This example uses the 0.2.0 development API and only the
+base installation; follow {doc}`installation` to set up the source checkout.
 
-## 1. Compute a crossing-free graph directly
+```{figure} assets/site_figures/quickstart-trefoil.png
+:alt: A three-dimensional trefoil and its planar projection with three over-under crossings
 
-Start with the theta graph consisting of three parallel edges. It is small
-enough to inspect immediately but, unlike a single open edge, it has no bridge
-and therefore has a nonzero Yamada polynomial.
+The same sampled curve in 3D (left) and in the projection used for the
+calculation (right). Gaps in the diagram show which strand passes underneath.
+```
+
+## 1. Create a curve in three dimensions
+
+Each row of `points` contains an x, y and z coordinate. The formulas below
+sample a trefoil, a closed knotted curve. `closure="direct"` adds the short
+segment from the final sample back to the first.
 
 ```python
+import numpy as np
 import sympy as sp
 
-from knotted_graph.core import ThetaGraph
-from knotted_graph.invariants.yamada import compute_graph_yamada_polynomial
-
-Y = sp.Symbol("Y")
-theta = ThetaGraph(3)
-abstract_polynomial = sp.expand(
-    compute_graph_yamada_polynomial(theta, Y)
-)
-print(f"Upsilon(Theta_3; Y) = {abstract_polynomial}")
-```
-
-Expected output:
-
-```text
-Upsilon(Theta_3; Y) = -Y**2 - Y - 2 - 1/Y - 1/Y**2
-```
-Here `Y` is the polynomial variable and
-\(\Upsilon(\Theta_3;Y)\) denotes the Yamada polynomial. The direct graph entry
-point uses the fastest available exact backend because this abstract graph has
-no crossing data to resolve.
-
-## 2. Give the same graph a spatial embedding
-
-An embedded graph stores a 3D position on each node and a sampled 3D polyline
-in the `pts` attribute of each edge. The following construction bends the
-three parallel edges into distinct planar arcs:
-
-```python
-import networkx as nx
-import numpy as np
-
-embedded_theta = nx.MultiGraph()
-embedded_theta.add_node("u", pos=np.array([-2.0, 0.0, 0.0]))
-embedded_theta.add_node("v", pos=np.array([2.0, 0.0, 0.0]))
-
-curves = [
-    np.array([
-        [-2.0, 0.0, 0.0],
-        [-1.0, 1.0, 0.0],
-        [1.0, 1.0, 0.0],
-        [2.0, 0.0, 0.0],
-    ]),
-    np.array([
-        [-2.0, 0.0, 0.0],
-        [-1.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0],
-        [2.0, 0.0, 0.0],
-    ]),
-    np.array([
-        [-2.0, 0.0, 0.0],
-        [-1.0, -1.0, 0.0],
-        [1.0, -1.0, 0.0],
-        [2.0, 0.0, 0.0],
-    ]),
-]
-
-for points in curves:
-    embedded_theta.add_edge("u", "v", pts=points)
-```
-
-## 3. Project and evaluate the embedding
-
-Use an explicit rotation instead of randomly sampling projection directions.
-This makes the tutorial deterministic. `normalize=False` preserves the same
-Laurent-polynomial convention used by the direct crossing-free calculation,
-and `n_jobs=1` keeps this small example single-worker and predictable.
-
-```python
+from knotted_graph.inputs import from_coordinate_chain
 from knotted_graph.projection import compute_yamada_polynomial
 
-result = compute_yamada_polynomial(
-    embedded_theta,
-    Y,
-    rotation_angles=(0.0, 0.0, 0.0),
-    normalize=False,
-    n_jobs=1,
-    method="recursive",
-    return_result=True,
-)
-
-print(f"Upsilon(Theta_3; Y) = {result.polynomial}")
-print(f"selected projection crossings = {result.projection.num_crossings}")
+t = np.linspace(0, 2 * np.pi, 120, endpoint=False)
+points = np.column_stack([
+    (2 + np.cos(3 * t)) * np.cos(2 * t),
+    (2 + np.cos(3 * t)) * np.sin(2 * t),
+    np.sin(3 * t),
+])
+graph = from_coordinate_chain(points, closure="direct").graph
 ```
+
+The adapter returns an embedded graph with one node and one loop edge. That
+edge stores the sampled 3D curve in `pts`, so its geometry is available to the
+projection step.
+
+## 2. Project the curve and compute Yamada
+
+A projection shows where strands cross and uses their depth to determine
+which passes over the other. The selected view below has three crossings.
+
+```python
+Y = sp.Symbol("Y")
+result = compute_yamada_polynomial(
+    graph, Y, rotation_angles=(10, 20, 30),
+    normalize=True, n_jobs=1, return_result=True,
+)
+print("Projection crossings:", result.projection.num_crossings)
+print("Normalized Yamada:", result.polynomial)
+```
+
+The rotation angles are in degrees. Using a fixed view makes this example
+repeatable; for your own data, you can omit `rotation_angles` to let the
+library choose a view. `return_result=True` keeps the diagram with the
+polynomial, and `n_jobs=1` is sufficient for this small calculation.
+
+## 3. Read the result
 
 Expected output:
 
 ```text
-Upsilon(Theta_3; Y) = -Y**2 - Y - 2 - 1/Y - 1/Y**2
-selected projection crossings = 0
+Projection crossings: 3
+Normalized Yamada: -Y**11 + Y**9 + Y**8 + Y**7 - Y**4 - Y**3 - Y**2 - Y - 1
 ```
 
-The abstract and embedded calculations agree because the selected projection
-is crossing-free. A nonzero value confirms that this smoke test did not
-accidentally reduce to the bridge identity.
+`result.projection` contains the viewing angles, crossing count and PD code
+(the encoded planar diagram). `result.polynomial` is the exact symbolic
+expression in `Y`. Here `normalize=True` shifts the lowest exponent to zero.
+The {doc}`user_guide/projection_yamada` guide explains these conventions and
+how to inspect other projections of the same embedding.
 
-## Run the maintained example
-
-The complete, tested version of the code above is stored in
-`examples/quickstart.py`:
+Run the complete, maintained example from the repository root with:
 
 ```bash
 uv run python examples/quickstart.py
 ```
 
-## Start from files
+## Explore the graph in 3D
 
-The companion `examples/input_to_yamada.py` completes the same route from
-paired node/edge CSV files. It creates a small temporary input, calls the
-existing `from_spatial_graph_csv()` adapter, checks `.issues`, validates the
-`pos`/`pts` embedding with `ensure_embedding()`, and prints the selected PD
-code and the polynomial:
+For a rotatable view, install the visualization extra:
+
+```bash
+uv sync --extra viz
+```
+
+After constructing `graph` above, run:
+
+```python
+from knotted_graph.visualization import plot_3D_graph_plotly
+
+figure = plot_3D_graph_plotly(graph)
+figure.show()
+```
+
+The {doc}`api/visualization` page also covers exporting plots and viewing
+results in notebooks.
+
+## Use your own data
+
+Replace `points` with your own ordered 3D coordinates, or choose a file reader
+from {doc}`user_guide/input_adapters`. That guide explains curve closure and
+how to prepare molecular backbones, graph tables and surface meshes.
+
+For a graph with several nodes and edges, run the companion CSV example:
 
 ```bash
 uv run python examples/input_to_yamada.py
 ```
 
-Expect 2 nodes, 3 edges, zero projection crossings and the same nonzero
-polynomial shown above. This route uses the base installation and no external
-data or network access. The script is a source-repository example; copy it
-separately if you installed only the wheel. Replace its temporary CSV creation
-with your two file paths when using your own graph, and inspect input issues
-before continuing. See {doc}`user_guide/input_adapters` for the CSV schema.
+It loads a planar theta graph from two small temporary CSV files, then prints
+2 nodes, 3 edges, zero projection crossings and its Yamada polynomial. Replace
+the temporary CSV creation with your own node and edge file paths to use that
+route. These scripts are included in the source checkout.
 
-After this succeeds, choose the next workflow from the
-{doc}`feature_status` matrix or the {doc}`user_guide/workflow_overview`. If it
-fails, continue with the
-{doc}`troubleshooting` guide.
+Choose your next example from {doc}`feature_status` or the
+{doc}`applications/index`. For installation or display help, see
+{doc}`troubleshooting`.

@@ -7,8 +7,7 @@ sources into either:
 - a result object containing an embedded `networkx.MultiGraph`; or
 - for surface files, a result object containing `PyVista.PolyData`.
 
-This page distinguishes direct public file support from the wider set of
-application-level representations shown in research figures.
+Choose a reader below, then follow the preparation notes for your source data.
 
 <div class="kg-link-row">
   <a href="../feature_status.html">Feature-status matrix</a>
@@ -21,15 +20,15 @@ application-level representations shown in research figures.
 
 Import the public functions from `knotted_graph.inputs`:
 
-| Starting data | Public call | Result | Important boundary |
+| Starting data | Public call | Result | Preparation / next step |
 | --- | --- | --- | --- |
-| Array or CSV/DAT/JSON/NPY/TSV/TXT/XYZ ordered coordinates | `from_coordinate_chain` | `CoordinateInputResult` | JSON/NPY mean coordinates, not arbitrary graphs |
+| Array or CSV/DAT/JSON/NPY/TSV/TXT/XYZ ordered coordinates | `from_coordinate_chain` | `CoordinateInputResult` | Store one ordered curve as an `(N, 3)` array |
 | PDB file or four-character RCSB ID | `from_pdb_backbone` | `PDBBackboneInputResult` | Select chain/model/atom explicitly |
 | CIF/mmCIF file or RCSB ID | `from_mmcif_backbone` | `MMCIFBackboneInputResult` | Supports the documented RCSB-style `_atom_site` subset |
 | GROMACS GRO snapshot | `from_gromacs_gro` | `PolymerInputResult` | Default coordinate conversion is nm to Å |
 | LAMMPS dump | `from_lammps_dump` | `PolymerInputResult` | Reads the first frame and unscaled `x/y/z` columns |
 | Paired node/edge CSV files | `from_spatial_graph_csv` | `SpatialGraphInputResult` | Two files; preserves parallel edges and optional polylines |
-| OBJ/OFF/PLY/STL/VTK/VTP surface | `from_surface_mesh` | `SurfaceInputResult` | Requires `surface`; returns a mesh, not a graph |
+| OBJ/OFF/PLY/STL/VTK/VTP surface | `from_surface_mesh` | `SurfaceInputResult` | Install `surface`, inspect the mesh, then choose an extraction workflow |
 
 Named knots, torus types, and Artin braid words are handled by
 `KnotFunction`; see {doc}`../applications/analytic_knot_fields`. They are
@@ -63,9 +62,8 @@ graph = result.graph
 print(graph.number_of_nodes(), graph.number_of_edges())
 ```
 
-Fatal schema or selection errors raise an exception. Recoverable row-level or
-post-load validation concerns may be returned in `.issues`; do not assume an
-object is publication-ready merely because parsing completed.
+Schema or selection errors raise an exception. Review the `.issues` list for
+row-level or geometry details to address before continuing to projection.
 
 ## 1. Ordered coordinate chains
 
@@ -129,9 +127,10 @@ provenance.
 
 When multiple chains match, choose `chain_id` explicitly. The mmCIF reader
 currently targets RCSB-style atom-site loops with one complete data row per
-physical line; it is not a fully general CIF grammar implementation. PDB and
-mmCIF backbone extraction creates an ordered curve from selected atoms—it does
-not infer a domain-specific protein interaction or repulsive-layout graph.
+physical line. Convert other CIF layouts to that form before loading. PDB and
+mmCIF backbone extraction creates an ordered curve from the selected atoms.
+To study a protein interaction network, supply the desired graph connections
+through the node/edge input route.
 
 ## 3. Polymer snapshots
 
@@ -150,10 +149,11 @@ lammps = from_lammps_dump(
 )
 ```
 
-The GRO adapter treats the selected atoms as one ordered coordinate curve and
-ignores the box/PBC record. Its default scale converts nanometres to ångströms.
-The LAMMPS adapter reads only the first frame, expects unscaled `x/y/z`, and
-does not reconstruct bonds, unwrap periodic images, or process `xs/ys/zs`.
+The GRO adapter treats the selected atoms as one ordered coordinate curve;
+its default scale converts nanometres to ångströms. The LAMMPS adapter reads
+the first frame with unscaled `x/y/z` columns. Before loading, select and order
+the atoms of the intended chain, unwrap periodic images when needed, and
+convert scaled `xs/ys/zs` coordinates to `x/y/z`.
 
 ## 4. Paired spatial-graph CSV
 
@@ -183,8 +183,8 @@ graph = result.graph
 
 `points_json` is optional; without it the edge is straight. When present, the
 polyline endpoints must match the corresponding node positions. Extra CSV
-columns are preserved as string attributes. This route is not a GraphML,
-single edge-list, or arbitrary graph-JSON reader.
+columns are preserved as string attributes. For GraphML, SWC, edge-list or
+graph-JSON sources, prepare these two tables as described below.
 
 ## 5. Surface meshes
 
@@ -202,24 +202,31 @@ uv sync --extra surface
 ```
 
 Cleaning and triangulation are enabled by default and may change mesh
-connectivity. Open boundaries are reported as issues rather than silently
-filled. Converting a physical surface to a scientifically meaningful graph is
-application-dependent; this adapter intentionally stops at `PolyData`.
+connectivity. The result contains a `PyVista.PolyData` mesh and reports open
+boundaries in `.issues`. Inspect the mesh, choose any boundary treatment, then
+follow {doc}`workflow_overview` to select the extraction and cleanup steps
+appropriate to your surface.
 
-## Formats shown in figures but not exposed as generic adapters
+## Preparing other file formats
 
-The following may appear after an external or application-specific conversion,
-but are not public generic readers in `knotted_graph.inputs`:
+The readers above accept the documented schemas. To use another format, first
+read it with a tool for that format and map its data to the appropriate input:
 
-- GraphML and generic edge lists;
-- SWC neural morphology;
-- arbitrary spatial-graph JSON;
-- NPZ scalar/vector volumes and oriented flows;
-- Hamiltonian files; and
-- generic mesh-to-skeleton conversion.
+| Source data | Preparation | Continue with |
+| --- | --- | --- |
+| GraphML, SWC, edge lists or graph JSON | Write node IDs and `x/y/z` positions to the node CSV, and connections to the edge CSV. Include curved edge geometry in `points_json`. | `from_spatial_graph_csv` |
+| JSON or NPY storing a single curve | Arrange the samples as an ordered `(N, 3)` coordinate array. | `from_coordinate_chain` |
+| NPZ scalar/vector volumes or oriented flows | Load the arrays and define their coordinate grid, then select the relevant sampling, tracing or extraction workflow. | {doc}`workflow_overview` |
+| Hamiltonian files | Read the model into the in-memory representation used by the chosen material or nodal example. | {doc}`../applications/index` |
 
-See {doc}`../feature_status` before assuming that a figure subtitle is an
-installation promise.
+For SWC data, each point's ID, parent ID and coordinates supply the node and
+edge rows; omit the parent edge for a root point. Preserve the original
+positions and any sampled edge curves during
+conversion: these describe the spatial embedding whose topology is analysed.
+GraphML attribute names and graph-JSON layouts vary, so map their coordinate
+fields explicitly to the schema above.
+
+For the complete reader and application reference, see {doc}`../feature_status`.
 
 ## Continue through the pipeline
 

@@ -282,7 +282,7 @@ def test_documented_optional_calls_import_when_dependencies_are_installed(
 
 def test_feature_status_is_linked_from_six_entry_points():
     entry_points = {
-        "README.md": "doc/feature_status.md",
+        "README.md": "https://hakanakgn.github.io/KnottedGraph/feature_status.html",
         "doc/index.md": "feature_status",
         "doc/quickstart.md": "feature_status",
         "doc/user_guide/index.md": "feature_status",
@@ -295,7 +295,7 @@ def test_feature_status_is_linked_from_six_entry_points():
         assert expected in text
 
 
-def test_figure_only_formats_are_explicitly_outside_the_support_table():
+def test_conversion_formats_have_guidance_separate_from_direct_readers():
     rows = _load_rows()
     starting_objects = "\n".join(row["Starting object or goal"] for row in rows).lower()
     rows_text = "\n".join(" ".join(row.values()) for row in rows).lower()
@@ -313,6 +313,6 @@ def test_figure_only_formats_are_explicitly_outside_the_support_table():
     for boundary in boundaries:
         assert boundary not in starting_objects
         assert boundary in full_text
-    assert "does not perform a generic" in full_text
+    assert "preparing data from other formats" in full_text
     assert "mesh-to-graph conversion" in full_text
     assert "separately installed native repulsor solver" in rows_text

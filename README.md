@@ -1,18 +1,16 @@
 # KnottedGraph
 
 ![pre-alpha](https://img.shields.io/badge/status-pre--alpha-red?style=flat-square)
-[![PyPI](https://img.shields.io/pypi/v/knotted_graph)](https://pypi.org/project/knotted_graph/)
 [![Docs](https://img.shields.io/badge/docs-online-blue)](https://hakanakgn.github.io/KnottedGraph/)
 
-**KnottedGraph turns geometric, graph, knot-field, and Hamiltonian-derived
-objects into inspectable spatial graphs, planar diagrams, and Yamada
-polynomials.** It separates the reusable graph/projection/invariant core from
-optional scientific applications such as nodal skeletons, analytic knot
-fields, material surfaces, and repulsive layouts.
+**KnottedGraph studies the topology of curves and graphs embedded in three
+dimensions.** Build a graph from geometric data, inspect its projection and
+compute its Yamada polynomial. Applications include molecular backbones,
+mathematical knots, material surfaces and Hamiltonian models.
 
 **[Website](https://hakanakgn.github.io/KnottedGraph/)** ·
 **[Paper figures and downloadable data](https://hakanakgn.github.io/KnottedGraph/paper_results.html)** ·
-**[Quick Start](https://hakanakgn.github.io/KnottedGraph/quickstart.html)**
+**[Quick Start](#five-minute-quick-start)** · **[Install](#install-from-source)**
 
 ## Please cite our work
 
@@ -52,6 +50,70 @@ Copy the entries below, or [download the BibTeX file](CITATION.bib).
   url={https://arxiv.org/abs/2609.13390}
 }
 ```
+
+## Install from source
+
+Use Python 3.11 or newer and [uv](https://docs.astral.sh/uv/) to install the
+**0.2.0 development API** used in the examples:
+
+```bash
+git clone --branch main --single-branch https://github.com/HakanAkgn/KnottedGraph.git
+cd KnottedGraph
+uv sync
+```
+
+The PyPI package is the legacy 0.1.2 release; use the source setup above for
+this guide. The [installation page](https://hakanakgn.github.io/KnottedGraph/installation.html)
+covers pip installation and extras for interactive plots, surfaces and notebooks.
+
+## Five-minute Quick Start
+
+Start with a trefoil embedded in 3D. The example below turns its coordinates
+into a graph, finds the crossings in a fixed projection and evaluates the
+normalized Yamada polynomial.
+
+![A three-dimensional trefoil and its three-crossing planar projection](doc/assets/site_figures/quickstart-trefoil.png)
+
+```python
+import numpy as np
+import sympy as sp
+
+from knotted_graph.inputs import from_coordinate_chain
+from knotted_graph.projection import compute_yamada_polynomial
+
+t = np.linspace(0, 2 * np.pi, 120, endpoint=False)
+points = np.column_stack([
+    (2 + np.cos(3 * t)) * np.cos(2 * t),
+    (2 + np.cos(3 * t)) * np.sin(2 * t),
+    np.sin(3 * t),
+])
+graph = from_coordinate_chain(points, closure="direct").graph
+
+Y = sp.Symbol("Y")
+result = compute_yamada_polynomial(
+    graph, Y, rotation_angles=(10, 20, 30),
+    normalize=True, n_jobs=1, return_result=True,
+)
+print("Projection crossings:", result.projection.num_crossings)
+print("Normalized Yamada:", result.polynomial)
+```
+
+Expected output:
+
+```text
+Projection crossings: 3
+Normalized Yamada: -Y**11 + Y**9 + Y**8 + Y**7 - Y**4 - Y**3 - Y**2 - Y - 1
+```
+
+Run this example from the checkout with:
+
+```bash
+uv run python examples/quickstart.py
+```
+
+The [online Quick Start](https://hakanakgn.github.io/KnottedGraph/quickstart.html)
+walks through the coordinates, over/under crossings and result, and shows how
+to open an interactive 3D view or start from your own data.
 
 ## Explore the paper and its data
 
@@ -93,36 +155,26 @@ links, timing definitions and the availability of the formula-discovery records.
 Open the [figure guide](doc/paper_results.md) for all 15 original PDFs, method
 links and the availability of each result dataset.*
 
-## Version and installation
-
-This repository provides the **0.2.0 development API** on `main`.
-The legacy 0.1.2 PyPI release uses a different, nodal-only API; install from
-source for the examples below. The website is built from `main`; see the
-[installation guide](doc/installation.md) for dependencies and version checks.
-
 ## Start here
 
 Choose the row that matches the object you already have:
 
 | I have / I want | First entry point | Continue to |
 | --- | --- | --- |
-| No existing data; I want a five-minute test | [`examples/quickstart.py`](examples/quickstart.py) | [Quick Start](doc/quickstart.md) |
-| Ordered coordinates or CSV/DAT/JSON/NPY/TSV/TXT/XYZ | `knotted_graph.inputs.from_coordinate_chain` | [Input handling](doc/user_guide/input_adapters.md) |
-| A PDB/mmCIF backbone | `from_pdb_backbone` / `from_mmcif_backbone` | [Input handling](doc/user_guide/input_adapters.md) |
-| A GRO snapshot or first LAMMPS frame | `from_gromacs_gro` / `from_lammps_dump` | [Input handling](doc/user_guide/input_adapters.md) |
-| Node and edge CSV files for a spatial graph | `from_spatial_graph_csv` | [Input handling](doc/user_guide/input_adapters.md) |
-| A named knot/link, torus type, or braid word | `knotted_graph.inputs.KnotFunction` | [Analytic knot fields](doc/applications/analytic_knot_fields.md) |
-| An embedded `networkx.MultiGraph` | `knotted_graph.core.ensure_embedding` | [Workflow overview](doc/user_guide/workflow_overview.md) |
-| A nodal/material Hamiltonian in memory | application APIs under `knotted_graph.applications` | [Application routes](doc/applications/index.md) |
-| A native Repulsor layout workflow | `knotted_graph.layout.repulsive` | [Repulsive layout](doc/user_guide/repulsive_layout.md) |
+| No existing data; I want a five-minute test | [`examples/quickstart.py`](examples/quickstart.py) | [Quick Start](https://hakanakgn.github.io/KnottedGraph/quickstart.html) |
+| Ordered coordinates or CSV/DAT/JSON/NPY/TSV/TXT/XYZ | `knotted_graph.inputs.from_coordinate_chain` | [Input handling](https://hakanakgn.github.io/KnottedGraph/user_guide/input_adapters.html) |
+| A PDB/mmCIF backbone | `from_pdb_backbone` / `from_mmcif_backbone` | [Input handling](https://hakanakgn.github.io/KnottedGraph/user_guide/input_adapters.html) |
+| A GRO snapshot or first LAMMPS frame | `from_gromacs_gro` / `from_lammps_dump` | [Input handling](https://hakanakgn.github.io/KnottedGraph/user_guide/input_adapters.html) |
+| Node and edge CSV files for a spatial graph | `from_spatial_graph_csv` | [Input handling](https://hakanakgn.github.io/KnottedGraph/user_guide/input_adapters.html) |
+| A named knot/link, torus type, or braid word | `knotted_graph.inputs.KnotFunction` | [Analytic knot fields](https://hakanakgn.github.io/KnottedGraph/applications/analytic_knot_fields.html) |
+| An embedded `networkx.MultiGraph` | `knotted_graph.core.ensure_embedding` | [Workflow overview](https://hakanakgn.github.io/KnottedGraph/user_guide/workflow_overview.html) |
+| A nodal/material Hamiltonian in memory | application APIs under `knotted_graph.applications` | [Application routes](https://hakanakgn.github.io/KnottedGraph/applications/index.html) |
+| A native Repulsor layout workflow | `knotted_graph.layout.repulsive` | [Repulsive layout](https://hakanakgn.github.io/KnottedGraph/user_guide/repulsive_layout.html) |
 
-The complete availability, extra, return-type, and scaling matrix is in
-[`doc/feature_status.md`](doc/feature_status.md).
-
-For material plots, start with the
-[phase-map walkthrough](doc/applications/material_phase_maps.md), not
-the raw research scripts. It covers saved-result inspection, raw replotting,
-coarse compute examples and the boundary to full research reproduction.
+See the [input and workflow reference](https://hakanakgn.github.io/KnottedGraph/feature_status.html)
+for the full list of readers and application routes. For material plots, the
+[phase-map walkthrough](https://hakanakgn.github.io/KnottedGraph/applications/material_phase_maps.html)
+starts with saved results and continues to small scan examples.
 
 ## The core mental model
 
@@ -133,142 +185,25 @@ coarse compute examples and the boundary to full research reproduction.
 *Current architecture from the Overleaf manuscript (Supplementary Figure 11).
 [Open the vector PDF](assets/paper/architecture.pdf).*
 
-Most graph-returning routes meet at one data contract:
+The shared object is an embedded graph: nodes carry 3D positions and edges
+carry sampled curves. The same graph can be drawn, relaxed, projected and
+analysed. Follow the [workflow guide](https://hakanakgn.github.io/KnottedGraph/user_guide/workflow_overview.html)
+for the steps shown in the diagram.
 
-```text
-source data
-    -> input adapter / application extractor
-    -> networkx.MultiGraph(node pos, edge pts)
-    -> embedding validation and cleanup
-    -> regular planar projection
-    -> PD-code data
-    -> Yamada polynomial + projection provenance
-```
+## Documentation and help
 
-- Every graph node has a finite three-vector `pos`.
-- Every graph edge has sampled 3-D geometry in `pts`; its first and last
-  points agree with the endpoint node positions.
-- A crossing visible in a 2-D projection is not automatically a graph vertex.
-- High-level input loaders return a result object with `.graph` (or `.mesh` for
-  surface input), `.issues`, identifiers, and source metadata.
-- Closure, chain/model selection, coordinate units, and projection choice are
-  scientific decisions and should be recorded explicitly.
+Browse the [online documentation](https://hakanakgn.github.io/KnottedGraph/) for:
 
-## Install from source
+- [Input handling](https://hakanakgn.github.io/KnottedGraph/user_guide/input_adapters.html): load your coordinates, graph tables, structures or surfaces.
+- [Projection and Yamada](https://hakanakgn.github.io/KnottedGraph/user_guide/projection_yamada.html): inspect a diagram and interpret its polynomial.
+- [Application tutorials](https://hakanakgn.github.io/KnottedGraph/applications/index.html): explore knots, molecular data and material models.
+- [API reference](https://hakanakgn.github.io/KnottedGraph/api/index.html): function signatures and examples.
+- [Troubleshooting](https://hakanakgn.github.io/KnottedGraph/troubleshooting.html): resolve installation, input and display issues.
 
-KnottedGraph requires Python 3.11 or newer. The recommended environment uses
-[uv](https://docs.astral.sh/uv/):
+For notebooks, start with the [User Guide](User_guide/README.md) or
+[application guide](User_guide/applications/README.md). Each notebook lists its
+setup and expected runtime. Questions and reproducible bug reports are welcome
+in the [GitHub issue tracker](https://github.com/HakanAkgn/KnottedGraph/issues).
 
-```bash
-git clone --branch main --single-branch \
-  https://github.com/HakanAkgn/KnottedGraph.git
-cd KnottedGraph
-uv sync --group dev
-uv run python examples/quickstart.py
-```
-
-The base installation covers spatial-graph data structures, embedding tools,
-projection/PD-code construction, and Yamada evaluation. Install optional
-features only when needed:
-
-```bash
-uv sync --group dev --extra knot-fields --extra notebook
-# or, for the full development/test environment:
-uv sync --group dev --all-extras
-```
-
-| Extra | Adds |
-| --- | --- |
-| `knot-fields` | Sampled analytic knot-field level sets and graph extraction |
-| `nodal` | Nodal skeleton and Hamiltonian workflows |
-| `surface` | PyVista surface-mesh loading |
-| `viz` | Plotly and publication-image export tools |
-| `repulsion` | Python helpers for the separately installed Repulsor backend |
-| `notebook` | JupyterLab |
-| `benchmark` | Topoly comparison dependency |
-| `all` | All optional Python workflows |
-
-See the [installation guide](doc/installation.md) for pip-based source
-installation, native dependencies, and environment verification. See
-[troubleshooting](doc/troubleshooting.md) if an import, optional extra, native
-backend, projection, or headless-rendering step fails.
-
-## Five-minute Quick Start
-
-The smallest deterministic nonzero example is the crossing-free theta graph:
-
-```python
-import sympy as sp
-
-from knotted_graph.core import ThetaGraph
-from knotted_graph.invariants.yamada import compute_graph_yamada_polynomial
-
-Y = sp.Symbol("Y")
-theta = ThetaGraph(3)
-polynomial = sp.expand(compute_graph_yamada_polynomial(theta, Y))
-print(f"Upsilon(Theta_3; Y) = {polynomial}")
-```
-
-Expected output:
-
-```text
-Upsilon(Theta_3; Y) = -Y**2 - Y - 2 - 1/Y - 1/Y**2
-```
-
-Run the maintained example to compare this result with an embedded graph and a
-fixed regular projection:
-
-```bash
-uv run python examples/quickstart.py
-```
-
-The example deliberately uses `n_jobs=1`, reports the selected crossing count,
-and verifies that the abstract and embedded calculations agree.
-
-## Supported inputs and practical notes
-
-Choose a reader from the [input guide](doc/user_guide/input_adapters.md) for
-coordinates, molecular structures, node–edge tables or surface meshes. For
-other graph formats, such as GraphML or SWC, first convert the network and its
-coordinates to the documented node–edge CSV format.
-
-The [application tutorials](doc/applications/index.md) cover Hamiltonian and
-field models, while the [workflow overview](doc/user_guide/workflow_overview.md)
-explains the steps from a surface mesh to a graph.
-
-For larger calculations, inspect the projection and set the worker count to
-suit your machine. The [projection and Yamada guide](doc/user_guide/projection_yamada.md)
-explains how the graph's crossing structure affects runtime.
-
-## Documentation map
-
-- [Paper figures and results](doc/paper_results.md): figure, claim, data and method links.
-- [Benchmarks](doc/benchmarks.md): recorded results and downloadable CSVs.
-- [Sanity checks](doc/sanity_checks.md): small correctness checks and expected outcomes.
-
-- [Installation](doc/installation.md): versions, environments, extras, native boundaries.
-- [Quick Start](doc/quickstart.md): copyable graph-to-invariant example with expected output.
-- [Input handling](doc/user_guide/input_adapters.md): supported formats, result objects, closure, units, and errors.
-- [Workflow overview](doc/user_guide/workflow_overview.md): how the stages fit together.
-- [Projection and Yamada](doc/user_guide/projection_yamada.md): projections, PD codes, provenance, and scaling.
-- [Feature-status matrix](doc/feature_status.md): public/application/external routes and return types.
-- [Application tutorials](doc/applications/index.md): mathematical, physical, knot-field, and reproduction workflows.
-- [API reference](doc/api/index.md): public calls grouped by subsystem.
-- [Troubleshooting](doc/troubleshooting.md): symptom-based recovery.
-
-The maintained notebooks start at the [`User_guide` directory guide](User_guide/README.md),
-with a separate [application directory guide](User_guide/applications/README.md). Introductory
-notebooks are distinct from publication-reproduction and benchmark notebooks;
-the latter may require native backends, cached data, and substantially more
-time or memory.
-
-Build the website locally with warnings treated as errors:
-
-```bash
-uv run --group docs python -m sphinx -b html -W --keep-going doc doc/_build/html
-```
-
-For questions or reproducible bug reports, use the
-[GitHub issue tracker](https://github.com/HakanAkgn/KnottedGraph/issues)
-and include the package version, commit, Python version, optional extras, and
-native-backend status.
+Contributing documentation? See the
+[documentation development guide](https://hakanakgn.github.io/KnottedGraph/developer/documentation.html).

@@ -78,13 +78,13 @@ The base installation contains the graph data structures, embedded-graph
 utilities, projection and PD-code pipeline, Yamada polynomial backends, and
 their required numerical dependencies.
 
-| Install target | Additional capability | Important boundary |
+| Install target | Additional capability | Setup notes |
 | --- | --- | --- |
 | `knot-fields` | Analytic knot-field level sets, tubular diagnostics, and spatial-graph extraction | Field construction is available in the base install; sampled level-set extraction adds scikit-image |
 | `nodal` | Non-Hermitian nodal skeleton extraction | Adds `poly2graph`, scikit-image, PyVista, minorminer, and tabulate |
 | `surface` | Surface-mesh workflows | Adds PyVista |
 | `viz` | Interactive plots and publication-image export | Adds Plotly, Kaleido, PDF/image conversion packages |
-| `repulsion` | Python-side repulsive-layout I/O and visualization | Does not provide the native C++ solver |
+| `repulsion` | Python-side repulsive-layout I/O and visualization | Install the native C++ solver separately; see below |
 | `notebook` | Interactive notebooks | Adds JupyterLab |
 | `all` | Every optional Python workflow | Also adds `igraph`; native system dependencies remain separate |
 
@@ -126,19 +126,18 @@ LAPACK/LAPACKE, `fmt`, and AMD/SuiteSparse. Continue with the
 
 ## Verify the installation
 
-The repository includes a deterministic smoke test that exercises both the
-crossing-free core evaluator and the embedded-graph projection pipeline:
+Run the small 3D trefoil example to check the coordinate-input, projection and
+Yamada workflow:
 
 ```bash
 uv run python examples/quickstart.py
 ```
 
-The final three lines should be:
+The final two lines should be:
 
 ```text
-Abstract Upsilon(Theta_3; Y) = -Y**2 - Y - 2 - 1/Y - 1/Y**2
-Embedded Upsilon(Theta_3; Y) = -Y**2 - Y - 2 - 1/Y - 1/Y**2
-Selected projection crossings = 0
+Projection crossings: 3
+Normalized Yamada: -Y**11 + Y**9 + Y**8 + Y**7 - Y**4 - Y**3 - Y**2 - Y - 1
 ```
 
 Continue with the {doc}`quickstart` after these results appear.

@@ -95,9 +95,9 @@ of the spatial graph. Changing the viewing direction may change the number and
 locations of crossings while leaving the embedded graph and invariant
 unchanged.
 
-When debugging, inspect the projection and PD records before blaming the
-polynomial evaluator. Many apparent invariant failures are actually invalid or
-degenerate projections.
+If a result differs from what you expect, inspect the selected projection and
+PD records first. They help locate unresolved crossings or a degenerate view
+before comparing the polynomial expressions.
 
 ## Variable and normalization conventions
 
@@ -114,8 +114,10 @@ Record:
 - the exact expression before/after expansion or factorization; and
 - the package/backend version.
 
-The Quick Start uses `normalize=False` for the embedded theta graph so its
-Laurent expression can be compared directly with the abstract evaluator.
+The Quick Start uses `normalize=True` for the embedded trefoil, shifting its
+lowest exponent to zero. The companion CSV theta-graph example uses
+`normalize=False` to compare its Laurent expression with the crossing-free
+formula.
 
 ## Interpreting zero
 

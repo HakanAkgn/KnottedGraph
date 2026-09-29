@@ -139,6 +139,9 @@ def from_surface_mesh(
     metadata: dict | None = None,
 ) -> SurfaceInputResult:
     """Load a surface mesh for KnottedGraph-compatible workflows."""
+    # Keep loading separate from graph extraction: callers choose the sampling,
+    # skeletonization and cleanup settings appropriate to the physical surface.
+    # The result retains the mesh and its validation issues for that next step.
     source_path = _as_path(path)
     mesh = load_surface_mesh(source_path, triangulate=triangulate, clean=clean)
     issues = validate_surface_mesh(mesh)

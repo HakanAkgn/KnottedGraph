@@ -38,11 +38,16 @@ html_static_path = ["_static"]
 html_extra_path = ["assets"]
 html_css_files = ["custom.css"]
 # Standalone guides have no child sections; reserve width for figures and tables.
-html_sidebars = {name: [] for name in ("index", "paper_results", "benchmarks", "sanity_checks", "citing")}
+html_sidebars = {
+    name: [] for name in (
+        "index", "paper_results", "benchmarks", "sanity_checks", "citing",
+        "quickstart", "installation", "feature_status", "troubleshooting",
+    )
+}
 html_theme_options = {
     "announcement": (
-        "Pre-alpha 0.2 development documentation. The indexed PyPI 0.1.2 "
-        "package uses the legacy API; follow the version-aware Installation page."
+        "KnottedGraph 0.2 development documentation. "
+        "Start with the source installation guide to run these examples."
     ),
     "github_url": "https://github.com/HakanAkgn/KnottedGraph",
     "navigation_depth": 3,

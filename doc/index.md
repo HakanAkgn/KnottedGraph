@@ -1,7 +1,7 @@
 # KnottedGraph
 
 <div class="kg-hero">
-  <p class="kg-lead"><strong>KnottedGraph</strong> organizes geometric input, graph extraction, projection, PD encoding, layout, visualization, and Yamada-polynomial computation into a reusable research library. Start with the version-aware installation guide and tested Quick Start, then continue to the workflow pages and notebooks.</p>
+  <p class="kg-lead"><strong>KnottedGraph</strong> studies the topology of curves and graphs embedded in three dimensions. Build a graph from geometric data, inspect its projection and compute its Yamada polynomial. Try the small 3D example below or explore the paper's figures and saved data.</p>
   <div class="kg-link-row">
     <a href="paper_results.html">Paper Figures &amp; Data</a>
     <a href="benchmarks.html">Benchmarks</a>
@@ -16,9 +16,16 @@
   </div>
 </div>
 
-<div class="kg-wide-figure">
-  <img src="site_figures/architecture.png" alt="KnottedGraph package architecture">
-</div>
+## Start with a 3D example
+
+The {doc}`quickstart` follows a trefoil from coordinates to a three-crossing
+diagram and its exact Yamada polynomial. It runs with the base installation.
+
+```{figure} assets/site_figures/quickstart-trefoil.png
+:alt: A 3D trefoil and the three-crossing projection used to evaluate its Yamada polynomial
+
+{doc}`Open the step-by-step Quick Start <quickstart>`.
+```
 
 ## Read the paper, inspect the evidence
 
@@ -36,13 +43,10 @@ using this work.
 
 ## New here?
 
-1. Read {doc}`installation` so the 0.2 development API is not confused with the
-   legacy PyPI package.
-2. Run {doc}`quickstart` and compare the printed polynomial with the expected
-   result.
+1. Follow {doc}`installation` for the 0.2 development API.
+2. Run {doc}`quickstart` to build, project and analyse a small 3D curve.
 3. Choose your real starting object from {doc}`feature_status`.
-4. Read {doc}`user_guide/workflow_overview` before opening a heavy application
-   or publication-reproduction notebook.
+4. Follow {doc}`user_guide/workflow_overview` to connect the steps for your data.
 
 | Starting point | Go to |
 | --- | --- |
@@ -53,10 +57,18 @@ using this work.
 | Nodal/material/phase-map workflow | {doc}`applications/index` |
 | Import or native-backend problem | {doc}`troubleshooting` |
 
-The website separates introductory tutorials from application research and
-publication reproduction. A linked notebook may require optional dependencies,
-cached data, or compute resources; check its top-of-notebook runtime card before
-using **Run All**.
+Each notebook includes a setup and runtime card. Use it to prepare the
+dependencies and saved data for the example you want to explore.
+
+## How the workflows connect
+
+<div class="kg-wide-figure">
+  <img src="site_figures/architecture.png" alt="KnottedGraph package architecture">
+</div>
+
+The modules share an embedded graph representation. Follow
+{doc}`user_guide/workflow_overview` to trace the input, extraction, projection,
+evaluation and visualization stages.
 
 ```{toctree}
 :hidden:

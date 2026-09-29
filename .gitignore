@@ -169,6 +169,7 @@ dev/*
 !dev/benchmark_data/topoly_random_cubic_v1.jsonl
 !dev/check_protected_final_audit.py
 !dev/build_phase_map_demos.py
+!dev/render_quickstart.py
 assets/*.pdf
 # assets/*.html
 .vscode/

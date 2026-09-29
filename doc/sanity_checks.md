@@ -51,7 +51,8 @@ The five embeddings within a family are not five different abstract graphs.
 
 | Check | Entry point | Coverage |
 | --- | --- | --- |
-| Five-minute installation check | `uv run python examples/quickstart.py` | Abstract and crossing-free embedded theta agree |
+| Five-minute installation check | `uv run python examples/quickstart.py` | 3D trefoil input, three-crossing projection and expected normalized Yamada polynomial |
+| Small CSV input check | `uv run python examples/input_to_yamada.py` | Planar theta graph loaded from node/edge files agrees with its explicit crossing-free formula |
 | Saved paper-data integrity | `uv run --no-project python scripts/inspect_paper_data.py` | File hashes, CSV columns, case alignment and saved statuses; no scientific calculation |
 | Application regressions | [Notebook 02](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/benchmarks/02_application_regression_checks.ipynb) | Current vs historical application outputs; requires the reference Git revision and application dependencies |
 | Published structured families | [Notebook 03](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/benchmarks/03_knottedgraph_vs_topoly_scaling.ipynb) | Published formulas and fixed-PD timing protocol; see {doc}`benchmarks` before executing |

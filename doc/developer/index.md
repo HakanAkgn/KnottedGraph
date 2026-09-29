@@ -9,4 +9,5 @@ the [User Guide](../user_guide/index.md), while domain-facing examples belong in
 :maxdepth: 1
 
 architecture
+documentation
 ```

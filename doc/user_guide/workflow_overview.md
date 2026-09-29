@@ -1,7 +1,8 @@
 # Workflow Overview
 
-KnottedGraph does not require every user to start from the same scientific
-object. The common part begins once an embedded spatial graph is available.
+Start at the stage that matches your data. Curves, graph tables, surfaces and
+scientific models meet at a shared embedded spatial graph, which can then be
+projected, visualized and analysed.
 
 <div class="kg-link-row">
   <a href="../feature_status.html">Choose by starting object</a>
@@ -112,8 +113,7 @@ print("Upsilon(G; Y) =", result.polynomial)
 print("projection crossings =", result.projection.num_crossings)
 ```
 
-Keeping only the polynomial discards important reproducibility information.
-Retain the selected projection, rotation policy, normalization convention,
+For a reproducible result, retain the selected projection, rotation policy, normalization convention,
 worker count, backend status, and any failed candidate views.
 
 State evaluation grows approximately as \(3^c\) with projected crossing count
@@ -149,9 +149,9 @@ The notebooks have different purposes:
 | application notebooks | domain-specific scientific workflows | optional extras; may include paper-sized modes |
 | benchmark notebooks | correctness/performance evidence | native backends, caches, and compute resources may be required |
 
-Do not treat a publication-regeneration notebook as the first tutorial. Start
-with the Quick Start and move to reproduction only after the common graph and
-projection contracts are clear.
+Start with the Quick Start to explore a small 3D example, then follow the
+notebook level that matches your task. Reproduction notebooks list the data
+and dependencies used for the corresponding paper calculation.
 
 ## Reproducibility checklist
 
