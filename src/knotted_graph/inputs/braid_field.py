@@ -5,11 +5,9 @@ represent the braid as the roots of a monic polynomial ``g(u, t)``, approximate
 its periodic coefficient functions by finite Fourier series, and replace
 ``exp(i t)`` and ``exp(-i t)`` by ``v`` and ``conjugate(v)`` respectively.
 
-The returned polynomial is exact for the retained Fourier coefficients.  The
-``BraidValidationReport`` is a *numerical* certificate that the retained
-trigonometric polynomial resolves the requested geometric braid on the sampled
-parameter values; it is deliberately not described as a formal proof that a
-particular finite scaling threshold on S^3 has been crossed.
+The returned polynomial is exact for the retained Fourier coefficients.
+``BraidValidationReport`` records root errors and strand separation at sampled
+parameter values for the selected finite Fourier realization and root scale.
 """
 
 from __future__ import annotations
@@ -181,8 +179,8 @@ class BraidValidationReport:
     @property
     def interpretation(self) -> str:
         return (
-            "numerical sampled braid-isotopy diagnostic; not a formal proof "
-            "certificate for the S^3 scaling threshold"
+            "Root-error and strand-separation diagnostics for the selected Fourier "
+            "modes and root scale, evaluated at sampled braid parameters."
         )
 
 
@@ -372,9 +370,8 @@ def braid_to_semiholomorphic(
 ) -> tuple[SemiholomorphicPolynomial, BraidValidationReport]:
     """Compile an Artin braid word to a validated semiholomorphic polynomial.
 
-    This validates the finite Fourier approximation on sampled ``t`` values.
-    It does not turn the existence theorem's unspecified sufficiently-small S3
-    scaling into a formal machine-checkable bound.
+    The validation report evaluates root errors and strand separation on sampled
+    ``t`` values for the selected Fourier modes and root scale.
     """
     word = _clean_word(word)
     strands = infer_braid_strands(word, strands)

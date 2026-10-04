@@ -26,11 +26,10 @@ print(result.polynomial)
 print(result.projection.num_crossings)
 ```
 
-State resolution grows exponentially with diagram crossing count. The safe
-default is one worker; `n_jobs=-1` is an explicit request to use all available
-cores. The crossing warning indicates expected cost, not an invalid result.
-Also note that a bridge (cut edge) makes the Yamada polynomial zero, so zero is
-not in itself evidence of a failed calculation.
+State resolution grows exponentially with diagram crossing count. The
+default is one worker; `n_jobs=-1` uses all available cores. The crossing warning
+indicates expected computational cost. A bridge (cut edge) makes the Yamada
+polynomial zero under the implemented convention.
 
 The onboarding examples use `Y` and write the invariant as
 `\Upsilon(G;Y)`. Backend formulas may use other temporary symbols internally.

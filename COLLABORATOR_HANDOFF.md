@@ -45,11 +45,9 @@ open site_preview/index.html
 
 The built preview is local. Publication to GitHub Pages is handled by `.github/workflows/docs.yml` on the configured deployment branch.
 
-Sphinx HTML builds also run `dev/build_phase_map_demos.py` to split the pinned
-material reference HTML into on-demand region assets. This is packaging,
-not a phase-map scan. Generated assets under
-`doc/assets/demos/new_phase_maps/` are ignored by Git. On a cluster, build and
-validate on a compute node; do not run this workload on a login node.
+Sphinx HTML builds run `dev/build_phase_map_demos.py` to package the saved
+material reference data into on-demand region assets. Generated assets under
+`doc/assets/demos/new_phase_maps/` are ignored by Git.
 
 ## Validation Before Integration
 

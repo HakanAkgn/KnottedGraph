@@ -25,10 +25,8 @@ uv sync --extra repulsion
 The commands below show the uv route. In an activated pip-based venv, omit the
 leading `uv run`.
 
-This does **not** vendor or install the external Repulsor C++ source.
-
-For a repository checkout, prepare the exact Repulsor revision used by the
-KnottedGraph release with
+Next, prepare the external Repulsor C++ source. For a repository checkout,
+install the exact revision used by the KnottedGraph release with
 
 ```bash
 uv run python scripts/bootstrap_repulsion.py --skip-python-install
@@ -41,7 +39,8 @@ The bootstrap:
 2. clones Repulsor when the checkout is absent;
 3. checks out the revision pinned in `scripts/bootstrap_repulsion.py`;
 4. initializes all Repulsor submodules; and
-5. refuses to silently change an existing checkout that is at another revision.
+5. reports a revision mismatch for an existing checkout and requests an
+   explicit revision choice.
 
 The command above uses `--skip-python-install` because the preceding `uv sync`
 already installed the extra. In an activated pip-based venv, omit that flag if
@@ -110,8 +109,8 @@ graphs. Increase the number of steps only after the short run builds and
 completes successfully. Use `--verify-topology` when you also want the
 independent saved-step verifier; it retains additional intermediate files.
 
-The native solver does not choose scheduler resources for you. On a shared
-system, keep `--threads` within the CPU allocation granted to the process.
+On shared systems, set `--threads` within the CPU allocation granted to the
+process.
 
 ## Reproducibility check
 

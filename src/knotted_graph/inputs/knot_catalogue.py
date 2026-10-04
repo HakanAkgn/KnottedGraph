@@ -1,8 +1,7 @@
 """Small verified braid catalogue used by :class:`KnotFunction`.
 
-The catalogue is intentionally modest: arbitrary user-supplied Artin braid
-words are supported by the generic compiler, so the package does not need a
-large hard-coded table to claim arbitrary-braid functionality.
+The catalogue provides named examples; the generic compiler also accepts
+user-supplied Artin braid words.
 """
 
 from __future__ import annotations

@@ -3,9 +3,6 @@
 Every prepared diagram follows the same mathematical path: factor high-arity
 fixed-vertex equalities into low-arity equality constraints joined by identity
 wires, then contract the resulting polynomial-valued connectivity frontier.
-There is no empirical solver dispatch, crossing-count threshold, benchmark-family
-special case, or structural skein-recursion branch in this evaluator.
-
 The retained raw frontier routines below remain available as an independent exact
 reference and portability fallback for diagnostics/tests.
 """

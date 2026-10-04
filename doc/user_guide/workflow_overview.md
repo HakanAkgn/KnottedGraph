@@ -28,17 +28,18 @@ external data / analytic field / in-memory model
     -> retain settings, diagnostics, and provenance
 ```
 
-Not every project uses every stage. An abstract graph can go directly to the
-crossing-free graph evaluator. A surface loader stops at `PolyData` until the
-user chooses an extraction method. A field or Hamiltonian workflow may require
-3-D sampling and skeletonization before a graph exists.
+An abstract graph can go directly to the crossing-free graph evaluator. For
+a loaded `PolyData` surface, choose an extraction method to obtain a graph.
+Field and Hamiltonian workflows may start with 3-D sampling and skeletonization.
 
-## Stage 1: identify what you actually have
+<a id="stage-1-identify-what-you-actually-have"></a>
+
+## Stage 1: choose your starting object
 
 Start by distinguishing these cases:
 
-- **Ordered coordinates** describe one sampled curve; they do not encode a
-  general graph topology.
+- **Ordered coordinates** describe one sampled curve. For a branching
+  network, supply node and edge connections.
 - **Node and edge data** can represent a spatial MultiGraph directly.
 - **Surface or volume data** require an extraction decision; multiple skeletons
   can be plausible for the same physical geometry.
@@ -69,10 +70,9 @@ Before simplifying anything, inspect:
 - coordinate units and scale; and
 - whether boundaries or periodic faces were touched during extraction.
 
-Cleanup operations such as smoothing, short-edge contraction, and leaf removal
-are not interchangeable. Record which operation was used and compare graph
-diagnostics before and after it. A visually smoother graph is not automatically
-topologically equivalent.
+Smoothing, short-edge contraction and leaf removal act on different parts of
+the graph. Record the operation and compare graph diagnostics before and after
+it to check the intended topology.
 
 ## Stage 3: select a regular projection
 
@@ -89,10 +89,10 @@ print("crossings:", projection.num_crossings)
 
 A valid projection must avoid degeneracies such as a projected vertex lying on
 an unrelated edge or multiple events collapsing to the same point. The selector
-samples candidate views and returns an inspectable result rather than hiding
-the chosen rotation.
+samples candidate views and returns the chosen rotation and diagram
+diagnostics for inspection.
 
-Projected crossings are diagram events, not new graph vertices. Read the
+Projected crossings are diagram events, separate from graph vertices. Read the
 crossing and arc records before interpreting a PD code.
 
 ## Stage 4: compute the invariant with provenance
@@ -124,8 +124,8 @@ resources explicitly for expensive cases.
 
 Skeletonization can be used to obtain compact centerline graphs for geometry
 inspection, comparison, routing, or visualization even when no Yamada
-polynomial is needed. Conversely, a skeleton extracted from a scalar field is
-not automatically the unique topological representation of that field.
+polynomial is needed. The extracted representation depends on the field,
+sampling and extraction method, so record these choices when comparing graphs.
 
 For sampled surfaces/volumes, report at least:
 

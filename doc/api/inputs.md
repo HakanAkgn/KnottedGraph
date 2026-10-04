@@ -10,10 +10,9 @@ The input namespace includes two different kinds of public entry point:
 Constructing a named, torus, braid-derived, or custom `KnotFunction` uses the
 base installation. Sampling its 3-D level set or converting it with
 `KnotFunction.to_spatial_graph` requires the `knot-fields` extra and scales
-with the sampled volume. A braid construction report validates the chosen
-finite Fourier realization; it is not a formal proof certificate for the
-underlying existence theorem. See {doc}`../applications/analytic_knot_fields`
-before treating a finite-grid extraction as publication evidence.
+with the sampled volume. The braid construction report describes the finite
+Fourier realization. The {doc}`../applications/analytic_knot_fields` guide
+explains tubular diagnostics and resolution checks.
 
 ```{eval-rst}
 .. automodule:: knotted_graph.inputs

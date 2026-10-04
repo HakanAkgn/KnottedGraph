@@ -36,3 +36,21 @@ When changing an example, run it as a new user would and update its expected
 output everywhere it appears. Check the rendered page for readable code,
 figures, spacing and links. The maintained Quick Start figure can be rebuilt
 with `uv run python dev/render_quickstart.py`.
+
+## Saved interactive assets
+
+HTML builds call `dev/build_phase_map_demos.py` to package the material reference
+HTML into a viewer and on-demand region JSON files. The builder checks the
+pinned source hashes and writes a manifest of the region hashes. Generated
+assets under `doc/assets/demos/new_phase_maps/` are ignored by Git. The build
+packages the saved figures and records with notebook execution turned off.
+The main-branch Docs workflow builds, validates and deploys the website.
+
+## Notebook validation
+
+The notebook CI validates source portability and normalization. It executes the
+introductory notebooks, offline protein example and two small benchmark
+notebooks. Research workloads in the mathematics and analytic-fields galleries
+and the other application notebooks receive source checks; their full runs use
+separate compute resources. `dev/execute_notebook.py` saves execution status and
+rendered exports for review.

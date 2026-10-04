@@ -1,6 +1,6 @@
 # Projection, PD Codes, And Yamada Polynomials
 
-This page separates three objects that are easy to conflate:
+The workflow connects three objects:
 
 1. an embedded spatial graph in three dimensions;
 2. a selected regular planar diagram with over/under information; and
@@ -33,7 +33,7 @@ Y = sp.Symbol("Y")
 polynomial = compute_graph_yamada_polynomial(ThetaGraph(3), Y)
 ```
 
-This route does not invent a spatial embedding or projection.
+This route evaluates the abstract graph directly from its connectivity.
 
 ### Embedded spatial graph
 
@@ -55,12 +55,12 @@ print(result.projection.rotation_angles)
 print(result.projection.num_crossings)
 ```
 
-`return_result=True` is recommended for scientific work because it retains the
-selected projection rather than returning only a polynomial expression.
+`return_result=True` retains the selected projection with the polynomial,
+including its rotation angles, crossing count and PD code.
 
 ## What projection selection does
 
-Projection choice is part of the computation, not just plotting. Candidate
+Projection selection determines the diagram used in the computation. Candidate
 rotations are evaluated for regularity and diagram complexity. A candidate may
 fail because of overlapping projected segments, a vertex/edge degeneracy, or
 an ambiguous crossing event.
@@ -77,8 +77,8 @@ result = compute_yamada_polynomial(
 )
 ```
 
-Use explicit angles only after confirming that the view is regular. Otherwise,
-let `select_projection` sample views and retain its diagnostic result.
+For explicit angles, check that the view is regular. To search for a view,
+let `select_projection` sample orientations and retain its diagnostic result.
 
 ## How to read PD-code data
 
@@ -90,10 +90,10 @@ The planar diagram records:
 - which arc passes over and under; and
 - cyclic/local incidence information needed by the evaluator.
 
-A crossing visible in 2-D is not a graph vertex unless it was already a vertex
-of the spatial graph. Changing the viewing direction may change the number and
-locations of crossings while leaving the embedded graph and invariant
-unchanged.
+Crossing records describe intersections in the selected view; graph vertices
+retain their identity from the spatial graph. Changing the viewing direction
+may change the number and locations of crossings while leaving the embedded
+graph and invariant unchanged.
 
 If a result differs from what you expect, inspect the selected projection and
 PD records first. They help locate unresolved crossings or a degenerate view
@@ -103,8 +103,8 @@ before comparing the polynomial expressions.
 
 The user-facing examples write the polynomial as
 \(\Upsilon(G;Y)\). Some backend, benchmark, or literature-comparison code uses
-`A` internally. The symbol name does not change the mathematics, but mixing
-normalization conventions can.
+`A` internally. The variable name is a symbolic convention; use the same
+normalization convention when comparing expressions.
 
 Record:
 
@@ -121,8 +121,8 @@ formula.
 
 ## Interpreting zero
 
-A zero result is not automatically an error. For example, a graph containing a
-bridge has zero Yamada polynomial under the implemented convention. First
+A graph containing a bridge has zero Yamada polynomial under the implemented
+convention. To interpret an exact zero,
 inspect graph connectivity, bridges, leaf cleanup, and whether the intended
 object was open or closed.
 
@@ -133,8 +133,7 @@ Also distinguish:
 - a skipped or filtered graph; and
 - a missing backend or timeout.
 
-These states must not be collapsed into one placeholder value in tables or
-figures.
+Record these outcomes separately in tables and figures.
 
 ## Cost and worker policy
 
@@ -142,19 +141,16 @@ For \(c\) diagram crossings, a direct state expansion has approximately
 \(3^c\) states before reductions. Geometry sampling and projection selection add
 their own costs.
 
-- Keep `n_jobs=1` for tutorials and shared/login environments.
-- Inspect crossing counts before enabling parallel work.
-- Use an explicit cluster allocation for expensive batches.
-- Record whether the compiled native backend was available.
-- Treat partial projection failures as diagnostics, not silently discarded
-  events.
+- Start with `n_jobs=1` and inspect the crossing count.
+- Increase workers within your allocated resources.
+- Record the compiled native-backend status.
+- Retain failed-view diagnostics with the selected projection.
 
 ## Formula-discovery and publication notebooks
 
-The formula-discovery notebook is an advanced reproduction artifact, not the
-first introduction to Yamada evaluation. Its setup permits ordinary reading
-and exploratory execution on review branches. Exact publication regeneration
-is opt-in:
+The formula-discovery notebook constructs graph families and tests proposed
+identities on held-out cases. Its setup records the reference source commit.
+For exact publication regeneration, enable strict mode:
 
 ```bash
 export KNOTTEDGRAPH_STRICT_PUBLICATION_REGENERATION=1
@@ -162,10 +158,9 @@ export KNOTTEDGRAPH_STRICT_PUBLICATION_REGENERATION=1
 
 Strict mode additionally requires the audited source revision, a clean library
 tree, the expected editable checkout, and the optimized factorized native
-backend. Without strict mode, the notebook emits explicit warnings instead of
-failing solely because the branch was renamed.
+backend. Exploratory runs report differences from the reference environment.
 
 Start with {doc}`../quickstart`, then use the
 [Advanced and Reproduction notebook](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/03_advanced_and_reproduction.ipynb).
-Open formula discovery only when you need the held-out reconstruction/audit
-workflow and understand its native-backend and cache requirements.
+Use formula discovery for the held-out reconstruction and verification
+workflow; its setup lists the native backend and cache requirements.

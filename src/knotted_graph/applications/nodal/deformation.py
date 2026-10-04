@@ -1,7 +1,7 @@
 """Reusable Bloch-vector deformation scans for ``NodalSkeleton``.
 
-This is intentionally separate from generic S3/R3 knot fields: an arbitrary
-analytic knot field is not automatically a periodic Brillouin-zone model.
+These scans interpolate Bloch-vector models in momentum space. For
+analytic S3/R3 knot-field homotopies, use ``KnotFunctionPath``.
 """
 
 from __future__ import annotations

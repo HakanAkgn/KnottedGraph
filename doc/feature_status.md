@@ -3,9 +3,8 @@
 Use this reference to find the reader or workflow for your data, its required
 dependencies and the next processing step. The package is currently **pre-alpha**.
 
-Use this page to choose a supported starting point before opening an application
-notebook or API page. Quantitative runtimes are stated only where they have been
-measured. The final column otherwise records the dominant scaling variable.
+Choose a starting point, then follow its application notebook or API page.
+The final column lists computational scaling and available runtime measurements.
 
 Status legend:
 
@@ -39,7 +38,7 @@ Status legend:
 | In-memory Hermitian multiband Hamiltonian | Application API · optional | `nodal` | `knotted_graph.applications.materials.MaterialFermiSurface` | `MaterialFermiSurface` | Inspect the gap surface, then call `.skeleton_graph()`. | Depends on grid size and band count. |
 | Knot-field or in-memory Hamiltonian Yamada phase map | Application API · optional | `knot-fields` for knot sources; `nodal` for Hamiltonian/material sources | `knotted_graph.applications.make_yamada_phase_map` | `YamadaPhaseMapResult` | Inspect cell errors, phase signatures, and transition intervals; recompute selected cells only when needed. | Number of phase-map cells multiplied by extraction and Yamada-evaluation cost. |
 | Saved material phase-map records | Application API · base | none | `knotted_graph.applications.phase_map_examples.load_phase_map` | `PhaseMapData` | Inspect `.summary()`, then use `plot_phase_map` for a raw categorical plot. | Reads saved rows; no field extraction or invariant recomputation. |
-| Embedded graph needing repulsive relaxation | External backend | none for the direct graph call; separately installed native Repulsor solver | `knotted_graph.layout.repulsive.relax_spatial_graph` | `GraphLayoutResult` | Validate `result.graph` before projection. | Depends on native build and solver options; native runtime has not been independently audited. |
+| Embedded graph needing repulsive relaxation | External backend | none for the direct graph call; separately installed native Repulsor solver | `knotted_graph.layout.repulsive.relax_spatial_graph` | `GraphLayoutResult` | Validate `result.graph` before projection. | Depends on graph size, solver options and iteration count. |
 | Embedded graph needing an interactive 3-D view | Public · optional | `viz` | `knotted_graph.visualization.plot_3D_graph_plotly` | `plotly.graph_objects.Figure` | Display or export the returned figure. | Depends on graph/polyline size and the renderer. |
 
 ## Preparing data from other formats

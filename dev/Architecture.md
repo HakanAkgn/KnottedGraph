@@ -50,7 +50,7 @@ flowchart LR
 
 ## Edge List
 
-| From | To | Meaning for agents |
+| From | To | Data flow / purpose |
 |---|---|---|
 | USER API | Input Adapters | Public package imports and user calls normalize external data. |
 | Model Library | Input Adapters | Example generators and fixtures can be converted into core graph objects. |
@@ -105,4 +105,4 @@ flowchart LR
 
 ## Maintenance Note
 
-This file is a source-level architecture map, not a historical reconstruction artifact. When module locations, public contracts, or optimized execution paths change, update the corresponding code anchors and data-contract rows here. The tracked visual overview is `assets/paper/architecture.svg`.
+Update these code anchors and data-contract rows when module locations, public interfaces, or execution paths change. The tracked visual overview is `assets/paper/architecture.svg`.

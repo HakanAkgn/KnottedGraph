@@ -1,7 +1,7 @@
-"""Protect accepted performance/audit content with history-independent hashes.
+"""Protect pinned publication implementation and notebook source content.
 
 Git object IDs identify the exact accepted implementation trees and files.
-Benchmark notebooks use a canonical scientific-source fingerprint that ignores
+Benchmark notebooks use a canonical source fingerprint that ignores
 only explicitly allowlisted bootstrap cells, cell IDs, and transient execution
 state.  No baseline commit needs to remain in the current history, so this check
 continues to work after a rebase or squash merge.
@@ -18,16 +18,20 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# Content-addressed objects accepted by the final performance audit. Directory
+# Content-addressed publication implementation objects. Directory
 # values are Git tree IDs; file values are Git blob IDs. They do not require the
 # commit from which they were recorded to remain in repository history.
+EDITORIAL_REFERENCE_REVISION = "9a0f379c38050e80e57967841904917da86c7528"
+# The 2026-10-05 prose refresh uses the published main above as its comparison
+# snapshot. Computation, notebook code/metadata, and saved data were checked
+# against that snapshot before these object IDs and fingerprints were refreshed.
 EXPECTED_GIT_OBJECTS = {
-    "CMakeLists.txt": "42ed69ac293bba15f4209231b5ee309cd149dc74",
-    "dev/final_performance_audit.py": "d1d6d2568aa77c0b16ad9afc4872efe2daec6ada",
-    "dev/final_performance_audit_medium.py": "227e88fbe16c05b7e7c09d1e09cb6fe9323c36c6",
-    "src/knotted_graph/extraction": "47c30ced3fd6499bcf02b32c49936c9ea128d2f5",
-    "src/knotted_graph/invariants/yamada": "de87e490047cc4b9150218acfd5a89823d6d093e",
-    "src/knotted_graph/projection": "e0354b5f80dda3ecd008da3eab46d3c578bd5804",
+    'CMakeLists.txt': 'dc23f7e8ef4456eb92229d9ee93f0c9fb83d546c',
+    'dev/final_performance_audit.py': 'd1d6d2568aa77c0b16ad9afc4872efe2daec6ada',
+    'dev/final_performance_audit_medium.py': '227e88fbe16c05b7e7c09d1e09cb6fe9323c36c6',
+    'src/knotted_graph/extraction': '74661fcc38d0f9bb1e94a16f8543a91697638866',
+    'src/knotted_graph/invariants/yamada': '81da4a1d0bdae0388848f8e04a8c6a2687561c90',
+    'src/knotted_graph/projection': '3bb3df7404d62b0648ffb4b435a43b408dab6371',
 }
 
 # These cells contain environment discovery/reporting rather than the accepted
@@ -43,18 +47,10 @@ ALLOWED_BOOTSTRAP_CELLS = {
 }
 
 EXPECTED_BENCHMARK_FINGERPRINTS = {
-    "User_guide/benchmarks/01_yamada_sanity_checks.ipynb": (
-        "ae261e4e1ff192f63726e8401ae3c37c6840fc587ee9b9534b255872e0ec67f8"
-    ),
-    "User_guide/benchmarks/02_application_regression_checks.ipynb": (
-        "36d77d39551dd33f823c06ed7e033e4ea9599b59440709f2355111356f458cca"
-    ),
-    "User_guide/benchmarks/03_knottedgraph_vs_topoly_scaling.ipynb": (
-        "24bae6ce245c650788d6fcf1fc7bc2aa8c9d8fed56c121125b47c3dbc161b9e6"
-    ),
-    "User_guide/benchmarks/04_thick_handlebody_validation.ipynb": (
-        "dd58463d6515c9e9faa0d608b5ce81f53a0e886b959fe3b4156252cdc3d96c3e"
-    ),
+    'User_guide/benchmarks/01_yamada_sanity_checks.ipynb': 'fa593f21b9f3495f43ed49982543573a7f0fe336b9af597c102d5bf4d84db92e',
+    'User_guide/benchmarks/02_application_regression_checks.ipynb': 'e3b2c6e00b7bf70dee067c3576556da207d99189c7671df58439c06aa1313aee',
+    'User_guide/benchmarks/03_knottedgraph_vs_topoly_scaling.ipynb': '3a02b617e2d52ae77244926091d77693111b31126c7c3d3de56adfa344149354',
+    'User_guide/benchmarks/04_thick_handlebody_validation.ipynb': '23740782d8a0d687a110a21b82eafee0a1002f5888cba0e36a42bafa3f60cb98',
 }
 
 

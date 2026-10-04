@@ -33,10 +33,9 @@ polynomial = compute_graph_yamada_polynomial(graph, Y)
 print(polynomial)
 ```
 
-`drawing_positions` is a two-dimensional layout for inspection. It is not a
-three-dimensional embedding and does not create edge `pts` data. Use the direct
-graph evaluator for an abstract graph; use the projection route only after you
-have a validated spatial embedding.
+`drawing_positions` provides a two-dimensional layout for inspection. Use
+the direct graph evaluator for the abstract graph. For projection, supply and
+validate a three-dimensional embedding with node `pos` and edge `pts` data.
 
 ## What the notebook demonstrates
 
@@ -50,8 +49,9 @@ The notebook progresses from simpler to more specialized questions:
 6. reuse PD-code output with user-defined Jones/Alexander calculations; and
 7. use exact computations to formulate and test a periodic-theta pattern.
 
-The last stages illustrate computational evidence and held-out checks. A
-pattern seen in a finite family is not, by itself, an all-parameter proof.
+The last stages use exact computations to propose patterns and test them on
+held-out cases. General identities can then be investigated through analytic
+derivations.
 
 ## Choose the correct route
 
@@ -64,5 +64,5 @@ pattern seen in a finite family is not, by itself, an all-parameter proof.
 
 See {doc}`../api/applications` for catalog entry points,
 {doc}`../api/yamada` for the direct evaluator, and
-{doc}`../user_guide/projection_yamada` for the spatial route and its scaling
-limits.
+{doc}`../user_guide/projection_yamada` for the spatial route and its computational
+scaling.

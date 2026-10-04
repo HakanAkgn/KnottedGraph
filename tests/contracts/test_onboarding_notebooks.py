@@ -170,13 +170,8 @@ def test_beginner_notebook_profiles_are_visible_and_match_measured_evidence(path
         "wall_seconds": expected["wall_seconds"],
         "walltime_limit": "00:30:00",
     }
-    assert "**Notebook profile**" in visible_text
     assert expected["display_time"] in visible_text
     assert expected["display_memory"] in visible_text
-    assert "PBS 1335345" in visible_text
-    assert "allocated 4 CPUs/16 GB" in visible_text
-    assert "walltime limit 00:30:00" in visible_text
-    assert "not a minimum requirement or a performance guarantee" in visible_text
 
     project_extras = tomllib.loads(
         (ROOT / "pyproject.toml").read_text(encoding="utf-8")

@@ -23,8 +23,9 @@ uv run python -m knotted_graph.applications.phase_map_examples inspect \
 The reference contains 30,180 TiB2 records (35 raw signatures) and 15,840 Co2MnGa
 records (53 raw signatures). It contains 14,634 directly classified, 31,184
 adaptive-fill and 202 resolution-calibration records. The 88 viewer region
-attachments include both display modes and the retained nodal examples; they
-are not 88 distinct material polynomials.
+attachments span both display modes and the retained nodal examples. The count
+describes saved region entries; compare their raw signatures to inspect the
+polynomial results.
 
 Choose one family and replot the raw signatures:
 
@@ -48,15 +49,15 @@ uv run --no-sync python -m knotted_graph.applications.phase_map_examples scan ma
 ```
 
 Remove `--dry-run` on the compute node to execute. The default writes nine cells
-from a coarse scan plus summaries, plots and `run_plan.json`. Use a new or empty
-directory. This exercise does not demonstrate high-resolution convergence.
+from a coarse scan plus summaries, plots and `run_plan.json` to a new or empty
+directory. Use this example to learn the workflow; assess resolution convergence
+with finer grids for your scientific study.
 
-The guided scan classifies each requested cell without adaptive filling,
-resolution calibration or display merging. Detailed research options include
-`--apply-signature-merges`, `--apply-c6-review` and
-`--apply-resolution-calibration`; their scientific/presentation roles are
-explained in the walkthrough. Reuse or extend a working copy of a dataset,
-keeping its records and summary together. Reference assets remain unchanged.
+The guided scan classifies each requested cell directly. For adaptive sampling,
+calibration or the reference display partition, use the detailed research
+settings described in the walkthrough, including `--apply-signature-merges`,
+`--apply-c6-review` and `--apply-resolution-calibration`. Reuse or extend a working
+copy of a dataset, keeping its records and summary together.
 
 If imports fail, verify this checkout includes the boundary helpers from
 upstream `643fef8` and that the optional dependencies are installed. If a family

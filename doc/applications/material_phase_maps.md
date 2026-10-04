@@ -2,8 +2,9 @@
 
 Start here for the material-parameter examples supplied in
 `User_guide/applications/NewPhaseMapPlots`. You can inspect saved results without
-running a scan. These are application-specific examples, not new generic input
-formats or a replacement for the [phase-map API](../api/applications.md).
+running a scan. The application provides material-specific models and helpers
+to inspect, plot and compute record tables. The [phase-map API](../api/applications.md)
+documents the general scan interface.
 
 ## Choose how much work to run
 
@@ -14,7 +15,8 @@ formats or a replacement for the [phase-map API](../api/applications.md).
 | Learn the computation | `phase_map_examples scan --profile quick` | optional `nodal` and `viz`; small optional calculation |
 | Reproduce high-resolution research plots | source scripts and reference data | advanced; expensive scans, explicit display processing and validation |
 
-Follow the [source-install instructions](../installation.md) for `main`. The legacy PyPI release does not contain these commands. Commands below
+Install the `main` source version with the
+[source-install instructions](../installation.md) to use these commands. They
 assume the repository root; the installed Python helpers also work outside a
 checkout when supplied with your own records file.
 
@@ -32,19 +34,17 @@ The saved material artifact also includes the earlier nodal transitions; select
 TiB2 or Co2MnGa to see the new material scans.
 
 Choose a transition and classification mode, then click a region to see its
-representative surface and skeleton. A representative is one selected cell,
-not every geometry in that colored region. In “Up to contraction” views,
-read the reported grouping convention before comparing colors.
+representative surface and skeleton from a selected cell in that region.
+In “Up to contraction” views, colors follow the reported grouping convention.
 
-These links load geometry **on selection**, not when you open this guide. If
-Plotly or a region download is blocked, the viewer reports the problem; the
-static figures remain available. Downloaded split viewers must be served over
-HTTP, not opened with `file://`. The original self-contained research HTML files
-remain in the source tree, but still require their declared browser dependencies.
+The viewer loads geometry **on selection**. If Plotly or a region download
+is blocked, use the static figures. Serve downloaded split viewers over HTTP.
+The original self-contained research HTML files remain in the source tree;
+use their declared browser dependencies.
 
 ## First exercise: inspect saved cells
 
-No optional extraction stack is needed:
+Inspect saved records with the base installation:
 
 ```bash
 uv run python -m knotted_graph.applications.phase_map_examples inspect \
@@ -59,8 +59,7 @@ Expected reference counts:
 | `co2mnga_t8` | 15,840 | 60 lambda × 264 energy samples | 53 |
 
 The inspector also reports errors, missing cells, source counts, direct
-classifications, adaptive fills and resolution calibrations. It never
-interprets a signature string as executable Python.
+classifications, adaptive fills and resolution calibrations.
 
 ## Replot without recomputing
 
@@ -73,13 +72,12 @@ uv run python -m knotted_graph.applications.phase_map_examples plot \
 This saves `tib2_raw.png`, `tib2_raw.pdf` and `tib2_raw.json`. The JSON is the
 phase key: it maps each category ID to its full signature, color, source and
 recorded polynomial, and includes the coordinate axes and the category-ID grid.
-Category IDs are not polynomial values. The plot uses serif labels
-and Computer Modern mathematics without changing your global plotting settings.
 White cells are missing, shaded cells are adaptive fills, open circles mark
 resolution calibrations, and crosses mark errors. The JSON also records each
 cell's classification status and calibration anchor energy when present.
-No small-island smoothing, C6 grouping or manual signature merging is applied.
-With many categories, use the JSON key rather than relying on color alone.
+This raw view retains the recorded signatures, with small-island smoothing,
+C6 grouping and manual signature merging disabled. Use the JSON key to identify
+categories when the plot contains many colors.
 
 The same operation from Python:
 
@@ -93,9 +91,8 @@ figure = plot_phase_map(data, output="my_results/raw_map")
 plt.close(figure)
 ```
 
-`my_records.csv` is a placeholder for a saved records file, not a file bundled
-with the wheel. Reference CSVs and large research assets are in the source
-checkout, not installed into `site-packages`.
+Replace `my_records.csv` with the path to your saved records. Find the
+reference CSVs and large research assets in the source checkout.
 
 ## Compute a small new example
 
@@ -109,9 +106,9 @@ uv run --no-sync python -m knotted_graph.applications.phase_map_examples scan ma
 
 The default quick profile uses one family, a $24^3$ sampling grid and $3\times3$
 parameter cells. It uses one process and caps exact-Yamada attempts at eight
-core edges. That cap does not guarantee a fixed runtime: projection complexity
-also matters. A low-resolution result is a smoke example, not a converged
-topological measurement or a substitute for the saved high-resolution figures.
+core edges. This coarse profile demonstrates the input, extraction and
+recording steps. Runtime depends on graph and projection complexity. Use the
+research configuration and resolution checks for quantitative comparisons.
 
 To execute the optional scan, remove `--dry-run`:
 
@@ -126,13 +123,13 @@ directory: the guided command refuses to overwrite existing results. Use
 `--max-exact-yamada-edges` to adjust the scan. Material families are `tib2_d6_F`,
 `co2mnga_t8`, `ti3al_M2` and `yh3_m1`. Material scans support `--workers`.
 
-On a cluster, even the quick scan and rendering/build tasks belong in a batch
-or interactive compute allocation, not on a login node. Resource choices are
-site-specific; no queue, account or scheduler settings are embedded in this
-application. Dense scans can be substantially more expensive in both time and
-memory. Estimate them from a coarse run before requesting larger resources.
+For cluster runs, request resources through your site's scheduler. Estimate
+the time and memory for larger scans from a coarse run.
 
-## What a color does—and does not—mean
+<a id="what-a-color-doesand-does-notmean"></a>
+<a id="what-a-color-does-and-does-not-mean"></a>
+
+## Read colors and classification status
 
 | Record or display status | Interpretation |
 | --- | --- |
@@ -153,19 +150,17 @@ The new guided scans classify every requested cell and disable adaptive filling,
 resolution calibration, smoothing, C6 display grouping and manual signature
 merges. They still use the upstream volume-resolution rule when extracting a
 material body; `removed_component_voxels` and `filled_void_voxels` describe that
-operation. Inspect boundary contact, sampling resolution,
-components and the representative skeleton before interpreting any class.
+operation. Compare boundary contact, sampling resolution, components and
+the representative skeleton when interpreting classifications.
 
 ## Research reproduction and provenance
 
-The latest material reference data, figures and HTML from upstream `56bfbab`
-are preserved. The boundary-volume
-helpers are supplied by upstream `643fef8`. Historical path strings are provenance, not runtime
-requirements. Reusable compute engines now live in
+The dataset guide records the reference assets from upstream `56bfbab` and
+the boundary-volume helpers from `643fef8`. Reusable compute engines live in
 `knotted_graph.applications.phase_map_examples`; the old script paths are
-compatibility entry points. Specialized publication layouts and bounded
-contraction processing remain documented research scripts, not generic public
-APIs. Their map mathematics and Hamiltonian definitions were not redesigned.
+compatibility entry points. The research scripts provide publication layouts
+and bounded contraction processing; reusable scan and record-handling functions
+are documented in the application API.
 
 Detailed material runs retain explicit research processing options:
 `--apply-signature-merges` enables manual display merges, `--apply-c6-review`
@@ -182,15 +177,8 @@ energy rows. The representative-geometry script follows the resolved dominant
 body and its outer/nested fillings. The old
 `--primary-component-min-fraction` selection option no longer applies.
 
-`--profile paper` chooses denser sampling defaults, but does **not** silently
-enable historical display merges, adaptive fills or all families, and is not
-a promise of pixel-identical publication reproduction. For that task use the
-[research-script map](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/applications/NewPhaseMapPlots/README.md),
-match the saved metadata, and review regenerated results before replacing an
-accepted figure. Input-format figures Main/S1/S2 are unrelated and unchanged.
-
-The website builder separates saved region JSON from the original HTML without
-changing grid values or geometry. `dev/build_phase_map_demos.py` checks pinned
-source hashes and writes a manifest of region hashes. Sphinx calls it for HTML
-builds; generated split assets are ignored by Git, avoiding another checked-in
-copy of the large payloads. Deployment follows the repository main-branch workflow.
+`--profile paper` selects denser sampling defaults. Choose families and display
+processing explicitly using the options above. For the publication layout, use
+the [research-script map](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/applications/NewPhaseMapPlots/README.md)
+and the saved metadata. Compare regenerated figures with the reference before
+updating a published result.

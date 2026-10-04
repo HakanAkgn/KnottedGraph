@@ -1,14 +1,12 @@
 # Hamiltonian Yamada Phase Maps
 
-This advanced workflow samples a two-parameter family of in-memory Hamiltonian
-or Bloch-vector models and records the topology extracted at each grid cell.
-It is not a Hamiltonian-file parser and it is not a proof of a continuum phase
-boundary.
+This workflow accepts an in-memory Hamiltonian or Bloch-vector model and
+records extracted topology at each point of a two-parameter sampling grid.
 
 For the additional material-parameter and compact-scaffold plots, continue to
 {doc}`material_phase_maps`. That guide starts from saved records and
-provides a separate bounded compute example; the accepted nodal viewer below is
-unchanged.
+provides a small compute example. The interactive nodal examples are shown
+below.
 
 <div class="kg-hero">
   <p class="kg-lead">Use the interactive result to select a transition and a phase region, then inspect a representative exceptional surface and its simplified spatial-graph skeleton. Use the notebook when you need to regenerate the grid, caches, audits, or figures.</p>
@@ -49,18 +47,21 @@ and a phase signature. The notebook adds row caches, connected-region
 stabilization, endpoint checks, classic phase labels, and a second view that
 groups regions up to selected contraction moves.
 
-## Interpretation boundaries
+<a id="interpretation-boundaries"></a>
 
-- A colored cell represents a finite-grid computation, not an analytically
-  exact phase boundary.
-- A failed extraction remains an error record; it must not be relabeled as a
-  zero invariant.
+## Read the phase-map records
+
+- Each colored cell records a computation at the stated parameter values and
+  grid resolution; boundaries follow neighboring sampled cells.
+- An extraction failure has an error record. An exact zero has a successfully
+  evaluated polynomial value.
 - The displayed surface gives physical/geometric context. The black skeleton
   is the graph used for topological analysis.
-- “Up to contraction moves” is a stated equivalence convention and should not
-  be confused with literal equality of the classic Yamada signatures.
-- Resolution, sampling-window contact, endpoint behavior, and representative
-  geometry should be checked before a region is interpreted scientifically.
+- The classic view groups Yamada signatures. “Up to contraction moves” groups
+  representative graphs under the stated contraction convention.
+- Inspect resolution, sampling-window contact, endpoint behavior and
+  representative geometry when comparing regions.
 
-The full notebook is resource-heavy and is statically checked in normal pull
-requests rather than run automatically as a beginner tutorial.
+The full notebook uses up to 60 lambda samples and 50 candidate Gamma samples
+with a $120^3$ volume per evaluated cell. Start from the saved interactive
+result, then use the notebook's configuration and cache settings for regeneration.

@@ -3,7 +3,7 @@
 **Start with the [guided walkthrough](../../../doc/applications/material_phase_maps.md).**
 It separates reading saved records, making a raw plot, a coarse new scan and
 publication reproduction. Run commands from the repository root after installing
-this development branch with `uv`; the old PyPI API is not sufficient.
+the 0.2 development checkout with `uv`.
 
 For the data provenance and interpretation,
 see [the provenance notes](INTEGRATION_NOTES.md).
@@ -26,8 +26,8 @@ uv run python -m knotted_graph.applications.phase_map_examples inspect \
 
 The material reference assets came from Hakan's `56bfbab` update, with the
 required boundary-topology implementation completed in `643fef8`. Recorded absolute paths
-inside original data/HTML describe its provenance; they are not required on your
-machine. The separate timing source CSV and `assets/paper/Time_distributions.pdf`
+inside original data/HTML record the producing machine. The commands below use
+repository-relative paths and explicit output locations. The separate timing source CSV and `assets/paper/Time_distributions.pdf`
 from `091bfc0` are also retained without alteration.
 
 ## Specialized reproduction commands
@@ -52,26 +52,29 @@ uv run --no-sync python \
   --output-dir _build/new_phase_maps/material_panels
 ```
 
-The detailed material engine defaults to no adaptive fill or display smoothing.
-For historical display processing, the relevant switches include
-`--adaptive-energy-step 0.05 --min-stable-cells 8 --island-merge-strategy below
---apply-signature-merges`. This is an explicit presentation choice, not a claim
-that the merged polynomials are equal. Match **all** parameters and saved energy
-grids from the reference summaries before claiming full reproduction; the
-historical scan also included incremental extensions. The new research switches
-`--apply-c6-review` and `--apply-resolution-calibration` separately enable the
-teacher's C6 display partition and resolution calibration; both are off by
-default. Calibration is recorded with `resolution_calibration_energy` and is
-distinct from ordinary adaptive fill. Reusing records applies any explicitly
-selected processing and writes to the chosen output directory, so use a copy of
-accepted input when exploring these choices.
+## Reference processing settings
 
-The material geometry script now uses the dominant resolved volume body and
-its outer/nested boundary fillings, matching the latest teacher implementation.
-It requires an acknowledgement because it also performs historical display
-processing. The former `--primary-component-min-fraction` convention no longer
-applies; supplying that option produces a migration error. The geometry and
-record classifications must be interpreted with the same version and settings.
+To reproduce the saved presentation, match the parameters and energy grids in
+the reference summaries, including the recorded incremental extensions. The
+detailed material engine classifies cells directly by default. Its optional
+processing settings are:
 
-The guided CLI's `--dry-run` is the safest way to inspect a new run plan. None of
-these tools submit jobs or select a billing account on your behalf.
+| Setting | Effect on the output |
+| --- | --- |
+| `--adaptive-energy-step 0.05` | Enables the reference adaptive energy sampling/filling setting. |
+| `--min-stable-cells 8 --island-merge-strategy below --apply-signature-merges` | Applies the reference display partition. A displayed group can contain several distinct polynomial signatures; use the raw signatures for polynomial comparisons. |
+| `--apply-c6-review` | Applies the recorded C6 display partition. Default: off. |
+| `--apply-resolution-calibration` | Applies resolution calibration. Default: off; calibrated records use `resolution_calibration_energy`, a separate status from adaptive fill. |
+
+When reusing records, the selected processing writes to your output directory.
+Use a working copy of the input to explore different settings.
+
+The material geometry script uses the dominant resolved volume body and its
+outer/nested boundary fillings from the boundary-topology implementation in
+`643fef8`. Select `--historical-display-processing` to use its reference display
+processing. This replaces the earlier `--primary-component-min-fraction`
+convention; the CLI reports a migration error for that earlier option. Keep the
+geometry and record classifications together with their version and settings.
+
+Use the guided CLI's `--dry-run` to inspect the scan settings and output paths
+before execution.

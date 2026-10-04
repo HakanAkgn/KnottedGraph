@@ -2,7 +2,7 @@
 
 Projection converts an embedded spatial `MultiGraph(pos/pts)` into a regular
 two-dimensional diagram. Geometric intersections in that view become crossing
-records; they do **not** become graph vertices.
+records, separate from the original graph vertices.
 
 Use {py:func}`knotted_graph.projection.select_projection` when you want to
 inspect the chosen view before evaluating an invariant. With explicit
@@ -24,8 +24,8 @@ rotations or a lowercase order such as `xyz` for intrinsic rotations. A mixed-
 case or non-axis order is rejected before geometry is processed.
 
 If some sampled views are degenerate, a warning reports how many failed while
-valid projections remain available. Collinear overlaps are not silently
-interpreted as crossings. See [Troubleshooting](../troubleshooting.md) for
+valid projections remain available. Collinear overlaps identify a degenerate
+view; choose another rotation. See [Troubleshooting](../troubleshooting.md) for
 regular-projection and runtime guidance.
 
 ```{eval-rst}

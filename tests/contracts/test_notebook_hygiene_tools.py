@@ -228,7 +228,9 @@ def test_benchmark_fingerprint_detects_scientific_source_changes() -> None:
         "cells": [
             {"id": "setup", "cell_type": "code", "source": ["setup = 1\n"]},
             {"id": "science", "cell_type": "code", "source": ["result = 1\n"]},
+            {"id": "method", "cell_type": "markdown", "source": ["Sampled input method\n"]},
         ],
+        "metadata": {"sampling_resolution": 24},
         "nbformat": 4,
     }
     baseline = _benchmark_fingerprint(notebook, {"setup"})
@@ -241,6 +243,14 @@ def test_benchmark_fingerprint_detects_scientific_source_changes() -> None:
     changed = json.loads(json.dumps(notebook))
     changed["cells"][1]["source"] = ["result = 2\n"]
     assert _benchmark_fingerprint(changed, {"setup"}) != baseline
+
+    changed_method = json.loads(json.dumps(notebook))
+    changed_method["cells"][2]["source"] = ["A different input method\n"]
+    assert _benchmark_fingerprint(changed_method, {"setup"}) != baseline
+
+    changed_metadata = json.loads(json.dumps(notebook))
+    changed_metadata["metadata"]["sampling_resolution"] = 48
+    assert _benchmark_fingerprint(changed_metadata, {"setup"}) != baseline
 
 
 def test_all_notebooks_have_unique_ids_and_clean_outputs() -> None:

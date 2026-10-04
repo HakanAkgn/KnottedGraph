@@ -1,9 +1,9 @@
 # Saved benchmark data
 
-These are existing records from source snapshot
-`9607c1c8a35affdc0dbe90e507c2612b7e464c7d`. No benchmark was rerun to build this
-index. That snapshot identifies the archived files; the original execution
-revision and environment are recorded in the timing rows where available.
+These archived records come from source snapshot
+`9607c1c8a35affdc0dbe90e507c2612b7e464c7d`. That snapshot identifies the saved
+files; the timing rows record the original execution revision and environment
+where available.
 
 Read the [benchmark interpretation guide](../../../doc/benchmarks.md) alongside
 the CSVs. The [paper guide](../../../doc/paper_results.md) maps figures to records.
@@ -29,9 +29,9 @@ uv run --no-project python scripts/inspect_paper_data.py --json
 The command uses only Python's standard library. It verifies SHA-256 hashes,
 columns and row counts from [manifest.json](manifest.json), checks unique case
 identifiers and joins the six handlebody tables by `case`. It then summarizes
-the **saved** pass/fail and timing-status fields. A changed or missing file
-produces a nonzero exit status. This is an archive-integrity check, not a new
-independent evaluation of the polynomials.
+the saved pass/fail and timing-status fields. A changed or missing file
+produces a nonzero exit status. Use this command to check the archived files;
+use the linked benchmark notebooks to evaluate graphs and polynomials.
 
 ## Key fields and comparison rules
 

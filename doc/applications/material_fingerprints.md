@@ -13,15 +13,14 @@
 
 ## What this route accepts
 
-This is an **application workflow**, not a material-file adapter. It starts from
-an in-memory symbolic Bloch Hamiltonian $H(k_x,k_y,k_z)$. Install the `nodal`
+Start from an in-memory symbolic Bloch Hamiltonian $H(k_x,k_y,k_z)$. Install the `nodal`
 extra before constructing `MaterialFermiSurface`; install `viz` as well for the
 interactive Plotly views used by the notebook.
 
 The supplied examples include symbolic constructors for $Ti_3Al$, a
 $D_6$/$TiB_2$ model, and $YH_3$. The notebook also shows a six-band
 $Co_2MnGa$ construction and a template for a user-defined SymPy matrix. See the
-{doc}`../feature_status` matrix for the exact public/application boundary.
+{doc}`../feature_status` reference for the calls and dependencies used by each route.
 
 ## Data flow
 
@@ -35,13 +34,15 @@ symbolic Hermitian Hamiltonian
     -> select a projection and compute an invariant
 ```
 
-The surface and graph are deliberately shown separately. A continuous
-isosurface is physical/numerical context; it is not itself the graph used by
-the projection and invariant code.
+The continuous isosurface shows the physical geometry. Its extracted
+spatial graph supplies the node and edge data used for projection and
+invariant evaluation.
 
-## Decisions you must make explicitly
+<a id="decisions-you-must-make-explicitly"></a>
 
-Before interpreting a fingerprint, record and test:
+## Choose and record the model settings
+
+For a reproducible fingerprint, record and test:
 
 - the momentum-space `span` and grid `dimension`;
 - the selected `band_pair` and `gap_tol`;
@@ -50,9 +51,9 @@ Before interpreting a fingerprint, record and test:
 - graph node/edge/degree diagnostics before and after cleanup; and
 - a resolution or threshold perturbation check.
 
-Leaf removal, short-edge contraction, and smoothing can change the scientific
-object if used indiscriminately. Inspect the raw graph first and do not treat a
-visually cleaner skeleton as proof of topological equivalence.
+Compare graph diagnostics before and after leaf removal, short-edge
+contraction or smoothing to check that the processed graph represents the
+intended scientific object.
 
 ## How to read the notebook
 

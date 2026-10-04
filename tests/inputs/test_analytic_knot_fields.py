@@ -38,7 +38,10 @@ def test_generic_braid_compiler_resolves_non_torus_figure_eight_braid():
     assert report.error_fraction < 0.2
     assert report.components == 1
     assert polynomial.degree_u == 3
-    assert "not a formal proof" in report.interpretation
+    assert report.validation_samples == 256
+    assert np.isfinite(report.max_root_error)
+    assert report.min_target_separation > 0
+    assert isinstance(report.interpretation, str) and report.interpretation
 
 
 def test_torus_constructor_has_exact_zero_parametrization():

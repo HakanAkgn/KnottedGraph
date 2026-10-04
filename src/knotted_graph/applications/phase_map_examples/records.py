@@ -108,7 +108,7 @@ def read_phase_map_records(path: str | Path) -> tuple[dict[str, Any], ...]:
 
 @dataclass(frozen=True)
 class PhaseMapData:
-    """One family of sampled records; labels are categories, not invariant values."""
+    """One family of sampled records with categorical signature labels."""
 
     family: str
     level_field: str

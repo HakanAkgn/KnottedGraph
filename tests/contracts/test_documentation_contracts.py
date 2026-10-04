@@ -110,7 +110,7 @@ def test_interactive_phase_map_asset_is_pinned_and_linked() -> None:
     provenance = (asset.parent / "README.md").read_text(encoding="utf-8")
 
     digest = hashlib.sha256(asset.read_bytes()).hexdigest()
-    assert digest == "a7a82b9ba83b3b21c41d11bda5653168547e81442eac6a02d77d2395fc5bc618"
+    assert digest == "dbc11cdeb5b76ca023ebdcaa47c3d0e6b38146629f5c7666a91d8f369edc8777"
     assert digest in provenance
     assert "hamiltonian_yamada_plotly_region_geometry_v14_nodal_only" in provenance
     assert "../demos/hamiltonian_yamada_phase_map.html" in page

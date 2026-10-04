@@ -276,8 +276,7 @@ class MaterialFermiSurface(NodalSkeleton):
     def from_hamiltonian(cls, hamiltonian: sp.Matrix, **kwargs):
         """Construct from a material Hamiltonian.
 
-        This convenience constructor does not introduce new physics or filtering;
-        it is exactly equivalent to ``MaterialFermiSurface(hamiltonian, **kwargs)``.
+        Equivalent to ``MaterialFermiSurface(hamiltonian, **kwargs)``.
         """
         return cls(hamiltonian, **kwargs)
 

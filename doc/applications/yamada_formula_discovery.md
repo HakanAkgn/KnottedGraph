@@ -1,8 +1,8 @@
 # Yamada Formula Discovery
 
-This is an **advanced publication-reproduction workflow**, not the first place
-to learn the Yamada API. Start with {doc}`../quickstart` and
-{doc}`../user_guide/projection_yamada` if you want to compute one invariant.
+Use this **publication-reproduction workflow** to explore graph-family
+formulas and their held-out checks. For a first invariant calculation, follow
+{doc}`../quickstart` and {doc}`../user_guide/projection_yamada`.
 
 <div class="kg-hero">
   <p class="kg-lead">Explore exact Laurent-polynomial data for homogeneous families, commuting mixed words and order-sensitive braid words. Start with the saved CSV/JSON records, then follow the notebook to inspect the construction and formula procedures.</p>
@@ -18,18 +18,17 @@ to learn the Yamada API. Start with {doc}`../quickstart` and
 The notebook has three independent scientific parts:
 
 1. **Homogeneous theta-derived families** — construct certified spatial
-   representatives, compute exact Laurent polynomials, and reserve values that
-   are not used during formula proposal.
+   representatives, compute exact Laurent polynomials, and reserve held-out
+   values for testing proposed formulas.
 2. **Abelian mixed theta words** — test whether the closed invariant factors
    through motif counts rather than order.
 3. **Non-Abelian ordered pure-braid words** — reconstruct exact symbolic
    transfer data and test complete held-out Laurent polynomials coefficient by
    coefficient.
 
-The held-out calculations are evidence for the displayed identities over the
-tested families. They are not, by themselves, an all-parameter mathematical
-proof; an analytic proof must still derive the transfer identities from the
-Yamada skein algebra.
+The held-out tables test the displayed identities coefficient by coefficient
+over the listed families. To establish an all-parameter formula, derive the
+general transfer identities from the Yamada skein algebra.
 
 ## Browse the saved data
 
@@ -45,7 +44,7 @@ for column definitions, panel mappings, certificates and provenance.
 Columns ending in `_coefficients_json` store exact integer coefficients keyed
 by Laurent exponent. `master_formula_pass` records the mixed-family comparison;
 the long-word JSON uses `raw_coefficient_identity`. The example CSVs are subsets
-of the larger tables, so they should not be added to the total case count.
+of the larger tables. Count cases from the full tables to obtain the totals.
 
 Verify the saved hashes and table/JSON agreement from a source checkout:
 
@@ -53,15 +52,13 @@ Verify the saved hashes and table/JSON agreement from a source checkout:
 uv run --no-project python scripts/inspect_paper_data.py
 ```
 
-This command and the website build read the archived records without starting
-new scientific calculations. Source versions and the distinction between these
-records and the notebook's own output schemas are documented in the dataset guide.
+This command checks the saved records. The dataset guide documents source
+versions and the corresponding notebook output schemas.
 
 ## Browse versus regenerate
 
-Opening and reading the notebook no longer depends on a literal Git branch
-name. The setup records the audited source commit and warns when the current
-checkout differs. This is appropriate for review and exploratory execution.
+The setup records the reference source commit and reports version differences
+for exploratory runs.
 
 Strict publication regeneration additionally requires the audited source
 ancestry, a clean `src/knotted_graph` tree, and the factorized native backend:
@@ -70,18 +67,14 @@ ancestry, a clean `src/knotted_graph` tree, and the factorized native backend:
 export KNOTTEDGRAPH_STRICT_PUBLICATION_REGENERATION=1
 ```
 
-Do not enable strict mode merely to read the derivation. The dataset-generation
-and extreme held-out stages can be expensive and are intentionally excluded
-from automatic beginner-notebook execution.
+Reading saved records and exploring the derivation use the standard mode.
+Dataset generation and extreme held-out calculations are larger research
+workloads; choose their settings in the notebook before running them.
 
 ## How to read a successful run
 
 - inspect the environment, commit, backend, and dataset hashes before formulas;
 - distinguish training/discovery rows from frozen held-out rows;
-- require exact symbolic equality, not numerical samples at selected values;
-- treat an error or missing backend as a failed regeneration, not as a
-  topological result; and
+- compare full expressions for exact symbolic equality;
+- record errors or missing backends as regeneration failures; and
 - preserve generated tables and their provenance together.
-
-The notebook uses explicit display-math delimiters so the symbolic summary
-renders consistently in Jupyter, GitHub, and the documentation toolchain.

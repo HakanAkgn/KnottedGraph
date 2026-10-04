@@ -12,10 +12,8 @@ physical path, however, the graph cycle rank increases and the state receives
 the usual +q = A^-1 + 2 + A cycle factor. An included physical edge carries
 -1 and therefore contributes -q when it closes a cycle.
 
-This is the sole production diagram evaluator. It contains no runtime-, family-,
-crossing-count-, or benchmark-dependent dispatch. A missing compiled factorized
-extension is treated as an installation error rather than silently selecting an
-older diagram algorithm.
+Production diagrams use this factorized-connectivity evaluator and require its
+compiled extension.
 """
 
 from __future__ import annotations
@@ -40,9 +38,8 @@ FACTOR_CROSSING = 2
 WIRE_PHYSICAL = 0
 WIRE_IDENTITY = 1
 
-# Hard diagrams may benefit enormously from a different elimination start, but
-# multi-start search must not tax the small/structured cases whose historical
-# greedy order is already excellent.
+# Compare elimination starts for diagrams with a wide frontier; smaller
+# diagrams retain the initial greedy order.
 MULTISTART_MIN_PEAK_PORTS = 12
 MULTISTART_MIN_IMPROVEMENT = 2
 MULTISTART_MAX_STARTS = 16
@@ -57,7 +54,7 @@ def factorized_import_error() -> Exception | None:
 
 
 def require_native_factorized() -> None:
-    """Fail clearly instead of silently selecting a superseded diagram backend."""
+    """Require the compiled factorized diagram backend."""
     if native_factorized_available():
         return
     detail = f" Original import error: {_FACTORIZED_IMPORT_ERROR!r}." if _FACTORIZED_IMPORT_ERROR else ""
@@ -112,7 +109,7 @@ def _multistart_factor_order(
     *,
     crossing_count: int,
 ):
-    """Conservatively rescue genuinely wide factorized production diagrams."""
+    """Compare candidate elimination starts for wide diagrams."""
     initial_plan = _factor_order_plan(
         initial_order,
         factor_ports,

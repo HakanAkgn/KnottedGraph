@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""Publish preserved research demos with on-demand, content-addressed geometry.
+"""Publish saved research demos with on-demand, content-addressed geometry.
 
-This packages saved material results; it does not regenerate phase labels,
-smooth a grid, simplify a mesh or run extraction.
-It separates each original region object into an unchanged JSON asset and
-changes only the HTML loading controller. Source hashes are deliberately pinned.
+Each saved region object becomes a JSON asset loaded by the HTML controller.
+Pinned source hashes identify the input snapshots used for packaging.
 """
 
 from __future__ import annotations
@@ -20,7 +18,7 @@ REFERENCE = ROOT / "User_guide" / "applications" / "NewPhaseMapPlots"
 SOURCES = {
     "materials": (
         "RealMaterials/html/07_hamiltonian_yamada_plotly_region_geometry_with_materials.html",
-        "955603c79a70e9fc4890c21d1c6ead5a9a030367891902f510ce069be18496a0",
+        "df5bc0d60f3c621260bd17be1ea43bffe40354f5619f122a4a75235a5763e1a0",
         "RealMaterials/figures/07_hamiltonian_yamada_material_phase_maps_3panel_like_porous.png",
     ),
 }
@@ -153,10 +151,9 @@ def split_demo(source: Path, destination: Path, *, expected_hash: str) -> dict:
     )
     notice = (
         '<aside role="note" style="margin:12px 0;padding:12px;border:1px solid #555;font:16px/1.5 sans-serif">'
-        "<strong>Saved research result.</strong> Colors include Yamada values and structural signatures; "
-        "display smoothing/merges and contraction grouping are not proofs of polynomial equality. "
-        "A representative geometry is loaded on selection. "
-        '<a href="../../../applications/material_phase_maps.html">Read scope, provenance and usage</a>.'
+        "<strong>Explore the saved material results.</strong> Colors distinguish the recorded "
+        "Yamada or structural signatures. Select a region to load its representative geometry. "
+        '<a href="../../../applications/material_phase_maps.html">See the classification method and source data</a>.'
         "</aside>"
     )
     prefix = prefix.replace("<body>", "<body>\n" + notice, 1)
@@ -195,7 +192,7 @@ def main(argv: list[str] | None = None) -> None:
     manifest = {
         "upstream_commits": {"materials": "56bfbab"},
         "material_core_commit": "643fef8",
-        "processing": "lossless JSON separation; no scientific recalculation",
+        "processing": "content-addressed JSON region assets from saved records",
         "demos": {},
     }
     for name, (relative, expected, preview) in SOURCES.items():

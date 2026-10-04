@@ -31,8 +31,8 @@ Import the public functions from `knotted_graph.inputs`:
 | OBJ/OFF/PLY/STL/VTK/VTP surface | `from_surface_mesh` | `SurfaceInputResult` | Install `surface`, inspect the mesh, then choose an extraction workflow |
 
 Named knots, torus types, and Artin braid words are handled by
-`KnotFunction`; see {doc}`../applications/analytic_knot_fields`. They are
-analytic constructors rather than generic file parsers.
+the analytic `KnotFunction` constructors; see
+{doc}`../applications/analytic_knot_fields`.
 
 ## The embedded-graph contract
 
@@ -92,9 +92,10 @@ contain the atom count and a blank or nonblank comment line.
 - The default is an open chain.
 - `closure="direct"` appends a straight final-to-first segment and produces a
   geometrically closed edge.
-- `closed=True` without a closure method is valid only when the supplied first
-  and last samples already agree.
-- `closure="metadata_only"` records intent but does not close the geometry.
+- `closed=True` with no closure method requires matching first and last
+  samples.
+- `closure="metadata_only"` records closure intent while preserving the supplied
+  geometry.
 
 The result's `.coords` retain the original source samples. Inspect edge `pts`
 when you need the geometry after direct closure.

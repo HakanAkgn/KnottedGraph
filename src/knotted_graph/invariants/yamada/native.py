@@ -1,9 +1,7 @@
 """Optional native kernels for exact resolved-graph Yamada evaluation.
 
-Diagram-level production evaluation is implemented exclusively by the generic
-factorized-connectivity dynamic program in :mod:`factorized_frontier`.  This
-module therefore contains no crossing-count dispatch, structural skein router,
-or benchmark-tuned frontier selection.
+Diagram-level production evaluation uses the factorized-connectivity dynamic
+program in :mod:`factorized_frontier`.
 
 The compiled ``_yamada_native`` extension is retained for exact crossing-free
 compact-graph evaluation and for the explicitly named exhaustive prepared-state

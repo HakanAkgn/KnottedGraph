@@ -1,9 +1,8 @@
 """Exact Yamada evaluation for projected spatial graphs.
 
-Production diagram evaluation uses one generic factorized-connectivity dynamic
-program after exact Reidemeister-II preprocessing.  High-arity fixed vertices
-are represented by low-arity equality factors joined by logical identity wires;
-there is no benchmark-family dispatch or empirical crossing threshold.
+Production diagram evaluation uses factorized-connectivity dynamic programming
+after exact Reidemeister-II preprocessing. High-arity fixed vertices are
+represented by low-arity equality factors joined by logical identity wires.
 """
 
 from __future__ import annotations

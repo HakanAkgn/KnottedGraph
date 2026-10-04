@@ -16,8 +16,7 @@ and Lifshitz transitions** (2026).
 
 Download {download}`both BibTeX entries <../CITATION.bib>` or use GitHub's
 **Cite this repository** button, which reads the repository's `CITATION.cff`.
-Record the source commit and calculation parameters alongside the citation;
-the paper identifier alone does not identify a software checkout.
+Record the source commit and calculation parameters alongside the citation.
 
 ```{literalinclude} ../CITATION.bib
 :language: bibtex

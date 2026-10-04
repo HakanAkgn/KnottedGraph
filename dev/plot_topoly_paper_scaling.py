@@ -109,8 +109,8 @@ def _size_value(row: dict, framework: str) -> tuple[float | None, bool]:
 
     Successful timings enter exactly. A timeout enters at the timeout threshold,
     so the arithmetic mean over all repeated rows is a lower bound on the true
-    mean whenever at least one timeout occurs. Errors/skips remain unavailable
-    rather than being assigned fabricated timings.
+    mean whenever at least one timeout occurs. Errors and skipped measurements
+    are excluded.
     """
     status = row.get(f"{framework}_status")
     if status == "ok" and row.get(f"{framework}_s") not in {"", None}:

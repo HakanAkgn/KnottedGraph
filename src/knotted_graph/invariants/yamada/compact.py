@@ -12,9 +12,8 @@ Literature provenance for the exact graph identities used below:
   obtained by edge replacements", J. Knot Theory Ramifications 27 (2018).
   https://doi.org/10.1142/S021821651842004X
 
-The implementation-specific compact representation, memoization layout and
-native dispatch are KnottedGraph engineering choices rather than claims taken
-from those papers.
+The graph identities follow the cited references. KnottedGraph implements them
+using a compact representation, memoization, and native kernels.
 """
 
 from __future__ import annotations

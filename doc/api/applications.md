@@ -1,12 +1,11 @@
 # Applications
 
-Application APIs assemble domain-specific models around the generic graph,
-projection, and invariant core. They do not add generic file readers. Use the
-{doc}`../feature_status` matrix to distinguish base application helpers from
-optional `nodal` workflows and to review their scaling boundaries.
+Application APIs assemble domain-specific models around the graph, projection
+and invariant core. Use the {doc}`../feature_status` reference to choose the
+input object, dependencies and public call for your workflow.
 
-The application layer is pre-alpha. Prefer the generic core when an ordinary
-embedded `networkx.MultiGraph` already represents the scientific object.
+If you already have an embedded `networkx.MultiGraph`, continue directly with
+the core graph and projection tools.
 
 ## Mathematical graph families
 
@@ -20,8 +19,7 @@ embedded `networkx.MultiGraph` already represents the scientific object.
 `KnotFunction` and `KnotFunctionPath` are constructed from the base
 {mod}`knotted_graph.inputs` API. Running a sampled level-set deformation needs
 the `knot-fields` extra because each cell extracts a 3-D level set and spatial
-graph. The returned result retains per-cell errors and phase signatures rather
-than silently discarding failed cells.
+graph. The returned result records each cell's phase signature and any errors.
 
 ```{eval-rst}
 .. automodule:: knotted_graph.applications.knot_deformation
@@ -33,8 +31,7 @@ than silently discarding failed cells.
 `make_yamada_phase_map` provides one finite-grid interface for analytic knot
 fields, nodal Bloch-vector paths, and in-memory material Hamiltonians. Install
 `knot-fields` for knot sources or `nodal` for Hamiltonian/material sources.
-The source objects remain application-specific; this function is not a generic
-Hamiltonian-file reader.
+Supply the in-memory source object expected by the chosen application.
 
 The default polynomial variable is `Y`. With `force_genus_zero_vertex=True`,
 each closed spherical boundary component becomes an isolated vertex: a ball
@@ -51,12 +48,12 @@ diagnostics; `boundary_filling_groups` returns outer and nested fillings.
 
 ## Saved material examples
 
-These pre-alpha application helpers read record tables; they do not parse
-general Hamiltonian files. Reading and raw plotting use the base stack.
+These helpers load saved CSV/JSON phase-map records for inspection and raw
+plotting with the base installation.
 New scans need the optional scientific dependencies and explicit compute
 resources described in {doc}`../applications/material_phase_maps`.
-The detailed research engines (underscore-prefixed modules) are implementation
-details, not a new stable mathematical API.
+Use the public functions listed below. Underscore-prefixed research engines
+support these workflows internally.
 
 ```{eval-rst}
 .. automodule:: knotted_graph.applications.phase_map_examples
@@ -68,7 +65,7 @@ details, not a new stable mathematical API.
 Executing `NodalSkeleton` or `MaterialFermiSurface` requires the `nodal` extra;
 the listed material symbolic-Hamiltonian constructors themselves use the base
 SymPy stack. These workflows operate on in-memory SymPy Hamiltonians or Bloch
-vectors rather than Hamiltonian files.
+vectors. Prepare file-based models in that representation before using them.
 
 ```{eval-rst}
 .. automodule:: knotted_graph.applications.nodal.models

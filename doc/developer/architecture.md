@@ -30,27 +30,25 @@ are imported explicitly from their application namespace.
 skeleton-to-graph entry point and always uses the current sparse extractor.
 Empty image margins are cropped before foreground indexing, 26-neighbour
 adjacency is generated deterministically, and returned coordinates remain in
-the original global voxel frame. The obsolete selectable skeleton backend has
-been removed; historical behavior is preserved only by Git history and by the
-isolated `02_application_regression_checks.ipynb` worktree comparison.
+the original global voxel frame. Use Git history and the isolated
+`02_application_regression_checks.ipynb` worktree comparison to inspect
+historical extraction behavior.
 
 By default, optimized extraction preserves the zero-radius historical topology.
 A caller that knows a genuine valence bound may pass `max_junction_degree` to
-enable the fail-closed persistence-based junction repair. The library does not
-assume trivalence globally: if no bound is supplied, generic higher-valence
-spatial graphs are not contracted merely for optimization.
+enable persistence-based junction repair. Without a supplied valence bound,
+the extractor preserves generic higher-valence junctions.
 
 ## Yamada Evaluation Policy
 
 `Yamada.compute()` has one diagram-level production algorithm: the exact
 factorized-connectivity dynamic program implemented by
-`factorized_frontier.py` and `_yamada_factorized_frontier`. There is no
-crossing-count threshold, theorem-family recognizer, empirical dispatcher, or
-structural skein-recursion alternative in the production route.
+`factorized_frontier.py` and `_yamada_factorized_frontier`. This same
+algorithm handles every diagram-level production evaluation.
 
 The compiled factorized extension is required for diagram-level production
 execution. A stale or incomplete installation fails with an explicit rebuild
-instruction instead of silently selecting an older evaluator. The compact
+instruction. The compact
 resolved-graph kernel remains available for crossing-free graphs and
 `compute_yamada_from_states()` compatibility. Exhaustive/raw evaluators are
 retained only as exact validation or arithmetic-overflow safety references.
@@ -65,9 +63,8 @@ chooses the valid projection with the fewest crossings, and emits a
 
 ## Inspection-Oriented API Direction
 
-Intermediate objects are part of the public user story, not only internal
-implementation details. Users should be able to inspect or export the major
-pipeline stages used in the paper figures: imported input, surface or mesh,
+Keep intermediate objects available for inspection and export at the
+stages used in the paper figures: imported input, surface or mesh,
 skeleton image, raw spatial graph, simplified spatial graph, sampled
 projections, selected planar diagram, PD code, and invariant output.
 

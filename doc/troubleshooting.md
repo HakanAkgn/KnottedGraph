@@ -16,15 +16,14 @@ uv pip check
 ```
 
 In an activated conventional venv, use `python --version`, `python -m pip
---version`, the same `python -c ...` command, and `python -m pip check`. Do not
-mix the system interpreter with uv's managed environment.
+--version`, the same `python -c ...` command, and `python -m pip check`. Run
+all checks with the interpreter from your selected environment.
 
 The current 0.2 development API is newer than the legacy 0.1 release on PyPI.
 If the version command prints `0.1.x`, or imports such as
 `knotted_graph.core` and `knotted_graph.inputs` are missing, install the
-current review source branch as described in the [installation guide](installation.md).
-Do not combine files from the legacy wheel with a source checkout in the same
-environment.
+current main-branch source version using the [installation guide](installation.md).
+Use an environment containing the selected source version and its dependencies.
 
 ## Install the optional dependency for the workflow
 
@@ -40,8 +39,9 @@ imports need the corresponding extra:
 | Missing Biopython or Plotly in repulsive layout | `knotted_graph[repulsion]` |
 
 For a source checkout, replace `pip install` with the matching `uv sync
---extra ...` command. The `all` extra installs every Python optional dependency,
-but it does not install the external Repulsor C++ source or its system libraries.
+--extra ...` command. The `all` extra installs every Python optional dependency.
+For native Repulsor, install the C++ source and system libraries with the
+[Repulsive Layout guide](user_guide/repulsive_layout.md).
 
 ## Distinguish a source checkout from an installed package
 
@@ -86,9 +86,9 @@ sampling projections.
 
 Rotation angles are three values in **degrees** by default. A rotation order is
 a three-character Euler sequence such as uppercase `ZYX` (extrinsic) or
-lowercase `xyz` (intrinsic); do not mix cases. To reproduce one view, pass its
-angles explicitly. To search for a cleaner regular projection, increase the
-sample count gradually:
+lowercase `xyz` (intrinsic). Keep the sequence entirely uppercase or lowercase.
+To reproduce one view, pass its angles explicitly. To search for a cleaner
+regular projection, increase the sample count gradually:
 
 ```python
 from knotted_graph.projection import sample_projections, select_projection
@@ -99,17 +99,16 @@ print(projection.rotation_angles, projection.num_crossings)
 alternatives = sample_projections(graph, num_rotation_samples=20)
 ```
 
-An overlapping-collinear-segment error means that the chosen view is not a
-regular diagram. Try another rotation rather than treating the overlap as a
-crossing. If some sampled views fail, KnottedGraph reports a warning and keeps
-the valid views; if every view fails, the raised error includes the failed
-sample details.
+An overlapping-collinear-segment error identifies a degenerate view. Try
+another rotation to obtain a regular diagram. If some sampled views fail,
+KnottedGraph reports a warning and keeps the valid views; if every view fails,
+the raised error includes the failed sample details.
 
 ## Understand slow Yamada calculations
 
 A diagram with `c` crossings has `3**c` resolved states before memoization and
-structural shortcuts. The warning emitted at ten crossings is therefore a
-runtime warning, not a correctness failure. Inspect the selected crossing count
+structural shortcuts. The warning emitted at ten crossings indicates
+computational cost. Inspect the selected crossing count
 before computing and start with one worker:
 
 ```python
@@ -141,14 +140,14 @@ export PYVISTA_OFF_SCREEN=true
 ```
 
 Surface loading returns a `PolyData` mesh and reports open boundary edges in
-`result.issues`; it does not automatically extract a skeleton. If PyVista is
-missing, install the `surface` extra.
+`result.issues`. Choose a skeleton-extraction route using the
+[Workflow Overview](user_guide/workflow_overview.md). If PyVista is missing,
+install the `surface` extra.
 
 ## Diagnose Repulsor setup
 
-The `repulsion` extra installs Python dependencies only. With uv, install that
-extra first, then tell the bootstrap not to invoke pip inside the pip-less uv
-environment:
+With uv, install the `repulsion` Python dependencies first, then bootstrap
+the native source with `--skip-python-install`:
 
 ```bash
 uv sync --extra repulsion

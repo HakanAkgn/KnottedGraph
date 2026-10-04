@@ -7,9 +7,9 @@ before using the two Plotly functions:
 uv sync --extra viz
 ```
 
-They consume points or an already constructed graph; they do not parse files,
-validate an embedding, choose a projection for invariant computation, or change
-graph topology. For an embedded graph:
+The plotting helpers take points or an existing graph and return a figure.
+Prepare file inputs with the input API and select computational projections
+with the projection API. For an embedded graph:
 
 ```python
 from knotted_graph.visualization import plot_3D_graph_plotly
@@ -24,7 +24,7 @@ returned Plotly figure instead of calling `show()`. See the
 
 `standard_petersen_layout` and `draw_petersen_embedding` use the base Matplotlib
 stack. The Plotly helpers require `viz`. All four names are exported from
-`knotted_graph.visualization`, not from the package root.
+`knotted_graph.visualization`; import them from that namespace.
 
 ## Public helpers
 

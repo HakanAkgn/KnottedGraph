@@ -11,6 +11,6 @@ The PNGs were rendered from the corresponding PDF with Poppler:
 pdftoppm -png -singlefile -scale-to-x 1500 -scale-to-y -1 figure-3.pdf figure-3
 ```
 
-This is display conversion only. It does not regenerate scientific data or
-claim that a final figure-composition script is included. The source HTML guide
-is `doc/paper_results.md`; the website entry is `paper_results.html`.
+These PNG previews are rendered from the author PDFs with Poppler. The figure
+and data guide is `doc/paper_results.md`; its website entry is
+`paper_results.html`.

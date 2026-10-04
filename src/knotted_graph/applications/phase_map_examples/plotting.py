@@ -14,9 +14,9 @@ def plot_phase_map(data: PhaseMapData, *, output: str | Path | None = None) -> A
     """Plot one raw saved grid and optionally save PNG, PDF and a phase-key JSON.
 
     ``output`` is a filename prefix (not a directory). Missing cells stay white,
-    adaptive fills are shaded, calibrations circled, and errors marked with crosses. Category
-    numbers only identify saved signatures; they are not numerical Yamada
-    values and do not establish equivalence under contraction.
+    adaptive fills are shaded, calibrations circled, and errors marked with
+    crosses. Colors identify saved signature categories; the phase-key JSON
+    gives the associated expressions and sources.
 
     Returns a Matplotlib Figure; the caller owns/should close it. Matplotlib
     configuration is scoped to this call, not applied globally on import.
@@ -104,7 +104,7 @@ def plot_phase_map(data: PhaseMapData, *, output: str | Path | None = None) -> A
         ax.set_title(f"{title}: raw phase signatures", pad=12)
         if len(signatures) <= 20:
             bar = fig.colorbar(mesh, ax=ax, ticks=list(ids.values()), pad=0.03)
-            bar.set_label("Saved signature ID (not a polynomial value)")
+            bar.set_label("Saved signature category")
         summary = data.summary()
         fig.text(
             0.5,

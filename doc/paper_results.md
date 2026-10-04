@@ -22,9 +22,8 @@ to their existing information. {download}`Open the original PDF <assets/paper_fi
 ```
 
 Follow {doc}`user_guide/input_adapters` for coordinate, molecular, polymer,
-spatial-CSV and surface inputs. The {doc}`feature_status` matrix distinguishes
-public loaders from application-specific constructions; an input pictured in
-the paper does not automatically imply a generic file parser.
+spatial-CSV and surface inputs. The {doc}`feature_status` reference lists the
+reader or construction step for each input representation.
 {doc}`user_guide/workflow_overview` explains the shared node `pos` / edge `pts`
 representation and the next projection step.
 
@@ -58,7 +57,8 @@ All saved KnottedGraph rows pass the reference comparison. The three
 500-crossing evaluation times are approximately 0.117, 2.376 and 4.998 seconds.
 The {doc}`benchmarks` page also reproduces the seven-crossing Table 1 values
 from these rows and explains completed, errored and skipped Topoly calls.
-The high-crossing endpoints are not completed paired Topoly comparisons.
+The 500-crossing endpoints show completed KnottedGraph evaluations; Topoly
+completion statuses are listed in the benchmark table.
 
 ## Figure 4: discovering and testing family laws
 
@@ -149,10 +149,9 @@ completed calls only.
 | S10: Non-Abelian worked example | {download}`PDF <assets/paper_figures/supp-10.pdf>` | [Worked example and data](#supplementary-figure-10-an-ordered-word-worked-example); notebook 05, Part III |
 | S11: Software architecture | {download}`PDF <assets/paper_figures/supp-11.pdf>` | {doc}`user_guide/workflow_overview`; {doc}`api/index`; {doc}`installation` |
 
-The archived PDFs show the submitted presentation. The notebooks expose
-scientific procedures; a saved record and a notebook are not necessarily a
-pixel-identical figure compositor. The figure provenance identifies the exact
-PDF version available here.
+The original PDFs preserve the submitted figures. Follow the linked notebooks
+for the calculations and the figure provenance inventory for the available PDF
+versions.
 
 ## Scientific application data and interactive views
 

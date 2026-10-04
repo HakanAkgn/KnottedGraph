@@ -18,8 +18,8 @@ checks trees, cycles, bouquets, theta graphs, an isthmus, a one-point union
 and planar K4 against explicit formulas. It also compares native-dispatched
 results with the exact Python compact evaluator, checks the two public
 methods on planar and one-crossing theta embeddings, and checks the mirror
-relation. These are small correctness calculations; Topoly, voxel data and
-Repulsor are not required.
+relation. These small correctness calculations use the base package and
+test tools.
 
 Success ends with:
 
@@ -27,8 +27,8 @@ Success ends with:
 PASS: all published/independent Yamada sanity checks succeeded.
 ```
 
-An assertion failure is a failed check. Retain the full message, source commit
-and environment rather than accepting an approximate polynomial match.
+If an assertion fails, retain its full message, source commit and environment
+details. These checks compare exact symbolic expressions.
 
 ## Projection invariance on fixed spatial embeddings
 
@@ -45,7 +45,7 @@ triangular-prism, K3,3 and cube graphs. It holds each embedding fixed, samples
 projection directions, checks the returned PD code and crossing count, and
 requires the same normalized Laurent polynomial across all valid views.
 The final message reports projection invariance for all 25 embeddings.
-The five embeddings within a family are not five different abstract graphs.
+Each family contributes five spatial embeddings of the same abstract graph.
 
 ## Further checks and their scope
 
@@ -58,6 +58,6 @@ The five embeddings within a family are not five different abstract graphs.
 | Published structured families | [Notebook 03](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/benchmarks/03_knottedgraph_vs_topoly_scaling.ipynb) | Published formulas and fixed-PD timing protocol; see {doc}`benchmarks` before executing |
 | Volume-to-graph recovery | [Notebook 04](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/benchmarks/04_thick_handlebody_validation.ipynb) | Topology/invariant preservation for certified sampled inputs; publication-scale workload |
 
-Passing a finite sanity suite does not establish a new scientific input model,
-resolution convergence or an all-parameter identity. See {doc}`paper_results`
-for the available evidence associated with each paper figure.
+These checks cover the listed algebraic identities and projection examples.
+The {doc}`paper_results` guide links each scientific dataset to its validation
+procedure.

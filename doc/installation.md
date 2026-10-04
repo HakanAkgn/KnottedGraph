@@ -25,9 +25,8 @@ For the generic library and the test tools, run:
 uv sync --group dev
 ```
 
-This command installs the base dependencies and the `dev` dependency group. It
-does **not** install optional feature extras. If you need every optional Python
-workflow, use:
+This command installs the base dependencies and the `dev` dependency group.
+To include every optional Python workflow, use:
 
 ```bash
 uv sync --group dev --all-extras
@@ -89,11 +88,10 @@ their required numerical dependencies.
 | `all` | Every optional Python workflow | Also adds `igraph`; native system dependencies remain separate |
 
 If you know your starting data or intended result but not the relevant extra,
-use the canonical {doc}`feature_status` matrix. It links each currently
-documented route to its public call, return object, next step, and scaling
-boundary.
+use the {doc}`feature_status` matrix. It links each documented route to its
+public call, return object, next step and computational scaling.
 
-The `dev` and `docs` names are dependency groups, not extras:
+Install the `dev` and `docs` dependency groups with `--group`:
 
 ```bash
 uv sync --group dev       # test and lint tools
@@ -109,10 +107,9 @@ uv sync --group docs --all-extras
 
 ## Repulsive-layout native dependency
 
-The `repulsion` extra supplies Python packages only. The Repulsor C++ source and
-the system libraries used to build it are intentionally not vendored in the
-Python wheel. From a source checkout, bootstrap the pinned upstream revision
-with:
+The `repulsion` extra supplies the Python dependencies. Install the Repulsor
+C++ source and its build libraries separately. From a source checkout,
+bootstrap the pinned upstream revision with:
 
 ```bash
 uv sync --extra repulsion

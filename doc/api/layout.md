@@ -9,10 +9,9 @@ HTML rendering:
 uv sync --extra repulsion
 ```
 
-That extra does **not** install the external C++ Repulsor solver or its native
-libraries. Complete the {doc}`../user_guide/repulsive_layout` setup before
-calling the solver. Validate `result.graph` before continuing to projection;
-layout is a geometric preprocessing step, not an invariant calculation.
+Install the external C++ Repulsor solver and its native libraries using the
+{doc}`../user_guide/repulsive_layout` setup. Layout updates the embedded geometry;
+validate `result.graph`, then continue with projection and invariant evaluation.
 
 ## Public Python interface
 

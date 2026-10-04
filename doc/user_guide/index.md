@@ -1,7 +1,7 @@
 # User Guide
 
 <div class="kg-hero">
-  <p class="kg-lead">Start with a small tested route, then move from input handling to graph inspection, projection, invariant evaluation, and only then to application or publication workflows.</p>
+  <p class="kg-lead">Start with a small tested route, follow input handling, graph inspection, projection and invariant evaluation, then choose an application or publication workflow for your task.</p>
   <div class="kg-link-row">
     <a href="../feature_status.html">Choose A Supported Route</a>
     <a href="https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/00_user_guide.ipynb">Open the notebook map</a>
@@ -13,22 +13,22 @@
 
 The {doc}`../feature_status` page distinguishes public adapters, optional
 features, application APIs, and external native backends before you choose a
-notebook. New users can first run the copyable {doc}`../quickstart` without
-placing that page in a second documentation hierarchy.
+notebook. New users can start with the {doc}`../quickstart`, then choose the
+guide that matches their data.
 
 ## Recommended order
 
-| Step | Read or run | What you should understand before continuing |
+| Step | Read or run | What you will learn |
 | --- | --- | --- |
 | 1 | {doc}`../installation` and {doc}`../quickstart` | active version/environment and one expected exact result |
-| 2 | {doc}`input_adapters` | what your source data becomes and which choices are not automatic |
-| 3 | {doc}`workflow_overview` | graph contract, extraction/cleanup boundaries, and provenance |
+| 2 | {doc}`input_adapters` | source representation, selections and preparation steps |
+| 3 | {doc}`workflow_overview` | graph contract, extraction/cleanup settings and provenance |
 | 4 | {doc}`projection_yamada` | projection regularity, PD-code meaning, zero versus failure, and cost |
 | 5 | {doc}`../applications/index` | one domain-specific application or advanced reproduction route |
 
 The first three notebooks are progressive tutorials. Application notebooks
-assume the common concepts above; benchmark notebooks are evidence artifacts
-and are not part of the default newcomer path.
+apply those concepts to scientific models; benchmark notebooks contain
+correctness and performance checks with their saved results.
 
 <div class="kg-wide-figure">
   <img src="../site_figures/knot_to_spatial_graph.png" alt="Knot and surface workflow leading to a spatial graph">

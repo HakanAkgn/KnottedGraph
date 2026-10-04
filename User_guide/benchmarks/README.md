@@ -14,7 +14,7 @@ All commands below run from the repository root.
 | [03: KnottedGraph vs Topoly](03_knottedgraph_vs_topoly_scaling.ipynb) | Structured-family invariant-evaluation benchmark | Yes; inspect the saved CSV first |
 | [04: Thick handlebody validation](04_thick_handlebody_validation.ipynb) | Certified volume-to-graph construction and topology preservation | Yes; publication workload includes 4,400 volumes |
 
-The saved results are already in this checkout. Do not use **Run All** merely to
-view a paper figure. The [figure guide](../../doc/paper_results.md) includes the
-published PDF originals. Benchmark notebooks can update their result ledgers;
-use a separate checkout/output location for a new experiment.
+Browse the [figure guide](../../doc/paper_results.md) and saved CSVs directly
+from this checkout. The guide includes the published PDF originals. For a new
+benchmark run, use a separate checkout/output location because notebooks can
+update their result ledgers.

@@ -59,24 +59,22 @@ against the supplied files before publication.
 | Pure-braid words | [Records](audit/discovery/short_exact_records.json) · [Word lists and basis](audit/discovery/word_plans.json) · [Transfer matrices](audit/discovery/exact_transfer_matrices.json) · [Hankel matrices](audit/discovery/hankel_input_matrices.json) | [Certificate](audit/discovery/certificate.json) · [Short-word comparisons](audit/discovery/exhaustive_short_word_checks.json) | [Provenance](audit/discovery/provenance.json) |
 | Long words | [Records](audit/discovery_long_words/records.json) · [Plan](audit/discovery_long_words/word_plan.json) | [Certificate](audit/discovery_long_words/certificate.json) | [Provenance](audit/discovery_long_words/provenance.json) |
 
-The complete ZIP retains the supplied notebook, audit scripts, manuscript
-snapshot, protocol notes and original SHA-256 inventory unchanged. The source
-notebook's scientific code cells match the repository's
-[application notebook 05](../../05_yamada_formula_discovery.ipynb). The scripts
-need a full KnottedGraph checkout and its dependencies; the ZIP is a data and
-source archive, not a standalone Python installation.
+The complete ZIP contains the supplied notebook, verification scripts,
+manuscript snapshot, protocol notes and original SHA-256 inventory. The source
+notebook uses the graph constructions and evaluation procedures described in
+[application notebook 05](../../05_yamada_formula_discovery.ipynb). To run the
+scripts, use a full KnottedGraph checkout with its dependencies installed; use
+the ZIP to browse the source and saved records.
 
 ## Record provenance
 
-These files document retrospective exact checks. The supplied package does
-not contain the original historical `05a_*`, `05b_*` and `05c_*` ledgers or an
-independent historical formula-freezing record. Its compact tables are not
-drop-in replacements for the notebook's differently structured output files.
-AAABA is part of the Hankel input and is a worked example, not an independent
-held-out case. The long-word certificate records two completed cases from a
-20-case plan; the other planned cases are not reported as completed.
+| Record | Provenance and interpretation |
+| --- | --- |
+| Exact comparisons | Retrospective checks of the recorded cases. The certificates describe these finite comparisons; an all-family identity requires an analytical derivation. |
+| Historical notebook outputs | The original `05a_*`, `05b_*` and `05c_*` ledgers and an independent historical formula-freezing record are absent from this package. The compact tables use their own schemas; use the notebook's output schemas when regenerating its ledgers. |
+| AAABA | A worked example included in the Hankel input. It belongs to the construction data rather than an independent held-out set. |
+| Length-101 plan | Two completed comparisons from the 20-case plan: A⁵¹B⁵⁰ and (AB)⁵⁰A. The remaining 18 cases have no completed result in the supplied certificate. |
 
-The certificates describe the recorded finite comparisons, not an all-family
-proof. Detailed protocols and the original handoff notes are retained inside
-the ZIP. These source details complement the figure downloads without requiring
-new scientific computations to use the published records.
+Detailed protocols and the original handoff notes are included in the ZIP.
+Browse these alongside the figures and coefficient records to follow the
+recorded comparisons.

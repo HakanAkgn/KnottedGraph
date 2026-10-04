@@ -211,7 +211,7 @@ def repair_getting_started(nb):
         )
         set_text(c, s)
 
-    install = '''## 1.1 Install KnottedGraph
+    install = r'''## 1.1 Install KnottedGraph
 
 ### Recommended: source checkout in an isolated environment
 
@@ -236,9 +236,9 @@ For all optional application and benchmark dependencies, use:
 python -m pip install -e ".[all]"
 ```
 
-The indexed PyPI package is currently the legacy 0.1.2 API and cannot run this
-0.2 development notebook. Until 0.2 is released, install a pinned source checkout
-as shown above rather than using an unpinned `pip install knotted_graph`.
+This notebook uses the 0.2 development API. Install a pinned source checkout
+as shown above; the indexed PyPI package currently provides the legacy 0.1.2
+API.
 
 After installing from source, restart Jupyter and select the kernel belonging to
 the same environment. If needed, register it explicitly:
@@ -324,8 +324,7 @@ def repair_user_guide_map(nb):
         )
         first_use = "If this is your first use of the library, start with **01 - Getting Started**."
         advanced_note = (
-            "Formula Discovery and Hamiltonian Phase Maps are advanced "
-            "reproduction notebooks, not the next step after installation."
+            r'''Continue with Formula Discovery and Hamiltonian Phase Maps when you are ready for advanced reproduction studies.'''
         )
         if advanced_note not in source:
             source = source.replace(first_use, first_use + " " + advanced_note)
@@ -449,12 +448,12 @@ if src_path.exists() and str(src_path) not in sys.path:
 def repair_hamiltonian_phase_maps(nb):
     introduction = r'''# Hamiltonian Yamada Phase Maps
 
-> **Role:** advanced, compute-intensive application and publication-reproduction
-> notebook. It is not a beginner tutorial and is not executed in the ordinary
-> pull-request notebook matrix.
+> **Workflow:** advanced Hamiltonian phase-map studies and publication
+> reproduction. Start with the single-graph topology tutorial, then use a compute
+> environment for full scans.
 
 Use this notebook when your input is a family of in-memory nodal Hamiltonians or
-Bloch-vector fields and you want to turn a two-parameter scan into an auditable
+Bloch-vector fields and you want to turn a two-parameter scan into a reproducible
 Yamada-topology phase map. Install the `nodal`, `viz`, and `notebook` extras and
 use a compute environment for full regeneration.
 
@@ -469,15 +468,14 @@ $$
 
 The configured study evaluates five transitions on up to 60 lambda samples and
 50 candidate Gamma samples with a $120^3$ volume per evaluated cell. Row caches
-reduce repeated work, but a clean full run remains a substantial workload. Do
-not run all cells on a login node.
+reduce repeated work. For full scans on a cluster, use a batch or interactive
+compute allocation.
 
-The notebook keeps audit steps visible: per-cell error records, connected-region
-stabilization, classic and contraction-equivalent classifications, endpoint
-checks, static figures, and an interactive Plotly view of representative
-exceptional surfaces and their graph skeletons. Generated outputs live below
-`User_guide/applications/results/06_hamiltonian_yamada_phase_maps`; execution
-outputs are deliberately not stored in the notebook JSON.
+The workflow records per-cell errors, connected-region stabilization, classic
+and contraction-equivalent classifications, and endpoint checks. Inspect the
+results in static figures and an interactive Plotly view of representative
+exceptional surfaces and their graph skeletons. Generated outputs are saved
+under `User_guide/applications/results/06_hamiltonian_yamada_phase_maps`.
 
 For a guided explanation and a directly viewable interactive artifact, read the
 website page **Hamiltonian Yamada Phase Maps** before regenerating this notebook.'''
@@ -503,8 +501,8 @@ scan. In particular:
 - cached rows are accepted only through a digest of the transition, axes,
   resolution, and retry policy.
 
-A colored cell is therefore a recorded finite-resolution calculation, not an
-analytic continuum phase boundary.''',
+Each colored cell records a calculation at these sampling parameters. Assess
+the stability of a phase boundary by comparing scans at finer resolutions.''',
     )
     upsert_markdown_after(
         nb,
@@ -526,13 +524,13 @@ copying code into a new project.''',
         nb,
         "83faf9d8",
         "phase-map-audit-guide",
-        r'''## Audit the records before plotting
+        r'''## Review the scan records
 
-The scan summary must be read before the figures. Check the number of evaluated
-cells, data source used for each cell, explicit errors, terminal Gamma retained
-for each transition, and endpoint distinctions. The following helper cells write
-stable CSV tables and verify that leaves, failed cells, or unstable small regions
-have not been hidden by plotting logic.''',
+Use the scan summary to read the evaluated-cell count, each cell's data source
+and error status, the terminal Gamma retained for each transition, and the
+endpoint results. The helper cells write CSV tables with these quantities,
+including leaf diagnostics, failed cells and small-region stability, so you
+can compare the records with the plotted partitions.''',
     )
     upsert_markdown_after(
         nb,
@@ -540,15 +538,16 @@ have not been hidden by plotting logic.''',
         "phase-map-figure-guide",
         r'''## Static phase figures and two classifications
 
-The **classic** map labels stabilized connected regions by their exact Yamada
-signature. The **up to contraction moves** map additionally groups selected
-representative cores under the notebook's stated contraction convention. These
-are different questions: a merged contraction class does not assert literal
-equality of all classic signatures.
+The **classic** map shows the stabilized partition derived from exact Yamada
+signatures. The tables retain raw signatures, stable labels and reassignment
+status for each cell. The **up to contraction moves** map groups selected
+representative cores under the stated contraction relation; a group can
+contain several classic signatures.
 
-Read phase boundaries as nearest-neighbor boundaries on the sampled grid. A
-single-cell island, a boundary-touching surface, or a cell produced only after a
-fallback requires inspection rather than automatic physical interpretation.''',
+Phase boundaries connect neighboring cells on the sampled grid. Inspect the
+recorded geometry and computation status for single-cell islands,
+boundary-touching surfaces and cells evaluated through a fallback; compare
+resolutions when interpreting their physical behavior.''',
     )
 
     for c in nb["cells"]:
@@ -579,26 +578,26 @@ if not kg_file.is_relative_to(ROOT):
         if c.get("id") == "interactive-plotly-qa-markdown":
             set_text(
                 c,
-                '''## Interactive Plotly geometry QA
+                r'''## Interactive phase maps and representative geometry
 
-The stable two-dimensional phase partitions are clickable. Select a mode and a
+The two-dimensional phase partitions are clickable. Select a mode and a
 transition, then click a region to load one representative exceptional surface
 and the corresponding simplified Yamada skeleton.
 
-Use the view as a geometry audit, not only as decoration: confirm that the
-surface, black skeleton, red graph vertices, component counts, cycle rank, and
-displayed polynomial describe the same representative record. The HTML is a
-self-contained data snapshot except for its pinned Plotly CDN script.''',
+Compare the surface, black skeleton, red graph vertices, component counts,
+cycle rank and polynomial for the selected representative record. The HTML
+contains the saved data and loads Plotly from the pinned CDN URL.''',
             )
         elif c.get("id") == "finalnodal":
             set_text(
                 c,
-                '''## Final phase-map verification
+                r'''## Final phase-map verification
 
 The final cell checks package provenance, transition coverage, error totals, and
-the existence of the generated interactive artifact. A passing final cell means
-the configured finite-grid workflow completed its stated checks; it does not
-replace resolution convergence or an analytic phase-boundary proof.''',
+the existence of the generated interactive artifact. A passing final cell
+confirms those checks for the configured finite-grid run. To study boundary
+stability, compare resolutions; an analytic boundary requires a model-specific
+derivation.''',
             )
         elif c.get("id") == "finalcheck":
             s = text(c)
@@ -765,9 +764,8 @@ if not AUDITED_SOURCE_PRESENT:
 def repair_formula_discovery(nb):
     introduction = r'''# Yamada Formula Discovery Applications
 
-> **Role:** advanced exact-computation and publication-reproduction notebook.
-> Learn the single-graph Yamada API first; do not use **Run All** as a first test
-> of the package.
+> **Workflow:** advanced exact computation and publication reproduction.
+> Start with the single-graph Yamada API, then follow the family study below.
 
 Use this notebook when you want to use KnottedGraph as an exact-computation
 engine for discovering and testing Yamada-polynomial formulae across
@@ -788,15 +786,13 @@ $$
 
 Each part defines a graph family, constructs embedded graphs, evaluates exact
 Laurent polynomials, exports only the data needed for fitting or audit, freezes a
-candidate identity, and then runs separate held-out checks. Outputs live under
-`User_guide/applications/results/05_yamada_formula_discovery`; execution outputs
-are deliberately not committed in the notebook.
+candidate identity, and then runs separate held-out checks. Outputs are saved
+under `User_guide/applications/results/05_yamada_formula_discovery`.
 
-The notebook is browsable on an ordinary review branch. Set
-`KNOTTEDGRAPH_STRICT_PUBLICATION_REGENERATION=1` only for an audited clean
-regeneration with the required source ancestry and factorized native backend.
-Held-out exact agreement is strong computational evidence, but it is not a
-substitute for a mathematical proof.'''
+For strict publication regeneration, set
+`KNOTTEDGRAPH_STRICT_PUBLICATION_REGENERATION=1` and use the required source
+ancestry and factorized native backend. The concluding section describes how
+the finite held-out checks relate to an all-parameter derivation.'''
     set_text(nb["cells"][0], introduction)
     for c in nb["cells"]:
         if c.get("cell_type") == "code" and "EXPECTED_BRANCH" in text(c):

@@ -11,9 +11,8 @@ normalization materializes a straight segment between the endpoint positions.
 
 `simplify_edges` collapses degree-two chains in components containing cycles or
 junctions while preserving their embedded polylines. For an acyclic graph it
-returns normalized connectivity unchanged; it never silently converts a path
-or tree into isolated nodes. `remove_leaf_nodes` is the explicit structural
-operation that repeatedly removes degree-one branches.
+returns its normalized connectivity unchanged. `remove_leaf_nodes` is the
+explicit structural operation that repeatedly removes degree-one branches.
 
 ```{eval-rst}
 .. automodule:: knotted_graph.core

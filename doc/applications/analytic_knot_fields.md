@@ -23,12 +23,9 @@ $$
 
 Bode and Dennis give a constructive algorithm that starts from a braid and constructs a semiholomorphic polynomial, polynomial in \(u,v,\bar v\), whose zero set on the unit three-sphere realizes the closed braid for sufficiently small scaling. See Bode & Dennis, *J. Knot Theory Ramifications* 28, 1850082 (2019), DOI `10.1142/S0218216518500827`, and arXiv:1612.06328. Bode later gave a constructive proof that all link types in \(S^3\) arise from semiholomorphic polynomials; see *European Journal of Mathematics* 9, 85 (2023), DOI `10.1007/s40879-023-00678-1`.
 
-KnottedGraph therefore distinguishes two claims:
+The braid constructor uses a finite Fourier representation. Sample the resulting 3-D field and use the diagnostics below to inspect its tubular geometry.
 
-1. the existence/construction theorem is mathematical;
-2. a particular finite Fourier truncation and finite 3-D grid are numerical objects and must be validated.
-
-`from_braid(...)` reports the sampled root-set error relative to the minimum strand separation. This checks the finite Fourier realization of the requested geometric braid; it is intentionally **not described as a formal proof certificate for the theorem's unspecified finite scaling threshold**. Publication-grade use should additionally check the resulting 3-D tubular topology and resolution convergence.
+`from_braid(...)` reports the sampled root-set error relative to the minimum strand separation for the finite Fourier realization. Use tubular diagnostics and a resolution comparison to assess the resulting 3-D level set.
 
 ## Construct fields
 
@@ -55,7 +52,7 @@ figure8_from_braid_2 = KnotFunction.from_name(
 trefoil_exact = KnotFunction.torus(2, 3)
 ```
 
-A positive integer `i` denotes the Artin generator \(\sigma_i\); `-i` denotes \(\sigma_i^{-1}\). The small built-in catalogue is only a convenience. Arbitrary braid closures use `from_braid(...)` and do not require a finite knot table.
+A positive integer `i` denotes the Artin generator \(\sigma_i\); `-i` denotes \(\sigma_i^{-1}\). Use the built-in catalogue for named examples and `from_braid(...)` to construct arbitrary braid closures.
 
 The preferred `4_1` constructor uses Rudolph's explicit semiholomorphic figure-eight polynomial
 
@@ -78,9 +75,9 @@ v=\frac{r^2-1+2iz}{1+r^2},\qquad r^2=x^2+y^2+z^2,
 $$
 
 
-so \(|u|^2+|v|^2=1\). Generic braid-generated fields may apply a fixed unitary rotation of the \(S^3\) coordinates to move the link away from the omitted stereographic projection point. This is an ambient diffeomorphism of \(S^3\), not a change of link type.
+so \(|u|^2+|v|^2=1\). Generic braid-generated fields may apply a fixed unitary rotation of the \(S^3\) coordinates to move the link away from the omitted stereographic projection point. This ambient diffeomorphism of \(S^3\) preserves the link type.
 
-A requested sublevel radius is rejected if it contains the projection pole, because that would become non-compact in the selected \(\mathbb R^3\) chart. The package also rejects a supposedly compact sublevel set if it touches the finite sampling-box boundary.
+A requested sublevel radius is rejected if it contains the projection pole, because that would become non-compact in the selected \(\mathbb R^3\) chart. With `require_compact=True`, boundary contact raises an error; enlarge the sampling span to contain the sublevel set.
 
 ## Handlebody and convergence checks
 
@@ -93,7 +90,7 @@ H_\epsilon=\{|F|\leq\epsilon\},\qquad
 $$
 
 
-For sufficiently small regular \(\epsilon\), this is a tubular neighborhood of the link. On a numerical grid, do not assume that automatically:
+For sufficiently small regular \(\epsilon\), this is a tubular neighborhood of the link. Check its sampled geometry with:
 
 ```python
 figure8 = KnotFunction.from_name("4_1")
@@ -152,11 +149,11 @@ result = scan.run()
 
 Before linear interpolation, the path RMS-normalizes both endpoint fields and aligns their global complex phase. Multiplying \(F\) by a nonzero scale or global phase does not change its zero set, but would otherwise change a naive interpolation.
 
-This gauge fixing **does not make the homotopy canonical**. Intermediate topology is a property of the chosen field representatives and deformation path, not an invariant determined solely by the endpoint knot types.
+The deformation is defined by the chosen field representatives and interpolation path, so its intermediate topology depends on those choices.
 
 ## Reusable Bloch phase-space calculation
 
-Generic \(S^3/\mathbb R^3\) fields are deliberately separate from periodic Bloch models. The earlier phase-space workflow is exposed through the nodal application layer:
+For periodic Bloch models, use the nodal application layer:
 
 ```python
 import numpy as np
@@ -177,4 +174,4 @@ scan = NodalPhaseScan(
 result = scan.run()
 ```
 
-`NodalBlochPath.at_components(...)` additionally supports independent \((\lambda_x,\lambda_y,\lambda_z)\) mixing, matching the component-wise deformation used in the earlier notebook. A generic analytic knot field is **not** advertised as a physical Brillouin-zone Hamiltonian without a separate periodic realization and validation.
+`NodalBlochPath.at_components(...)` additionally supports independent \((\lambda_x,\lambda_y,\lambda_z)\) mixing, matching the component-wise deformation used in the earlier notebook. Use a periodic Bloch model for Brillouin-zone calculations; the generic knot-field constructors describe fields on $S^3$ and $\mathbb R^3$.

@@ -11,8 +11,9 @@ Yamada's spatial-graph polynomial. Primary reference:
 S. Yamada, "An invariant of spatial graphs", J. Graph Theory 13 (1989),
 537-551. https://doi.org/10.1002/jgt.3190130503
 
-The integer-port representation and conservative bigon detector are
-KnottedGraph implementation choices; they are not copied from that paper.
+KnottedGraph implements the state construction with an integer-port
+representation and recognizes cancellable crossing pairs with a conservative
+bigon detector.
 """
 
 from __future__ import annotations
