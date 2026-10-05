@@ -8,7 +8,7 @@ checkout.
 
 | Directory | What it contains | First use |
 | --- | --- | --- |
-| [figures](figures/) | Accepted static material panels | Browse the saved figures |
+| [figures](figures/) | Saved static material panels | Browse the saved figures |
 | [html](html/) | Saved interactive phase maps and representative geometry | Download the region-geometry HTML and open in a browser; Plotly requires its declared CDN |
 | [data](data/) | CSV/JSON cell records and scan summaries | Inspect provenance and sampling parameters |
 | [scripts](scripts/) | Compatibility entries and specialized reproduction tools | Use explicit input/output paths from the [script map](../README.md) |

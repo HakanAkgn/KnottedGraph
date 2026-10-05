@@ -20,7 +20,7 @@
 | {doc}`protein_derived_spatial_graphs` | input user | you want to load a PDB/mmCIF backbone and prepare a spatial graph | guided backbone input; choose domain connections for interaction networks |
 | {doc}`yamada_formula_discovery` | researcher reproducing a result | you need the exact dataset/held-out symbolic checks | advanced publication reproduction |
 | {doc}`hamiltonian_yamada_phase_maps` | domain researcher | you need a two-parameter Hamiltonian topology scan | advanced, cached, compute-intensive |
-| {doc}`material_phase_maps` | reader of the new material plots | you want to inspect saved records, then try a coarse scan | base for saved records; optional and compute-intensive for new scans |
+| {doc}`material_phase_maps` | reader of the material phase maps | you want to inspect saved records, then try a coarse scan | base for saved records; optional and compute-intensive for new scans |
 
 For a first run, try the {doc}`../quickstart`. To inspect the published results,
 start with {doc}`../paper_results`, then open the corresponding application

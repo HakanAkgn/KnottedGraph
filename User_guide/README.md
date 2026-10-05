@@ -1,9 +1,10 @@
 # Start using KnottedGraph
 
 Begin with the [installation guide](../doc/installation.md) and
-[Quick Start](../doc/quickstart.md). The Quick Start uses the base installation
-to build a 3-D trefoil, inspect its three-crossing projection and compute its
-normalized Yamada polynomial.
+[Quick Start](../doc/quickstart.md). The Quick Start extracts an embedded graph
+from a tubular volume, encodes its projection as a PD code and computes its
+normalized Yamada polynomial. The coordinate-curve tutorial then follows a
+trefoil built directly from sampled points.
 
 | Your next step | Open | What to expect |
 | --- | --- | --- |
@@ -12,7 +13,7 @@ normalized Yamada polynomial.
 | Work with your own data | [Core workflows](02_core_workflows.ipynb) and [Input Handling](../doc/user_guide/input_adapters.md) | Supported input calls, graph checks and projection |
 | Understand advanced options | [Advanced and reproduction](03_advanced_and_reproduction.ipynb) | Optional workflows and reproduction settings |
 | Choose a scientific example | [Applications](applications/README.md) | Six application notebooks and material saved results |
-| Inspect paper figures and saved data | [Paper guide](../doc/paper_results.md) and [CSV inventory](benchmarks/results/README.md) | Existing results, no rerun needed |
+| Inspect paper figures and saved data | [Paper guide](../doc/paper_results.md) and [CSV inventory](benchmarks/results/README.md) | Figures, downloadable records and interpretation |
 | Run a small sanity check | [Commands and expected outcomes](../doc/sanity_checks.md) | Algebraic and public-API checks |
 | Check correctness evidence | [Yamada sanity checks](benchmarks/01_yamada_sanity_checks.ipynb) and [application regressions](benchmarks/02_application_regression_checks.ipynb) | Focused checks; publication benchmarks have separate resource needs |
 

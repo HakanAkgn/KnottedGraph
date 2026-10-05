@@ -12,7 +12,9 @@
   <img src="../site_figures/repulsive_curves.png" alt="Repulsive curves workflow for embedded spatial graphs">
 </div>
 
-## What is implemented now
+<a id="what-is-implemented-now"></a>
+
+## Load an ordered backbone
 
 The public input layer can extract an **ordered backbone trace** from a local
 PDB/mmCIF file or an RCSB identifier:

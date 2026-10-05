@@ -30,8 +30,8 @@ and vary an energy/gap threshold $E$.
 </div>
 
 <p><a href="../demos/new_phase_maps/materials/index.html">Open material and Hamiltonian regions</a>.</p>
-The saved material artifact also includes the earlier nodal transitions; select
-TiB2 or Co2MnGa to see the new material scans.
+The viewer includes nodal transitions and material scans. Select TiB2 or
+Co2MnGa to explore the material results.
 
 Choose a transition and classification mode, then click a region to see its
 representative surface and skeleton from a selected cell in that region.
@@ -146,7 +146,7 @@ the time and memory for larger scans from a coarse run.
 
 The supplied material records contain 14,634 directly classified, 31,184
 adaptive-fill and 202 resolution-calibration cells. A missing classification status is reported as **unrecorded**.
-The new guided scans classify every requested cell and disable adaptive filling,
+The guided scans classify every requested cell and disable adaptive filling,
 resolution calibration, smoothing, C6 display grouping and manual signature
 merges. They still use the upstream volume-resolution rule when extracting a
 material body; `removed_component_voxels` and `filled_void_voxels` describe that
@@ -157,7 +157,7 @@ the representative skeleton when interpreting classifications.
 
 The dataset guide records the reference assets from upstream `56bfbab` and
 the boundary-volume helpers from `643fef8`. Reusable compute engines live in
-`knotted_graph.applications.phase_map_examples`; the old script paths are
+`knotted_graph.applications.phase_map_examples`; the script paths are
 compatibility entry points. The research scripts provide publication layouts
 and bounded contraction processing; reusable scan and record-handling functions
 are documented in the application API.
@@ -174,8 +174,8 @@ For `--reuse-records` or `--extend-existing-records`, work on a copy of the
 records and matching summary in one output directory. Reuse rebuilds outputs
 and records the chosen processing in the summary; extension computes missing
 energy rows. The representative-geometry script follows the resolved dominant
-body and its outer/nested fillings. The old
-`--primary-component-min-fraction` selection option no longer applies.
+body and its outer/nested fillings. The CLI reports a migration error for
+`--primary-component-min-fraction`; use the resolved-body selection described above.
 
 `--profile paper` selects denser sampling defaults. Choose families and display
 processing explicitly using the options above. For the publication layout, use

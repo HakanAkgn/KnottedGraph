@@ -3,14 +3,15 @@
 ![pre-alpha](https://img.shields.io/badge/status-pre--alpha-red?style=flat-square)
 [![Docs](https://img.shields.io/badge/docs-online-blue)](https://hakanakgn.github.io/KnottedGraph/)
 
-**KnottedGraph studies the topology of curves and graphs embedded in three
-dimensions.** Build a graph from geometric data, inspect its projection and
-compute its Yamada polynomial. Applications include molecular backbones,
-mathematical knots, material surfaces and Hamiltonian models.
+**KnottedGraph studies three-dimensional geometry through embedded spatial
+graphs.** Extract a graph from a sampled volume, resolve its planar projection,
+and compute its PD code and Yamada polynomial. The library also works with
+coordinate curves, molecular backbones, material surfaces and Hamiltonian models.
 
-**[Website](https://hakanakgn.github.io/KnottedGraph/)** ·
-**[Paper figures and downloadable data](https://hakanakgn.github.io/KnottedGraph/paper_results.html)** ·
-**[Quick Start](#five-minute-quick-start)** · **[Install](#install-from-source)**
+- **[Online documentation](https://hakanakgn.github.io/KnottedGraph/)**: input guides, scientific examples and the API reference.
+- **[Paper figures and data](https://hakanakgn.github.io/KnottedGraph/paper_results.html)**: published figures with their supporting CSV and JSON downloads.
+- **[Quick Start](#five-minute-quick-start)**: follow a complete 3D input, graph and Yamada calculation.
+- **[Source installation](#install-from-source)**: set up the development API with uv.
 
 ## Please cite our work
 
@@ -68,58 +69,72 @@ covers pip installation and extras for interactive plots, surfaces and notebooks
 
 ## Five-minute Quick Start
 
-Start with a trefoil embedded in 3D. The example below turns its coordinates
-into a graph, finds the crossings in a fixed projection and evaluates the
-normalized Yamada polynomial.
+Start with a **3D tube volume**, extract its embedded spatial graph, then
+project the graph to obtain a **PD code and Yamada polynomial**. This example
+uses a trefoil with an extra connecting tube: the extracted graph has two
+three-way junctions and three edges.
 
-![A three-dimensional trefoil and its three-crossing planar projection](doc/assets/site_figures/quickstart-trefoil.png)
+![Surface of a tube volume, its extracted spatial graph and the corresponding planar diagram](doc/assets/site_figures/quickstart-volume.png)
+
+The diagram's arc numbers appear in the PD code below; red dots mark graph
+vertices, and gaps mark undercrossings. Computed from this volume:
+
+```text
+Graph: 2 nodes, 3 edges
+Projection crossings: 4
+PD code: V[7,5,0];V[4,6,10];X[2,9,1,8];X[9,0,10,1];X[8,3,7,2];X[6,4,5,3]
+Normalized Yamada: Y**12 - Y**8 - Y**6 - Y**4 - Y**3 - Y**2 - Y - 1
+```
+
+From the source checkout, install the volume-skeletonization dependency:
+
+```bash
+uv sync --extra knot-fields
+```
+
+Load the [sample volume](examples/data/quickstart-handlebody.npz) and run the
+complete extraction and analysis:
 
 ```python
 import numpy as np
 import sympy as sp
 
-from knotted_graph.inputs import from_coordinate_chain
+from knotted_graph.core import smooth_edges
+from knotted_graph.extraction import skeleton_image_to_graph, skeletonize_volume
 from knotted_graph.projection import compute_yamada_polynomial
 
-t = np.linspace(0, 2 * np.pi, 120, endpoint=False)
-points = np.column_stack([
-    (2 + np.cos(3 * t)) * np.cos(2 * t),
-    (2 + np.cos(3 * t)) * np.sin(2 * t),
-    np.sin(3 * t),
-])
-graph = from_coordinate_chain(points, closure="direct").graph
+with np.load("examples/data/quickstart-handlebody.npz") as sample:
+    volume = sample["volume"]
+skeleton = skeletonize_volume(volume)
+graph = skeleton_image_to_graph(skeleton, max_junction_degree=3)
+graph = smooth_edges(graph, epsilon=1.5)
 
 Y = sp.Symbol("Y")
 result = compute_yamada_polynomial(
     graph, Y, rotation_angles=(10, 20, 30),
     normalize=True, n_jobs=1, return_result=True,
 )
+print(f"Graph: {graph.number_of_nodes()} nodes, {graph.number_of_edges()} edges")
 print("Projection crossings:", result.projection.num_crossings)
+print("PD code:", result.projection.pd_code)
 print("Normalized Yamada:", result.polynomial)
 ```
 
-Expected output:
-
-```text
-Projection crossings: 3
-Normalized Yamada: -Y**11 + Y**9 + Y**8 + Y**7 - Y**4 - Y**3 - Y**2 - Y - 1
-```
-
-Run this example from the checkout with:
+Run the maintained script from the checkout with:
 
 ```bash
-uv run python examples/quickstart.py
+uv run --extra knot-fields python examples/volume_to_yamada.py
 ```
 
 The [online Quick Start](https://hakanakgn.github.io/KnottedGraph/quickstart.html)
-walks through the coordinates, over/under crossings and result, and shows how
-to open an interactive 3D view or start from your own data.
+explains the volume, skeletonization, graph extraction, diagram encoding and
+polynomial, with instructions for a rotatable 3D view and a coordinate-curve tutorial.
 
 ## Explore the paper and its data
 
 **[Open the online figure and data gallery](https://hakanakgn.github.io/KnottedGraph/paper_results.html)**
 to view the paper's figures and download their supporting records directly
-below each figure. No notebook execution is needed to browse the data.
+below each figure.
 
 | Explore | Direct entry point |
 | --- | --- |
@@ -128,7 +143,7 @@ below each figure. No notebook execution is needed to browse the data.
 | Runtime comparisons and 4,400 handlebody cases | [Benchmark CSVs and interpretation](https://hakanakgn.github.io/KnottedGraph/benchmarks.html) |
 | Small correctness checks with commands and expected results | [Sanity checks](https://hakanakgn.github.io/KnottedGraph/sanity_checks.html) |
 
-Check the saved records without rerunning a scientific calculation:
+Inspect the saved records locally:
 
 ```bash
 uv run --no-project python scripts/inspect_paper_data.py
@@ -161,7 +176,7 @@ Choose the row that matches the object you already have:
 
 | I have / I want | First entry point | Continue to |
 | --- | --- | --- |
-| No existing data; I want a five-minute test | [`examples/quickstart.py`](examples/quickstart.py) | [Quick Start](https://hakanakgn.github.io/KnottedGraph/quickstart.html) |
+| No existing data; I want a five-minute test | [`examples/volume_to_yamada.py`](examples/volume_to_yamada.py) | [Volume-to-graph Quick Start](https://hakanakgn.github.io/KnottedGraph/quickstart.html) |
 | Ordered coordinates or CSV/DAT/JSON/NPY/TSV/TXT/XYZ | `knotted_graph.inputs.from_coordinate_chain` | [Input handling](https://hakanakgn.github.io/KnottedGraph/user_guide/input_adapters.html) |
 | A PDB/mmCIF backbone | `from_pdb_backbone` / `from_mmcif_backbone` | [Input handling](https://hakanakgn.github.io/KnottedGraph/user_guide/input_adapters.html) |
 | A GRO snapshot or first LAMMPS frame | `from_gromacs_gro` / `from_lammps_dump` | [Input handling](https://hakanakgn.github.io/KnottedGraph/user_guide/input_adapters.html) |
@@ -182,7 +197,7 @@ starts with saved results and continues to small scan examples.
   <img src="doc/assets/site_figures/architecture.png" width="1000" alt="KnottedGraph architecture: Input Adapters, Skeletonization and Extraction, Embedded Graph Core, Projection and PD Encoding, and Yamada Evaluation">
 </p>
 
-*Current architecture from the Overleaf manuscript (Supplementary Figure 11).
+*KnottedGraph software architecture (Supplementary Figure 11).
 [Open the vector PDF](assets/paper/architecture.pdf).*
 
 The shared object is an embedded graph: nodes carry 3D positions and edges

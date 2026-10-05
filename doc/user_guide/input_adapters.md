@@ -127,7 +127,7 @@ is enabled. For reproducible offline work, keep a local file and record its
 provenance.
 
 When multiple chains match, choose `chain_id` explicitly. The mmCIF reader
-currently targets RCSB-style atom-site loops with one complete data row per
+reads RCSB-style atom-site loops with one complete data row per
 physical line. Convert other CIF layouts to that form before loading. PDB and
 mmCIF backbone extraction creates an ordered curve from the selected atoms.
 To study a protein interaction network, supply the desired graph connections

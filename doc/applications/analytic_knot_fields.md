@@ -174,4 +174,4 @@ scan = NodalPhaseScan(
 result = scan.run()
 ```
 
-`NodalBlochPath.at_components(...)` additionally supports independent \((\lambda_x,\lambda_y,\lambda_z)\) mixing, matching the component-wise deformation used in the earlier notebook. Use a periodic Bloch model for Brillouin-zone calculations; the generic knot-field constructors describe fields on $S^3$ and $\mathbb R^3$.
+`NodalBlochPath.at_components(...)` supports independent \((\lambda_x,\lambda_y,\lambda_z)\) mixing of the Bloch-vector components. Use a periodic Bloch model for Brillouin-zone calculations; the generic knot-field constructors describe fields on $S^3$ and $\mathbb R^3$.

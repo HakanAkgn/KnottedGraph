@@ -27,7 +27,7 @@ are imported explicitly from their application namespace.
 ## Skeleton Extraction Policy
 
 `knotted_graph.extraction.skeleton_image_to_graph` is the canonical
-skeleton-to-graph entry point and always uses the current sparse extractor.
+skeleton-to-graph entry point and uses the sparse extractor.
 Empty image margins are cropped before foreground indexing, 26-neighbour
 adjacency is generated deterministically, and returned coordinates remain in
 the original global voxel frame. Use Git history and the isolated
@@ -68,7 +68,7 @@ stages used in the paper figures: imported input, surface or mesh,
 skeleton image, raw spatial graph, simplified spatial graph, sampled
 projections, selected planar diagram, PD code, and invariant output.
 
-Current graph-to-Yamada workflows expose this pattern through
+Graph-to-Yamada workflows expose this pattern through
 `sample_projections`, `select_projection`, and
 `compute_yamada_polynomial(..., return_result=True)`. Future high-level
 pipeline helpers should preserve these lower-level APIs while collecting the

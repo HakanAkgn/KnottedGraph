@@ -68,6 +68,6 @@ and raw plots. To explore a new material scan, install `nodal` and `viz`, use
 to inspect the requested work.
 
 - Follow the {doc}`installation` guide to install the required extra.
-- Run the deterministic {doc}`quickstart` for a base-install smoke test.
+- Follow the [coordinate-curve example](quickstart.md#coordinate-curves-a-trefoil) for a base-install smoke test.
 - Use the {doc}`user_guide/index` to choose a tutorial.
 - Open the {doc}`api/index` after selecting the relevant public entry point.

@@ -9,7 +9,7 @@ the recorded research calculations and their processing metadata.
 The material CSV contains 46,020 rows: 14,634 directly classified records,
 31,184 adaptive fills and 202 resolution calibrations. TiB2 has 35 raw
 signatures and Co2MnGa has 53. The saved viewer contains 88 region entries
-across seven transitions, including five earlier nodal transitions. A region
+across seven transitions, including five nodal transitions. A region
 count is not a count of distinct polynomials.
 
 The `source`, status and processing metadata distinguish exact computations,
@@ -31,5 +31,4 @@ The [material walkthrough](../../../doc/applications/material_phase_maps.md)
 explains saved-data inspection, raw plotting, and optional new calculations.
 The [paper guide](../../../doc/paper_results.md) identifies which figures and
 records belong to the software paper and which illustrate the separate
-scientific application paper. Earlier integration notes and their historical
-validation reports remain available in Git history.
+scientific application paper.

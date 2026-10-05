@@ -1,7 +1,7 @@
 # KnottedGraph
 
 <div class="kg-hero">
-  <p class="kg-lead"><strong>KnottedGraph</strong> studies the topology of curves and graphs embedded in three dimensions. Build a graph from geometric data, inspect its projection and compute its Yamada polynomial. Try the small 3D example below or explore the paper's figures and saved data.</p>
+  <p class="kg-lead"><strong>KnottedGraph</strong> studies three-dimensional geometry through embedded spatial graphs. Extract a graph from a sampled volume, resolve its planar projection, and compute its PD code and Yamada polynomial. Explore the complete example below, application tutorials, or the paper's figures and saved data.</p>
   <div class="kg-link-row">
     <a href="paper_results.html">Paper Figures &amp; Data</a>
     <a href="benchmarks.html">Benchmarks</a>
@@ -18,13 +18,21 @@
 
 ## Start with a 3D example
 
-The {doc}`quickstart` follows a trefoil from coordinates to a three-crossing
-diagram and its exact Yamada polynomial. It runs with the base installation.
+The {doc}`quickstart` starts with a tube volume, extracts a graph with two
+vertices and three edges, and computes its planar diagram, PD code and exact
+Yamada polynomial. The first panel shows the volume's surface; the second
+shows the extracted graph; the third labels the arcs used in the PD code.
 
-```{figure} assets/site_figures/quickstart-trefoil.png
-:alt: A 3D trefoil and the three-crossing projection used to evaluate its Yamada polynomial
+```{figure} assets/site_figures/quickstart-volume.png
+:alt: Surface of a branched tube volume, its extracted spatial graph and its four-crossing planar diagram
+:target: _images/quickstart-volume.png
 
 {doc}`Open the step-by-step Quick Start <quickstart>`.
+```
+
+```text
+PD code: V[7,5,0];V[4,6,10];X[2,9,1,8];X[9,0,10,1];X[8,3,7,2];X[6,4,5,3]
+Normalized Yamada: Y**12 - Y**8 - Y**6 - Y**4 - Y**3 - Y**2 - Y - 1
 ```
 
 ## Read the paper, inspect the evidence
@@ -32,7 +40,7 @@ diagram and its exact Yamada polynomial. It runs with the base installation.
 The {doc}`paper_results` guide places the published figures beside their source
 data and notebooks. The {doc}`benchmarks` page explains the 500-crossing scaling
 measurements and 4,400-case construction benchmark, with direct CSV downloads.
-Figure 4 and Supplementary Figure 10 now also have downloadable coefficient
+Figure 4 and Supplementary Figure 10 have downloadable coefficient
 tables, exact matrices and a complete data/source archive beside their figures.
 Use {doc}`sanity_checks` for the small correctness checks and their expected
 outcomes. Please {doc}`cite the software and application papers <citing>` when
@@ -44,7 +52,7 @@ using this work.
 ## New here?
 
 1. Follow {doc}`installation` for the 0.2 development API.
-2. Run {doc}`quickstart` to build, project and analyse a small 3D curve.
+2. Run {doc}`quickstart` to extract, project and analyse a small 3D volume.
 3. Choose your real starting object from {doc}`feature_status`.
 4. Follow {doc}`user_guide/workflow_overview` to connect the steps for your data.
 

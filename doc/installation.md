@@ -44,7 +44,7 @@ Use `uv run` so commands execute inside the managed environment:
 uv run python examples/quickstart.py
 ```
 
-The Quick Start is the base-install smoke test. The complete test suite imports
+The coordinate-curve example is the base-install smoke test. The complete test suite imports
 optional workflows; install all extras before running it:
 
 ```bash

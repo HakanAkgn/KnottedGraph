@@ -24,11 +24,11 @@ uv run python -m knotted_graph.applications.phase_map_examples inspect \
 | `src/knotted_graph/applications/phase_map_examples/` (repository root) | installed application helpers and private compute engines | maintained Python implementation |
 | `dev/build_phase_map_demos.py` (repository root) | lossless, lazy-loading website packaging | no scan; generated assets ignored by Git |
 
-The material reference assets came from Hakan's `56bfbab` update, with the
-required boundary-topology implementation completed in `643fef8`. Recorded absolute paths
-inside original data/HTML record the producing machine. The commands below use
-repository-relative paths and explicit output locations. The separate timing source CSV and `assets/paper/Time_distributions.pdf`
-from `091bfc0` are also retained without alteration.
+The material reference assets originate from commit `56bfbab`; the
+boundary-topology helpers are from `643fef8`. The timing source CSV and
+`assets/paper/Time_distributions.pdf` are from `091bfc0`. Absolute paths inside
+the reference data and HTML identify the producing machine. The commands below
+use repository-relative paths and explicit output locations.
 
 ## Specialized reproduction commands
 
@@ -72,9 +72,10 @@ Use a working copy of the input to explore different settings.
 The material geometry script uses the dominant resolved volume body and its
 outer/nested boundary fillings from the boundary-topology implementation in
 `643fef8`. Select `--historical-display-processing` to use its reference display
-processing. This replaces the earlier `--primary-component-min-fraction`
-convention; the CLI reports a migration error for that earlier option. Keep the
-geometry and record classifications together with their version and settings.
+processing. The CLI reports a migration error for
+`--primary-component-min-fraction`; use the resolved-body selection described
+above. Keep the geometry and record classifications together with their version
+and settings.
 
 Use the guided CLI's `--dry-run` to inspect the scan settings and output paths
 before execution.

@@ -114,7 +114,7 @@ Record:
 - the exact expression before/after expansion or factorization; and
 - the package/backend version.
 
-The Quick Start uses `normalize=True` for the embedded trefoil, shifting its
+The Quick Start uses `normalize=True` for the extracted spatial graph, shifting its
 lowest exponent to zero. The companion CSV theta-graph example uses
 `normalize=False` to compare its Laurent expression with the crossing-free
 formula.
