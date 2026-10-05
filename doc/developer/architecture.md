@@ -34,10 +34,9 @@ the original global voxel frame. Use Git history and the isolated
 `02_application_regression_checks.ipynb` worktree comparison to inspect
 historical extraction behavior.
 
-By default, optimized extraction preserves the zero-radius historical topology.
-A caller that knows a genuine valence bound may pass `max_junction_degree` to
-enable persistence-based junction repair. Without a supplied valence bound,
-the extractor preserves generic higher-valence junctions.
+The extractor compares nearby junction-zone scales by default. Supply
+`max_junction_degree` when the scientific model provides a physical valence
+bound; `None` leaves valence unconstrained during scale selection.
 
 ## Yamada Evaluation Policy
 

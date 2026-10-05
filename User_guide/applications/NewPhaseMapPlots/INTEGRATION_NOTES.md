@@ -9,8 +9,9 @@ the recorded research calculations and their processing metadata.
 The material CSV contains 46,020 rows: 14,634 directly classified records,
 31,184 adaptive fills and 202 resolution calibrations. TiB2 has 35 raw
 signatures and Co2MnGa has 53. The saved viewer contains 88 region entries
-across seven transitions, including five nodal transitions. A region
-count is not a count of distinct polynomials.
+across seven transitions, including five nodal transitions. Viewer entries
+count displayed regions. Compare polynomial values and computation status in
+the raw cell records.
 
 The `source`, status and processing metadata distinguish exact computations,
 adaptive fills, resolution calibration, display merges and contraction groups.

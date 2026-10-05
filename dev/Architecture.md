@@ -2,7 +2,7 @@
 
 The tracked visual counterpart of this architecture is `assets/paper/architecture.svg`.
 This Markdown version is the code-navigation reference: the Mermaid flowchart and
-tables below map the conceptual blocks to the current package layout and contracts.
+tables below map the conceptual blocks to the package layout and contracts.
 
 ## Mermaid Flowchart
 
@@ -78,7 +78,7 @@ flowchart LR
 | Input Adapters | `src/knotted_graph/inputs/` | Converts coordinate chains, PDB/mmCIF backbones, polymers, spatial-graph CSV files, and surface meshes into core graph or mesh objects. |
 | NodalSkeleton Application | `src/knotted_graph/applications/nodal/skeleton.py::NodalSkeleton.__init__` | Domain-specific non-Hermitian physics workflow; accepts Hamiltonian/Bloch-vector data and produces sampled fields plus a core skeleton graph. Memory-efficient lazy-grid and streamed-spectrum behavior is implemented directly in `src/knotted_graph/applications/nodal/skeleton.py`. |
 | Skeleton Extractor | `NodalSkeleton.spectrum`, `NodalSkeleton._interior_mask`, `NodalSkeleton._skeleton_image`, `MaterialFermiSurface._skeleton_image` | Application workflows crop empty margins before Lee skeletonization and restore skeletons into the original voxel frame. |
-| Graph Building & Post Processing | `NodalSkeleton.skeleton_graph`, `MaterialFermiSurface.skeleton_graph`, `src/knotted_graph/extraction/`, `src/knotted_graph/core/embedding.py` | Every normal 3-D image uses the current cropped exact-order sparse extractor. The obsolete selectable skeleton backend has been removed; optional bounded-valence persistence repair is enabled only when a real `max_junction_degree` is supplied. Post-processing then performs leaf removal, edge simplification, RDP smoothing, and graph diagnostics as requested by each workflow. |
+| Graph Building & Post Processing | `NodalSkeleton.skeleton_graph`, `MaterialFermiSurface.skeleton_graph`, `src/knotted_graph/extraction/`, `src/knotted_graph/core/embedding.py` | Three-dimensional skeleton images use the cropped sparse extractor, which compares nearby junction-zone scales by default. `max_junction_degree` supplies a physical valence bound; `None` leaves valence unconstrained. Post-processing performs leaf removal, degree-two-chain simplification, RDP polyline simplification and graph diagnostics as requested by each workflow. |
 | Core Objects | `networkx.MultiGraph`, `src/knotted_graph/core/`, `src/knotted_graph/projection/geom.py` | Main generic objects include embedded spatial multigraphs with node `pos` and edge `pts`, abstract multigraph helpers, `PDCode`, `Vertex`, `Crossing`, and `Arc`. |
 | Repulsive Curves | `src/knotted_graph/layout/repulsive/` | Optional 3D curve-network relaxation that accepts and returns the core `networkx.MultiGraph(pos/pts)` contract before projection. |
 | Projections & PD Encoding | `src/knotted_graph/projection/pd_code.py::PDCode`, `src/knotted_graph/projection/rotations.py`, `src/knotted_graph/projection/pd_code.py::select_projection` | Rotates spatial graphs, projects them, detects crossings, creates arcs, and emits PD-code strings and structured objects. |

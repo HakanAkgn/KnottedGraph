@@ -7,7 +7,7 @@
   "files": [
     {
       "path": "User_guide/applications/results/figure4_suppfig10/REGENERATE_EXTRACTS.py",
-      "sha256": "9adfa7ff2855789dbf0cd7fe1c0f7ee76228a00f18749c7a9a418de0bb746af4"
+      "sha256": "c1721f9dbed2e6445059ca698fbadf6fbf32224a1609ca9394cd890783c0a64b"
     },
     {
       "path": "User_guide/applications/results/figure4_suppfig10/audit/discovery/certificate.json",
@@ -107,7 +107,7 @@
     },
     {
       "path": "doc/assets/data/figure4-suppfig10-source-data.zip",
-      "sha256": "3c8c4a083d752baf8a20df4bb026c7a1ff2b823acdc7a6e4122b639c4fb33f72"
+      "sha256": "e19e84ed1f3955842f101bd34f12e256175c07831050439411deb305c037d880"
     }
   ]
 }

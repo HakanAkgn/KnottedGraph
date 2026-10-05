@@ -1,4 +1,4 @@
-"""Runtime helpers without process-wide environment or import-path changes."""
+"""Package, dataset-path, and optional-dependency helpers for material scans."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def package_location() -> str:
-    """Record the installed package location, not a developer's checkout path."""
+    """Return the location of the active KnottedGraph package."""
     return str(Path(__file__).resolve().parents[2])
 
 

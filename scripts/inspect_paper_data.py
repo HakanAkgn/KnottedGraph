@@ -1,4 +1,4 @@
-"""Check and summarize committed paper records; never run a scientific calculation.
+"""Check file integrity and summarize committed paper records.
 
 Usage from a source checkout: uv run --no-project python scripts/inspect_paper_data.py
 Only the Python standard library is required. Exit 1 means a missing/changed
@@ -21,7 +21,7 @@ FIGURE_DATA = Path("User_guide/applications/results/figure4_suppfig10")
 
 
 def inspect_figure_data(root: Path) -> dict:
-    """Check supplied file integrity and CSV/JSON agreement without calculations."""
+    """Check supplied file integrity and agreement between saved CSV/JSON records."""
     directory = root / FIGURE_DATA
     manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
     failures = []
@@ -199,7 +199,7 @@ def inspect(root: Path) -> dict:
             "abstract_isomorphic": counts(preservation, "abstract_isomorphic"),
             "topoly_status": counts(plot, "topoly_status"),
         },
-        "scope": "Checks saved records and their integrity, not independent polynomial recomputation.",
+        "scope": "Checks saved-record integrity, case alignment, and CSV/JSON agreement.",
         "availability_notes": manifest["availability_notes"],
     }
 

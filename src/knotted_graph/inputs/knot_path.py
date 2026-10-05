@@ -22,9 +22,9 @@ class PathGauge:
 class KnotFunctionPath:
     r"""RMS-normalized, global-phase-aligned linear field homotopy.
 
-    Gauge fixing removes two elementary freedoms of a zero-set representative,
-    but does not make the path canonical. Intermediate topology remains a
-    property of the selected representatives and homotopy.
+    Gauge fixing normalizes the amplitudes and aligns the global phases of the
+    selected zero-set representatives. Intermediate topology depends on these
+    representatives and the chosen linear homotopy.
     """
 
     def __init__(

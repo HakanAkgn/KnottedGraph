@@ -1,8 +1,8 @@
 # Troubleshooting
 
-Start with the checks below before changing scientific parameters. They separate
-installation problems from invalid embedded geometry and genuinely expensive
-topology calculations.
+Use the checks below to diagnose installation problems, validate embedded
+geometry and inspect the computational cost of topology calculations before
+changing scientific parameters.
 
 ## Confirm the interpreter and package version
 

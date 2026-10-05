@@ -253,21 +253,21 @@ for performance. The verification cell below reports whether it is active.'''
 
     verify_md = '''## 1.2 Verify the installation
 
-Run this cell **before the tutorial**. It checks the active Python interpreter,
-where `knotted_graph` is imported from, core dependencies, and the compiled Yamada
-backend. An editable install may correctly report a Python file under `src/`; what
-matters is that the environment was installed with `pip -e` and the native extension
-is discoverable through that installation.
+Run the next cell to inspect the active Python interpreter, imported package,
+core dependencies and resolved-graph native kernel. An editable installation loads
+the Python modules from `src/` and the compiled extensions from the active environment.
 
-For a performance-ready source installation, the desired backend result is:
+The compiled graph-state kernel is reported as:
 
 ```text
 Native Yamada backend: True
 Native import error: None
 ```
 
-If the backend is `False`, Yamada results remain exact through the Python fallback,
-but larger calculations can be substantially slower.'''
+This field reports the optional resolved-graph kernel. When it is `False`, graph
+helpers use Python implementations. Production diagram evaluation requires the
+factorized native backend. If diagram evaluation reports an extension import
+error, rebuild the source checkout in the active environment.'''
 
     verify_code = '''from pathlib import Path
 import importlib.util
@@ -285,7 +285,7 @@ if native_available():
     import knotted_graph.invariants.yamada._yamada_native as _yamada_native
     print("Native extension:", Path(_yamada_native.__file__).resolve())
 else:
-    print("WARNING: exact Python Yamada fallback is active; high-crossing calculations may be slow.")'''
+    print("Native graph-state kernel: Python implementation. Production diagram evaluation requires the factorized native backend.")'''
 
     for c in nb["cells"]:
         if c.get("cell_type") == "markdown" and text(c).startswith("## 1.1 Install"):
@@ -411,7 +411,7 @@ def repair_regression(nb):
         if c.get("id") == "setup":
             s = text(c)
             if "Current notebook environment" not in s:
-                insert = '''\nimport knotted_graph\nfrom knotted_graph.invariants.yamada.native import native_available, native_import_error\nprint('Current notebook environment:', sys.executable)\nprint('Current KnottedGraph:', Path(knotted_graph.__file__).resolve())\nprint('Native Yamada backend:', native_available())\nprint('Native import error:', native_import_error())\nprint('NOTE: the historical regression subprocesses intentionally import each detached source worktree; this notebook is a correctness regression, not a performance benchmark.')\n'''
+                insert = '''\nimport knotted_graph\nfrom knotted_graph.invariants.yamada.native import native_available, native_import_error\nprint('Current notebook environment:', sys.executable)\nprint('Current KnottedGraph:', Path(knotted_graph.__file__).resolve())\nprint('Native Yamada backend:', native_available())\nprint('Native import error:', native_import_error())\nprint('Application correctness comparison: reference and current revisions run in separate detached worktrees.')\n'''
                 s = s.replace(
                     "DRIVER = ROOT / 'dev' / 'application_yamada_regression.py'\n",
                     "DRIVER = ROOT / 'dev' / 'application_yamada_regression.py'\n" + insert,
@@ -512,8 +512,8 @@ the stability of a phase boundary by comparing scans at finer resolutions.''',
 
 Each successful cell stores the sampled parameters, graph size, connected
 components, cycle rank, degree sequence, total edge-geometry samples, exact
-Yamada expression, and a stable phase signature. A failed extraction stores an
-error instead of silently becoming a zero invariant.
+Yamada expression, and a stable phase signature. A failed extraction retains its
+error status separately from the invariant results.
 
 `make_yamada_phase_map(...)` is the reusable application API. The longer code
 below adds the publication-specific extraction retries, cache layout,
@@ -785,7 +785,7 @@ $$
 $$
 
 Each part defines a graph family, constructs embedded graphs, evaluates exact
-Laurent polynomials, exports only the data needed for fitting or audit, freezes a
+Laurent polynomials, exports the fitting and verification data, freezes a
 candidate identity, and then runs separate held-out checks. Outputs are saved
 under `User_guide/applications/results/05_yamada_formula_discovery`.
 

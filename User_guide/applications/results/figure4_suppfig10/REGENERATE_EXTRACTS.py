@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Build compact browsing tables from the copied retrospective audit JSON.
+"""Build compact CSV browsing tables from saved retrospective audit JSON.
 
 Run from any directory with: python3 REGENERATE_EXTRACTS.py
-No Yamada calculations are performed here. The original JSON files remain the
-authoritative records for these retrospective audits.
+The original JSON files supply the source records for the exported tables.
 """
 from __future__ import annotations
 

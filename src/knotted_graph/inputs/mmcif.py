@@ -314,8 +314,7 @@ def from_mmcif_backbone(
     ``source`` may be a local ``.cif``/``.mmcif`` path or a four-character
     RCSB identifier. The parser reads the first ``_atom_site`` loop and expects
     each complete atom-site row on one physical line. When more than one chain
-    contains the requested atom, pass ``chain_id`` explicitly; the loader never
-    chooses a biological chain silently.
+    contains the requested atom, pass ``chain_id`` explicitly.
 
     The returned ``coords`` retain source order. Its ``graph`` follows the
     package's embedded ``MultiGraph(pos/pts)`` contract. Recoverable malformed

@@ -1,8 +1,8 @@
 # Figure 4 and Supplementary Figure 10 data
 
 Browse the exact coefficient records accompanying the paper's homogeneous,
-mixed-family and ordered-braid examples. This release organizes the data package
-provided on 29 September 2026; its recorded checks were run on 18 September 2026.
+mixed-family and ordered-braid examples. The data package was provided on
+29 September 2026; its recorded checks were run on 18 September 2026.
 
 **[Download the complete data and source ZIP](../../../../doc/assets/data/figure4-suppfig10-source-data.zip)**
 or [view the figures beside their downloads](https://hakanakgn.github.io/KnottedGraph/paper_results.html#figure-4-discovering-and-testing-family-laws).
@@ -43,8 +43,9 @@ uv run --no-project python scripts/inspect_paper_data.py
 ```
 
 This reads files, verifies the hashes in [manifest.json](manifest.json), and
-checks that the compact tables match the archived JSON records. It also reports
-the saved benchmark counts. It does not evaluate a new graph or polynomial.
+checks that the compact tables match the archived JSON records, then reports
+the saved benchmark counts. Use the linked notebooks for graph and polynomial
+calculations.
 
 The included [table exporter](REGENERATE_EXTRACTS.py) converts the JSON records
 back to the four CSV files and AAABA JSON. Run it on a copy if you want to
@@ -70,11 +71,10 @@ the ZIP to browse the source and saved records.
 
 | Record | Provenance and interpretation |
 | --- | --- |
-| Exact comparisons | Retrospective checks of the recorded cases. The certificates describe these finite comparisons; an all-family identity requires an analytical derivation. |
-| Historical notebook outputs | The original `05a_*`, `05b_*` and `05c_*` ledgers and an independent historical formula-freezing record are absent from this package. The compact tables use their own schemas; use the notebook's output schemas when regenerating its ledgers. |
-| AAABA | A worked example included in the Hankel input. It belongs to the construction data rather than an independent held-out set. |
-| Length-101 plan | Two completed comparisons from the 20-case plan: A⁵¹B⁵⁰ and (AB)⁵⁰A. The remaining 18 cases have no completed result in the supplied certificate. |
+| Exact comparisons | Finite-case coefficient checks recorded in the certificates. Establish all-family identities with an analytical derivation. |
+| Notebook-output inventory | The package provides compact CSV/JSON tables with separate schemas. Original `05a_*`, `05b_*` and `05c_*` ledgers and an independent historical formula-freezing record: not included. Use the notebook's schemas when generating its ledgers. |
+| AAABA | Validation role: Hankel construction example (in-sample). |
+| Length-101 plan | Completed results: A⁵¹B⁵⁰ and (AB)⁵⁰A, two of 20 planned cases. For the other 18 cases, the supplied certificate contains no completed result. |
 
-Detailed protocols and the original handoff notes are included in the ZIP.
-Browse these alongside the figures and coefficient records to follow the
-recorded comparisons.
+The ZIP includes comparison protocols and source files. Browse them alongside
+the figures and coefficient records to follow the recorded comparisons.

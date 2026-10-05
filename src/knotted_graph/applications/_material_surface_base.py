@@ -1,10 +1,6 @@
 """Hermitian multiband material-surface workflow.
 
-This module promotes the former ``NodalSkeletonMultiBand`` research helper into
-the public applications layer without changing the existing two-band
-``NodalSkeleton`` workflow.
-
-The numerical definition is intentionally preserved:
+The selected pairwise band-gap condition
 
     selected pairwise band gap <= gap_tol
 
@@ -43,7 +39,7 @@ def _is_hermitian_symbolic_or_numeric(
     *,
     atol: float = 1e-8,
 ) -> bool:
-    """Prove Hermiticity symbolically; never certify it from finitely many samples."""
+    """Check symbolic equality of the Hamiltonian and its Hermitian conjugate."""
 
     del span, atol
     diff = matrix - matrix.H
@@ -67,8 +63,8 @@ def _is_hermitian_symbolic_or_numeric(
 class MaterialFermiSurface(NodalSkeleton):
     """Analyze a Hermitian multiband material Hamiltonian.
 
-    This is the public applications-layer version of the former
-    ``NodalSkeletonMultiBand`` helper.
+    Sample the selected pairwise band gap, construct its thickened nodal region,
+    and extract the region's embedded skeleton graph.
 
     Parameters
     ----------
@@ -96,8 +92,8 @@ class MaterialFermiSurface(NodalSkeleton):
         ``"abs"``, ``"real"``, or ``"imag"`` for the selected pairwise gap.
         For the Hermitian workflow, ``"abs"`` is the normal choice.
     compute_berry
-        Preserved only as an explicit guard.  Berry curvature is not computed by
-        this Hermitian multiband class.
+        Compatibility argument; use ``False`` for this multiband gap workflow.
+        Use ``NodalSkeleton`` for the non-Hermitian Berry-curvature workflow.
     check_hermitian
         Whether to validate ``H(k)=H(k)†`` before sampling.  Keep this enabled
         for unknown Hamiltonians; disable it only for trusted Hermitian models
@@ -373,7 +369,7 @@ class MaterialFermiSurface(NodalSkeleton):
 
     @property
     def berry_curvature(self):
-        """Berry curvature is intentionally not defined in this workflow."""
+        """Direct Berry-curvature requests to the non-Hermitian NodalSkeleton workflow."""
         raise NotImplementedError(
             "MaterialFermiSurface is the Hermitian multiband gap-skeleton workflow. "
             "Use NodalSkeleton for the non-Hermitian Berry-curvature workflow."

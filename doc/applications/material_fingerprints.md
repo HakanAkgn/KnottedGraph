@@ -1,7 +1,7 @@
 # Material Fermi Surface Fingerprints
 
 <div class="kg-hero">
-  <p class="kg-lead">The physics applications notebook explains how material Fermi surfaces are converted into knotted spatial graphs and then summarized by Yamada-polynomial fingerprints. This page uses the feature image as the visual summary of the material-to-graph-to-invariant pipeline.</p>
+  <p class="kg-lead">Select a symbolic material Hamiltonian, sample its Fermi surface, extract a spatial graph and compute its Yamada-polynomial fingerprint. Follow the physics applications notebook for the models and calculations illustrated below.</p>
   <div class="kg-link-row">
     <a href="https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/applications/01_physics_applications.ipynb">Open 01_physics_applications.ipynb</a>
   </div>

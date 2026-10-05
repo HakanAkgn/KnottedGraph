@@ -1,6 +1,6 @@
 # KnottedGraph Collaborator Handoff
 
-This repository contains the current KnottedGraph library, the reorganized user-guide notebooks, and the Sphinx website source. Development branches should preserve the public interfaces and validate changes against the repository test and notebook workflows before integration.
+This repository contains the KnottedGraph library, user-guide notebooks and Sphinx website source. Validate development branches against the repository tests and notebook workflows, and preserve the documented public interfaces during integration.
 
 ## Where to Continue
 
@@ -24,7 +24,7 @@ This repository contains the current KnottedGraph library, the reorganized user-
 
 ## Generated Website Output
 
-`doc/_build/` and `site_preview/` are generated Sphinx build directories and are ignored by Git. This avoids committing duplicate HTML, static assets, and Sphinx caches. The reproducible website source is `doc/` together with the tracked figure assets under `doc/assets/`.
+`doc/_build/` and `site_preview/` contain generated Sphinx builds and are ignored by Git. The website source is `doc/`, with tracked figure assets under `doc/assets/`.
 
 ## Rebuild the Local Website Preview
 

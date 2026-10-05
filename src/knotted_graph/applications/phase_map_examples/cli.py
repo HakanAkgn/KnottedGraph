@@ -1,4 +1,4 @@
-"""Separate reading/plotting saved results from explicitly requested computation."""
+"""Inspect saved phase-map records, plot signatures, or run material scans."""
 
 from __future__ import annotations
 
@@ -24,17 +24,17 @@ def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description=__doc__)
     commands = result.add_subparsers(dest="command", required=True)
     inspect = commands.add_parser(
-        "inspect", help="summarize saved CSV/JSON; no extraction"
+        "inspect", help="summarize saved CSV/JSON records"
     )
     inspect.add_argument("records", type=Path)
-    plot = commands.add_parser("plot", help="plot raw saved signatures; no extraction")
+    plot = commands.add_parser("plot", help="plot raw saved signatures")
     plot.add_argument("records", type=Path)
     plot.add_argument("--family", help="family key printed by inspect")
     plot.add_argument(
         "--output", type=Path, required=True, help="filename prefix for PNG/PDF/JSON"
     )
     scan = commands.add_parser(
-        "scan", help="compute a new optional-dependency scan (use a compute node)"
+        "scan", help="compute a material phase map with optional dependencies"
     )
     scan.add_argument("kind", choices=FAMILIES)
     scan.add_argument(
@@ -66,7 +66,7 @@ def parser() -> argparse.ArgumentParser:
         "--output-dir",
         type=Path,
         required=True,
-        help="new/empty output directory; never the checked-in reference data",
+        help="new or empty output directory for generated results",
     )
     scan.add_argument(
         "--dry-run",

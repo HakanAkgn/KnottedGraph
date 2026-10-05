@@ -41,20 +41,20 @@ use the linked benchmark notebooks to evaluate graphs and polynomials.
   `PASS` and both execution statuses are `ok`.
 - `topoly_result` is the comparison outcome; `topoly_status` says whether the
   call completed, errored or was skipped. A row marked
-  `skipped_after_family_error` or `skipped_after_family_nonpass` has no new
-  Topoly timing. Its `ERROR` result label must not be counted as a new
-  execution failure or assigned a fabricated runtime.
+  `skipped_after_family_error` or `skipped_after_family_nonpass` records a
+  skipped call, with runtime unrecorded. Use `topoly_status` to count execution
+  outcomes, including rows whose comparison label is `ERROR`.
 - Handlebody: join by `case`, not row position. `input_topology_pass`,
   `primary_topology_pass`, `yamada_match` and `overall_pass` test different
   stages. `abstract_isomorphic` is a separate diagnostic: it is true in 456
   cases, while all 4,400 saved Yamada comparisons pass.
 - Timing-figure source: `topoly_status=ok` selects the 3,968 completed Topoly
   cases. The 411 timeouts and 21 errors remain recorded separately. The
-  completed-time distribution is censored by a 10-second limit; the marginal
-  distributions do not provide a paired speedup over all 4,400 cases.
+  completed-time distribution is censored by a 10-second limit. Calculate
+  per-case speedups from paired completed rows with matching polynomial results.
 - Environment: `git_commit`, `python_version`, `platform` and `processor` in
   the stage-timing table describe the original run. Empty metadata fields
-  mean the value was not recorded, not that all machines are equivalent.
+  indicate unrecorded values.
 
 ## Geometry and cached diagrams
 

@@ -27,9 +27,8 @@ BACKEND_PROVENANCE_PAIRS = (
     ("native_factorized_available", "factorized_import_error"),
 )
 
-# Notebook code must import the installed package. Prepending the raw source tree
-# bypasses editable-install import hooks and can hide the compiled _yamada_native
-# extension, producing misleading fallback/performance results.
+# Notebook code imports the installed package through its editable-install hooks
+# so compiled native extensions resolve alongside the Python modules.
 SOURCE_OVERRIDE_PATTERNS = (
     re.compile(r"sys\.path\.insert\([^\n]*src", re.IGNORECASE),
     re.compile(r"PYTHONPATH[^\n]*src", re.IGNORECASE),
@@ -108,9 +107,8 @@ def validate_notebook(path: Path) -> list[str]:
         except SyntaxError as exc:
             errors.append(f"cell {index}: Python syntax error: {exc}")
 
-        # Historical application regression intentionally injects each detached
-        # worktree's source path in a subprocess so two revisions can be compared.
-        # It is correctness-only, never a performance benchmark.
+        # Historical application regression compares detached worktree sources
+        # in subprocesses. Timing benchmarks use the installed package.
         historical_regression = path.name == "02_application_regression_checks.ipynb"
         if not historical_regression:
             for pattern in SOURCE_OVERRIDE_PATTERNS:

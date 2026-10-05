@@ -21,16 +21,15 @@ ROOT = Path(__file__).resolve().parents[1]
 # Content-addressed publication implementation objects. Directory
 # values are Git tree IDs; file values are Git blob IDs. They do not require the
 # commit from which they were recorded to remain in repository history.
-EDITORIAL_REFERENCE_REVISION = "9a0f379c38050e80e57967841904917da86c7528"
-# The 2026-10-05 prose refresh uses the published main above as its comparison
-# snapshot. Computation, notebook code/metadata, and saved data were checked
-# against that snapshot before these object IDs and fingerprints were refreshed.
+EDITORIAL_REFERENCE_REVISION = "315f4f8ef01b1926e75e5b7f980dd44eb28222f8"
+# Reference revision for verifying source and data integrity before updating
+# accepted object IDs and benchmark fingerprints.
 EXPECTED_GIT_OBJECTS = {
-    'CMakeLists.txt': 'dc23f7e8ef4456eb92229d9ee93f0c9fb83d546c',
+    'CMakeLists.txt': '693071b8ff906ac981fe4fd78428cb64643ce91c',
     'dev/final_performance_audit.py': 'd1d6d2568aa77c0b16ad9afc4872efe2daec6ada',
     'dev/final_performance_audit_medium.py': '227e88fbe16c05b7e7c09d1e09cb6fe9323c36c6',
-    'src/knotted_graph/extraction': '74661fcc38d0f9bb1e94a16f8543a91697638866',
-    'src/knotted_graph/invariants/yamada': '81da4a1d0bdae0388848f8e04a8c6a2687561c90',
+    'src/knotted_graph/extraction': '4d0f2009510a7ee4bcce73474572f567f00fe292',
+    'src/knotted_graph/invariants/yamada': '13b2d6afdbcc50ce0261b238e1c9def53d300d3f',
     'src/knotted_graph/projection': '3bb3df7404d62b0648ffb4b435a43b408dab6371',
 }
 
@@ -48,9 +47,9 @@ ALLOWED_BOOTSTRAP_CELLS = {
 
 EXPECTED_BENCHMARK_FINGERPRINTS = {
     'User_guide/benchmarks/01_yamada_sanity_checks.ipynb': 'fa593f21b9f3495f43ed49982543573a7f0fe336b9af597c102d5bf4d84db92e',
-    'User_guide/benchmarks/02_application_regression_checks.ipynb': 'e3b2c6e00b7bf70dee067c3576556da207d99189c7671df58439c06aa1313aee',
-    'User_guide/benchmarks/03_knottedgraph_vs_topoly_scaling.ipynb': '3a02b617e2d52ae77244926091d77693111b31126c7c3d3de56adfa344149354',
-    'User_guide/benchmarks/04_thick_handlebody_validation.ipynb': '23740782d8a0d687a110a21b82eafee0a1002f5888cba0e36a42bafa3f60cb98',
+    'User_guide/benchmarks/02_application_regression_checks.ipynb': 'f2126f895f743a00b85a43957507dbe66015564f58f73b6db89df0fec6a6d4ba',
+    'User_guide/benchmarks/03_knottedgraph_vs_topoly_scaling.ipynb': '65d42cedcf34b1b60dd4958bacdb0978764a893227bd04dbb1c3019254c71cb0',
+    'User_guide/benchmarks/04_thick_handlebody_validation.ipynb': '0f831a01687dd0a1ea3bbdcbf583797fe9e1c91c620d0c026020756d5a9a6cc7',
 }
 
 

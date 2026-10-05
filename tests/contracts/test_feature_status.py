@@ -121,8 +121,8 @@ EXPECTED_ROUTE_FIELDS = {
         "`KnotDeformationScanResult`",
     ),
     "Already skeletonized 3-D boolean image": (
-        "Public · optional",
-        "`nodal`",
+        "Public · base",
+        "none",
         "`knotted_graph.extraction.skeleton_image_to_graph`",
         "`networkx.MultiGraph`",
     ),
@@ -179,6 +179,7 @@ BASE_CALLS = [
     ("knotted_graph.invariants.yamada", "compute_graph_yamada_polynomial"),
     ("knotted_graph.applications.mathematical", "build_graph_case"),
     ("knotted_graph.layout.repulsive", "relax_spatial_graph"),
+    ("knotted_graph.extraction", "skeleton_image_to_graph"),
 ]
 OPTIONAL_CALLS = [
     (
@@ -192,7 +193,6 @@ OPTIONAL_CALLS = [
         ("skimage",),
     ),
     ("knotted_graph.inputs", "from_surface_mesh", ("pyvista",)),
-    ("knotted_graph.extraction", "skeleton_image_to_graph", ("poly2graph",)),
     (
         "knotted_graph.applications.nodal",
         "NodalSkeleton",

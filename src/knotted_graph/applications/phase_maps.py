@@ -1017,10 +1017,9 @@ def boundary_filling_groups(
 ) -> list[tuple[np.ndarray, list[np.ndarray]]]:
     """Return the outer and nested handlebody fillings of every component.
 
-    Each item is ``(outer_filling, inner_fillings)``. Skeletonizing these
-    fillings separately preserves every boundary component of a compression
-    body; skeletonizing the occupied shell itself cannot encode its ``b2``
-    cavity as a graph cycle.
+    Each item is ``(outer_filling, inner_fillings)``. Each boundary component of a compression body is represented
+    by a separate filling, and each filling is skeletonized independently.
+    Inner cavities contribute nested fillings.
     """
 
     mask = np.asarray(mask, dtype=bool)
@@ -1106,7 +1105,7 @@ def _compute_yamada(
     variable: sp.Symbol,
     yamada_options: dict[str, Any],
 ) -> sp.Expr:
-    """Compute the requested invariant without silently dropping embedding data."""
+    """Evaluate edge-bearing graphs through their spatial projection."""
     from knotted_graph.invariants.yamada import compute_graph_yamada_polynomial
 
     if graph.number_of_edges() == 0:

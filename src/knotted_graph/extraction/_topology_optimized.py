@@ -122,8 +122,8 @@ def _embedded_geometry_safe(graph: nx.MultiGraph) -> bool:
     node before returning to that node. Merely having a self-loop in the
     abstract MultiGraph is not enough: a two-endpoint loop whose endpoints snap
     to the same vertex is not an embedded edge and later normalization correctly
-    rejects it. Detecting that here lets the multi-scale selector try another
-    junction radius instead of returning a doomed candidate.
+    rejects it. Detecting this geometry lets the multi-scale selector try another
+    junction radius.
     """
     positions: dict[object, np.ndarray] = {}
     for node, data in graph.nodes(data=True):

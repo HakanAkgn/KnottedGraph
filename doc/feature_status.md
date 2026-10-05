@@ -1,7 +1,7 @@
 # Feature Status And Workflow Routes
 
 Use this reference to find the reader or workflow for your data, its required
-dependencies and the next processing step. The package is currently **pre-alpha**.
+dependencies and the next processing step. Package status: **pre-alpha**.
 
 Choose a starting point, then follow its application notebook or API page.
 The final column lists computational scaling and available runtime measurements.
@@ -33,7 +33,7 @@ Status legend:
 | Abstract undirected Graph/MultiGraph without crossing data | Public · base | none | `knotted_graph.invariants.yamada.compute_graph_yamada_polynomial` | `sympy.Expr` | Inspect or expand the Laurent polynomial. | Depends on graph topology and edge count. |
 | Named structured mathematical graph family | Application API · base | none | `knotted_graph.applications.mathematical.build_graph_case` | `(networkx.MultiGraph, dict)` | Use the graph for direct invariant evaluation; use the position dictionary only for display. | Depends on generated graph size. |
 | Deformation between two analytic knot fields | Application API · optional | `knot-fields` | `knotted_graph.applications.knot_deformation.KnotDeformationScan` | `KnotDeformationScanResult` | Inspect phase signatures, errors, and transition intervals across the sampled grid. | Number of lambda/radius cells multiplied by `dimension**3` field extraction and any requested invariant cost. |
-| Already skeletonized 3-D boolean image | Public · optional | `nodal` | `knotted_graph.extraction.skeleton_image_to_graph` | `networkx.MultiGraph` | Validate and simplify the graph before projection. | Depends on voxel count and skeleton topology. |
+| Already skeletonized 3-D boolean image | Public · base | none | `knotted_graph.extraction.skeleton_image_to_graph` | `networkx.MultiGraph` | Validate and simplify the graph before projection. | Depends on voxel count and skeleton topology. |
 | In-memory two-band non-Hermitian Hamiltonian or Bloch vector | Application API · optional | `nodal` | `knotted_graph.applications.nodal.NodalSkeleton` | `NodalSkeleton` | Inspect the sampled surface/mask, then call `.skeleton_graph()`. | Grid work grows with `dimension**3`. |
 | In-memory Hermitian multiband Hamiltonian | Application API · optional | `nodal` | `knotted_graph.applications.materials.MaterialFermiSurface` | `MaterialFermiSurface` | Inspect the gap surface, then call `.skeleton_graph()`. | Depends on grid size and band count. |
 | Knot-field or in-memory Hamiltonian Yamada phase map | Application API · optional | `knot-fields` for knot sources; `nodal` for Hamiltonian/material sources | `knotted_graph.applications.make_yamada_phase_map` | `YamadaPhaseMapResult` | Inspect cell errors, phase signatures, and transition intervals; recompute selected cells only when needed. | Number of phase-map cells multiplied by extraction and Yamada-evaluation cost. |

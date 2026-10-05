@@ -37,18 +37,18 @@ uv run python -m knotted_graph.applications.phase_map_examples plot \
 
 Success produces PNG, PDF and a JSON phase key. The JSON preserves full
 signatures, source labels and cell classification/calibration status. Category
-IDs are labels, not polynomial values. `source=yamada-set` can include outer
-and inner boundary results and structural fallbacks; inspect its contents.
+IDs label signature categories. The phase key provides recorded polynomial
+expressions and sources. `source=yamada-set` collects outer and inner boundary
+results, including any structural fallbacks.
 
-For new computation, install `uv sync --extra nodal --extra viz` on a compute
-node, then inspect the plan:
+Inspect the coarse computation plan:
 
 ```bash
 uv run --no-sync python -m knotted_graph.applications.phase_map_examples scan materials \
   --profile quick --output-dir _build/new_phase_maps/my_material_scan --dry-run
 ```
 
-Remove `--dry-run` on the compute node to execute. The default writes nine cells
+Run `uv sync --extra nodal --extra viz`, then remove `--dry-run` to execute. The default writes nine cells
 from a coarse scan plus summaries, plots and `run_plan.json` to a new or empty
 directory. Use this example to learn the workflow; assess resolution convergence
 with finer grids for your scientific study.

@@ -484,7 +484,7 @@ def smooth_edges(
     epsilon: float = 0.0,
     copy: bool = True,
 ) -> nx.MultiGraph:
-    """Simplify edge polylines without changing the embedded topology.
+    """Simplify edge polylines with RDP and strict 3-D geometry validation.
 
     The fast RDP proposal is accepted only when the resulting graph still
     satisfies the strict 3-D embedding check. If the shortcut would create a
@@ -823,9 +823,8 @@ def simplify_edges(G: nx.MultiGraph) -> nx.MultiGraph:
     """Simplify degree-2 chains without discarding embedded connectivity.
 
     Components containing cycles or junctions are represented by embedded
-    edges between their significant vertices. Acyclic components are returned
-    normalized but otherwise unchanged so that paths, trees, and per-edge
-    metadata cannot disappear implicitly. Use :func:`remove_leaf_nodes`
+    edges between their significant vertices. Acyclic components retain their normalized connectivity and per-edge
+    metadata. Use :func:`remove_leaf_nodes`
     explicitly when terminal branches should be removed.
     """
 

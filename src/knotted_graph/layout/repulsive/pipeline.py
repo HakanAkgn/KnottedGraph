@@ -240,11 +240,10 @@ def relax_spatial_graph(
         "relaxed": clearance_report(final_vertices, mapping.edge_vertex_indices, mapping.edge_order),
         "final": clearance_report(output_vertices, output_mapping.edge_vertex_indices, output_mapping.edge_order),
         "note": (
-            "This is a static clearance sanity report. The topology-preserving "
-            "certificate is the per-step swept topology check in the solver history; "
-            "Repulsor MaximumSafeStepSize is still used as the first step-size bound. "
-            "The decimator accepts only shortcuts whose swept triangle stays "
-            "clear of non-adjacent segments by a conservative distance threshold."
+            "The report records static clearance. Solver history stores per-step "
+            "swept topology checks, and Repulsor MaximumSafeStepSize supplies the "
+            "initial step-size bound. Decimation uses a conservative swept-triangle "
+            "clearance threshold against non-adjacent segments."
         ),
     }
     clearance_json.write_text(json.dumps(clearance, indent=2), encoding="utf-8")
@@ -513,11 +512,10 @@ def run_protein_example(
             else None
         ),
         "note": (
-            "This is a static clearance sanity report. The topology-preserving "
-            "certificate is the per-step swept topology check in the solver history; "
-            "Repulsor MaximumSafeStepSize is still used as the first step-size bound. "
-            "The decimator accepts only shortcuts whose swept triangle stays "
-            "clear of non-adjacent segments by a conservative distance threshold."
+            "The report records static clearance. Solver history stores per-step "
+            "swept topology checks, and Repulsor MaximumSafeStepSize supplies the "
+            "initial step-size bound. Decimation uses a conservative swept-triangle "
+            "clearance threshold against non-adjacent segments."
         ),
     }
     clearance_json.write_text(json.dumps(clearance, indent=2), encoding="utf-8")

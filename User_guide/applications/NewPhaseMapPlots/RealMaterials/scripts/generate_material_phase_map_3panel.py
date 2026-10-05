@@ -1,4 +1,4 @@
-"""Render the historical material panels from saved HTML; no scan is performed."""
+"""Render historical material panels from values saved in HTML."""
 
 import argparse
 import json

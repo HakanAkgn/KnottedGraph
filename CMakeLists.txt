@@ -14,10 +14,8 @@ if(CMAKE_CXX_COMPILER)
     pybind11_add_module(_yamada_factorized_frontier MODULE src/knotted_graph/invariants/yamada/_yamada_factorized_frontier.cpp)
     pybind11_add_module(_skeleton_native MODULE src/knotted_graph/extraction/_skeleton_native.cpp)
 
-    # _yamada_factorized_frontier is the sole production diagram evaluator.
-    # The raw frontier kernels are retained only as independent exact-reference
-    # implementations used by regression tests; they are never selected by the
-    # public production dispatch.
+    # Production diagram evaluation uses _yamada_factorized_frontier.
+    # The raw frontier kernels support independent exact-reference regression tests.
     foreach(target _yamada_native _yamada_frontier _yamada_frontier_dense _yamada_factorized_frontier _skeleton_native)
         target_compile_features(${target} PRIVATE cxx_std_17)
         if(MSVC)
@@ -38,5 +36,5 @@ if(CMAKE_CXX_COMPILER)
         RUNTIME DESTINATION knotted_graph/extraction
     )
 else()
-    message(WARNING "No C++ compiler found; building KnottedGraph with Python Yamada fallback only")
+    message(WARNING "C++ compiler not found. Building Python graph utilities; production Yamada diagram evaluation requires the native factorized extension built with a C++17 compiler.")
 endif()

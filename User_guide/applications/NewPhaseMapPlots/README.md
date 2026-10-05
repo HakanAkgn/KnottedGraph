@@ -1,8 +1,8 @@
 # Material phase-map examples
 
 **Start with the [guided walkthrough](../../../doc/applications/material_phase_maps.md).**
-It separates reading saved records, making a raw plot, a coarse new scan and
-publication reproduction. Run commands from the repository root after installing
+Follow saved-record inspection, raw plotting, a coarse scan and publication
+reproduction. Run commands from the repository root after installing
 the 0.2 development checkout with `uv`.
 
 For the data provenance and interpretation,
@@ -32,16 +32,16 @@ use repository-relative paths and explicit output locations.
 
 ## Specialized reproduction commands
 
-Reading the saved CSVs and viewers needs no computation server. New
-output belongs under `_build/new_phase_maps/` or an explicit scratch directory,
-not beside the reference records. The examples below do not overwrite accepted
-files. They require `uv sync --extra nodal --extra viz` except raw record reading.
+Read saved CSVs with the base installation and open viewers in a browser.
+Install `uv sync --extra nodal --extra viz` for the reproduction scripts below.
+Write generated files under `_build/new_phase_maps/` or a scratch directory to
+keep the reference records available for comparison.
 
 | Script under this folder | Purpose and key options |
 | --- | --- |
 | `RealMaterials/scripts/material_parameter_phase_maps.py` | detailed material scan; `--output-dir`, `--dimension`, `--lambda-count`, `--energy-count`, `--only`, `--workers` |
 | `RealMaterials/scripts/reproduce_multiband_material_surfaces.py` | original surface-gallery reproduction; `--output-dir`, `--only` |
-| `RealMaterials/scripts/generate_material_phase_map_3panel.py` | reproduce the two material panels from saved region HTML; `--html`, `--output-dir` (historical filename retained) |
+| `RealMaterials/scripts/generate_material_phase_map_3panel.py` | reproduce the two material panels from saved region HTML; `--html`, `--output-dir` |
 | `RealMaterials/scripts/integrate_material_maps_into_region_geometry.py` | replace selected material transitions while preserving other base-viewer transitions; `--input-html`, `--data-dir`, `--output`, mandatory `--historical-display-processing` acknowledgement |
 
 For example, render saved material panels without a dense scan:

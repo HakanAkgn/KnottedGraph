@@ -135,14 +135,14 @@ the time and memory for larger scans from a coarse run.
 | --- | --- |
 | `source=yamada` | a Yamada result for the extracted finite-grid graph; also inspect `classification_computed` |
 | `source=vertex` | the engine classified a vertex-only core; inspect components and boundary contact |
-| `source=large-core` | a structural signature because an exact attempt was outside the configured limit; not an exact polynomial |
+| `source=large-core` | a structural signature used when the graph exceeds the configured exact-evaluation limit |
 | `source=yamada-set` | an outer/inner boundary classification collection; inspect each entry because structural fallbacks may also occur |
-| `source=error`, or nonempty `error` | computation failed; this is not a zero invariant |
-| `classification_computed=False`, no calibration anchor | assigned by adaptive energy filling, not independently evaluated at that cell |
+| `source=error`, or nonempty `error` | computation error; the `error` field stores its diagnostic |
+| `classification_computed=False`, no calibration anchor | classification copied from an evaluated energy sample by adaptive filling |
 | nonempty `resolution_calibration_energy` | assigned using the recorded anchor energy under the upstream TiB2 resolution rule; separate from adaptive filling |
 | small-island smoothing or manual signature merges | historical display postprocessing; distinct raw results may share a displayed class |
 | TiB2 C6 display grouping | groups audited non-C6 representatives under the stated upstream rule; raw signatures remain available |
-| contraction mode | grouping under stated bounded contraction tests; not literal equality of classic Yamada polynomials |
+| contraction mode | groups representative graphs under the stated bounded contraction tests; different raw Yamada polynomials can share a class, and each polynomial is stored separately |
 
 The supplied material records contain 14,634 directly classified, 31,184
 adaptive-fill and 202 resolution-calibration cells. A missing classification status is reported as **unrecorded**.

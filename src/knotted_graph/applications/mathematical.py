@@ -679,8 +679,8 @@ def plot_structured_multigraph(
 ):
     """Draw a small planar multigraph with visible loops and parallel edges.
 
-    The helper is meant for mathematical Yamada examples, where users need to
-    see loops and edge multiplicities rather than a generic spring-layout graph.
+    The helper displays loops and edge multiplicities clearly in mathematical
+    Yamada examples.
     It returns the Matplotlib axis so callers can arrange examples in grids.
     """
 

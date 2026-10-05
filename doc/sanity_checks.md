@@ -51,9 +51,9 @@ Each family contributes five spatial embeddings of the same abstract graph.
 
 | Check | Entry point | Coverage |
 | --- | --- | --- |
-| Five-minute installation check | `uv run python examples/quickstart.py` | 3D trefoil input, three-crossing projection and expected normalized Yamada polynomial |
+| Coordinate-input installation check | `uv run python examples/quickstart.py` | 3D trefoil input, three-crossing projection and expected normalized Yamada polynomial |
 | Small CSV input check | `uv run python examples/input_to_yamada.py` | Planar theta graph loaded from node/edge files agrees with its explicit crossing-free formula |
-| Saved paper-data integrity | `uv run --no-project python scripts/inspect_paper_data.py` | File hashes, CSV columns, case alignment and saved statuses; no scientific calculation |
+| Saved paper-data integrity | `uv run --no-project python scripts/inspect_paper_data.py` | Checks saved file hashes, CSV columns, case alignment and statuses |
 | Application regressions | [Notebook 02](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/benchmarks/02_application_regression_checks.ipynb) | Current vs historical application outputs; requires the reference Git revision and application dependencies |
 | Published structured families | [Notebook 03](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/benchmarks/03_knottedgraph_vs_topoly_scaling.ipynb) | Published formulas and fixed-PD timing protocol; see {doc}`benchmarks` before executing |
 | Volume-to-graph recovery | [Notebook 04](https://github.com/HakanAkgn/KnottedGraph/blob/main/User_guide/benchmarks/04_thick_handlebody_validation.ipynb) | Topology/invariant preservation for certified sampled inputs; publication-scale workload |

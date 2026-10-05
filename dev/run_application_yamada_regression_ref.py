@@ -1,10 +1,8 @@
 """Run the application Yamada regression against one detached revision.
 
-This helper is intentionally limited to the historical application-output regression.
-It places the requested worktree's ``src`` directory first on ``sys.path`` so an
-editable install of another revision cannot leak into the comparison. A tiny API
-compatibility shim is installed only inside this subprocess so the current regression
-driver can execute against ``Latest_Workplace`` as well as the current optimized head.
+This helper compares historical application outputs in a subprocess. It places
+the selected worktree's ``src`` directory first on ``sys.path`` and applies a
+local API compatibility shim for ``Latest_Workplace`` and current revisions.
 """
 
 from __future__ import annotations

@@ -85,8 +85,7 @@ DEFAULT_MIN_STABLE_CELLS = 1
 DEFAULT_ISLAND_MERGE_STRATEGY = "below"
 
 PHASE_SIGNATURE_MERGES: dict[str, dict[str, str]] = {
-    # TiB2 deliberately has no manual signature merges: distinct
-    # boundary-resolved Yamada values remain distinct phases.
+    # Keep distinct TiB2 boundary-resolved Yamada values as separate phase labels.
     "tib2_d6_F": {},
     "co2mnga_t8": {
         "core:ic=1;h=40;b=1;nodes=68;edges=107;gcomp=1;beta=40;deg=((3, 67), (13, 1))": "core:ic=1;h=40;b=1;nodes=69;edges=108;gcomp=1;beta=40;deg=((3, 68), (12, 1))",
@@ -1489,7 +1488,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--apply-signature-merges",
         action="store_true",
-        help="Apply the historical display-only signature merges (not polynomial equality).",
+        help="Apply the saved display-group mappings to signature labels.",
     )
     parser.add_argument(
         "--apply-c6-review",
@@ -2088,12 +2087,13 @@ def stabilize_thin_tube_resolution_prefix(
     *,
     minimum_run: int = 3,
 ) -> list[PhaseCell]:
-    """Continue the dominant resolved low-E plateau through thinner voxel cuts.
+    """Assign low-energy TiB2 classifications from an anchor band.
 
-    TiB2 has no physical finite-thickness transition below 1 eV in the scanned
-    parameter interval, while at N=140 its thinnest tubes can temporarily lose
-    handles.  The modal Yamada signature in the resolved 0.5--1.0 eV band is
-    therefore the convergence value for the same column as E approaches zero.
+    Choose the modal signature among valid records in the configured 0.5--1.0 eV
+    band. For records up to the band's upper-energy bound with a different
+    signature, copy a representative anchor's classification while retaining
+    their energy and voxel-cleanup fields. Store the anchor energy in
+    ``resolution_calibration_energy``.
     """
     if len(records) < minimum_run:
         return records
@@ -2168,7 +2168,7 @@ def stabilize_thin_tube_resolution_prefix(
 
 
 def stabilize_tib2_records(records: list[PhaseCell]) -> list[PhaseCell]:
-    """Apply the thin-tube convergence rule independently to each F column."""
+    """Apply anchor-band classification assignments independently to each F column."""
     by_lambda: dict[float, list[PhaseCell]] = defaultdict(list)
     for record in records:
         by_lambda[round(float(record.lam), 12)].append(record)

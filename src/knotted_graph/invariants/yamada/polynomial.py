@@ -242,8 +242,8 @@ class Yamada:
     def iter_compact_states(self):
         """Iterate exact compact states for advanced diagnostics.
 
-        This inspectable compatibility interface deliberately exposes the same
-        compact states represented by the prepared diagram.
+        This compatibility interface exposes the compact states represented by
+        the prepared diagram.
         """
         yield from self._iter_compact_states()
 
