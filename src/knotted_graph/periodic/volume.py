@@ -185,7 +185,8 @@ def analyze_periodic_sublevel(energy: ArrayLike, level: float) -> PeriodicVolume
     A threshold equal to a vertex value can be singular and is rejected.
     """
     values = np.asarray(energy)
-    if np.iscomplexobj(values) or not np.isfinite(level) or not np.all(np.isfinite(values)):
+    if (np.iscomplexobj(values) or np.iscomplexobj(level) or not np.isfinite(level)
+        or not np.all(np.isfinite(values))):
         raise ValueError("energies and level must be finite real numbers")
     if np.any(values == level):
         raise ValueError("the level equals a vertex value")
