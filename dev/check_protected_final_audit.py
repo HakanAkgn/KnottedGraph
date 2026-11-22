@@ -25,7 +25,7 @@ EDITORIAL_REFERENCE_REVISION = "315f4f8ef01b1926e75e5b7f980dd44eb28222f8"
 # Reference revision for verifying source and data integrity before updating
 # accepted object IDs and benchmark fingerprints.
 EXPECTED_GIT_OBJECTS = {
-    'CMakeLists.txt': '693071b8ff906ac981fe4fd78428cb64643ce91c',
+    'CMakeLists.txt': '33beb96ea346712975066bbdb70568b8c1d4f2a8',
     'dev/final_performance_audit.py': 'd1d6d2568aa77c0b16ad9afc4872efe2daec6ada',
     'dev/final_performance_audit_medium.py': '227e88fbe16c05b7e7c09d1e09cb6fe9323c36c6',
     'src/knotted_graph/extraction': '4d0f2009510a7ee4bcce73474572f567f00fe292',
